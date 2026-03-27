@@ -29,8 +29,7 @@ export async function argocdFetch<T>(
   });
 
   if (response.status === 401 || response.status === 403) {
-    const returnUrl = encodeURIComponent(window.location.href);
-    window.location.href = `${baseUrl}/login?return_url=${returnUrl}`;
+    window.location.href = `${baseUrl}/auth/login`;
     throw new ApiError(response.status, "Unauthenticated");
   }
 
@@ -53,8 +52,7 @@ export async function argocdFetchStream(
   });
 
   if (response.status === 401 || response.status === 403) {
-    const returnUrl = encodeURIComponent(window.location.href);
-    window.location.href = `${baseUrl}/login?return_url=${returnUrl}`;
+    window.location.href = `${baseUrl}/auth/login`;
     throw new ApiError(response.status, "Unauthenticated");
   }
 
