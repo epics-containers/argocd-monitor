@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useSearchParams } from "react-router";
 import { RefreshCw } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -10,6 +12,11 @@ export function ApplicationsPage() {
   const project = import.meta.env.VITE_ARGOCD_PROJECT || undefined;
   const { data: applications, isLoading, error, dataUpdatedAt } = useApplications(project);
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    sessionStorage.setItem("tableFilters", searchParams.toString());
+  }, [searchParams]);
 
   if (isLoading) {
     return <LoadingSpinner message="Loading applications..." />;

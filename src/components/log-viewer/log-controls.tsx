@@ -19,6 +19,8 @@ interface LogControlsProps {
   onFollowChange: (follow: boolean) => void;
   sinceSeconds: number;
   onSinceSecondsChange: (seconds: number) => void;
+  tailLines: number;
+  onTailLinesChange: (lines: number) => void;
   isStreaming: boolean;
   onStop: () => void;
   onRestart: () => void;
@@ -32,6 +34,12 @@ const timeRanges = [
   { label: "All", value: 0 },
 ];
 
+const tailLineOptions = [
+  { label: "100 lines", value: 100 },
+  { label: "1000 lines", value: 1000 },
+  { label: "All lines", value: 0 },
+];
+
 export function LogControls({
   containers,
   selectedContainer,
@@ -42,6 +50,8 @@ export function LogControls({
   onFollowChange,
   sinceSeconds,
   onSinceSecondsChange,
+  tailLines,
+  onTailLinesChange,
   isStreaming,
   onStop,
   onRestart,
@@ -72,6 +82,22 @@ export function LogControls({
         </SelectTrigger>
         <SelectContent>
           {timeRanges.map((r) => (
+            <SelectItem key={r.value} value={String(r.value)}>
+              {r.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={String(tailLines)}
+        onValueChange={(v) => { if (v !== null) onTailLinesChange(Number(v)); }}
+      >
+        <SelectTrigger className="w-36">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {tailLineOptions.map((r) => (
             <SelectItem key={r.value} value={String(r.value)}>
               {r.label}
             </SelectItem>

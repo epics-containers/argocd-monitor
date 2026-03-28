@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useSearchParams, useNavigate, Link } from "react-router";
+import { useParams, useSearchParams, Link } from "react-router";
 import { ArrowLeft, RotateCcw, ScrollText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,8 +26,9 @@ export function ApplicationDetailPage() {
   const { data: tree, isLoading: treeLoading } = useResourceTree(name!, appNamespace);
   const restartMutation = useRestartPod();
 
-  const navigate = useNavigate();
   const [restartTarget, setRestartTarget] = useState<ResourceNode | null>(null);
+  const tableFilters = sessionStorage.getItem("tableFilters");
+  const backTo = tableFilters ? `/?${tableFilters}` : "/";
 
   if (appLoading || treeLoading) {
     return <LoadingSpinner message="Loading application..." />;
@@ -47,14 +48,13 @@ export function ApplicationDetailPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
+        <Link
+          to={backTo}
           className="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-sm font-medium hover:bg-muted"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
-        </button>
+        </Link>
       </div>
 
       <div className="space-y-2">

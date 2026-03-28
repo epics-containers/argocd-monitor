@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { Moon, Sun, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -10,10 +11,13 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
-        <div className="flex items-center gap-2">
+        <Link
+          to={`/${sessionStorage.getItem("tableFilters") ? `?${sessionStorage.getItem("tableFilters")}` : ""}`}
+          className="flex items-center gap-2 hover:opacity-80"
+        >
           <Activity className="h-5 w-5 text-primary" />
           <h1 className="text-lg font-semibold">IOC Monitor</h1>
-        </div>
+        </Link>
         <div className="flex items-center gap-3">
           {user?.username && (
             <span className="text-sm text-muted-foreground">

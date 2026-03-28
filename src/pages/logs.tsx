@@ -31,7 +31,8 @@ export function LogsPage() {
   const [container, setContainer] = useState("");
   const [previous, setPrevious] = useState(false);
   const [follow, setFollow] = useState(true);
-  const [sinceSeconds, setSinceSeconds] = useState(3600);
+  const [sinceSeconds, setSinceSeconds] = useState(0);
+  const [tailLines, setTailLines] = useState(100);
 
   const logParams = useMemo(
     () => ({
@@ -39,10 +40,11 @@ export function LogsPage() {
       namespace,
       container: container || undefined,
       sinceSeconds: sinceSeconds || undefined,
+      tailLines: tailLines || undefined,
       follow,
       previous,
     }),
-    [podName, namespace, container, sinceSeconds, follow, previous],
+    [podName, namespace, container, sinceSeconds, tailLines, follow, previous],
   );
 
   const { lines, isStreaming, error, stop, restart } = useLogs({
@@ -79,6 +81,8 @@ export function LogsPage() {
         onFollowChange={setFollow}
         sinceSeconds={sinceSeconds}
         onSinceSecondsChange={setSinceSeconds}
+        tailLines={tailLines}
+        onTailLinesChange={setTailLines}
         isStreaming={isStreaming}
         onStop={stop}
         onRestart={restart}
