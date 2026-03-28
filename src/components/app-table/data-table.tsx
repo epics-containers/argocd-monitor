@@ -100,7 +100,7 @@ export function DataTable<TData, TValue>({
         {namespaces.length > 1 && (
           <Select
             value={namespaceFilter}
-            onValueChange={(value) => updateParams({ ns: value })}
+            onValueChange={(value) => updateParams({ ns: value ?? "" })}
           >
             <SelectTrigger size="default">
               <SelectValue placeholder="All namespaces" />
