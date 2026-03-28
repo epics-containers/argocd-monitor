@@ -32,6 +32,8 @@ jobs:
           context: .
           load: true
           tags: tag_for_testing
+          build-args: |
+            VITE_APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || 'dev' }}
 
       - name: Test container starts
         run: docker run --rm -d --name test_container tag_for_testing && sleep 2 && docker stop test_container
