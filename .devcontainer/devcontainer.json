@@ -1,10 +1,7 @@
 {
   "name": "ArgoCD IOC Monitor",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
-  "features": {
-    "ghcr.io/devcontainers/features/python:1": {
-      "version": "3.12"
-    }
+  "build": {
+    "dockerfile": "Dockerfile"
   },
   "forwardPorts": [
     5173
@@ -23,7 +20,7 @@
     "PATH": "/cache/venv-for${localWorkspaceFolder}/bin:${containerEnv:PATH}"
   },
   "remoteUser": "root",
-  "postCreateCommand": "npm install && pip install pre-commit -r docs/requirements.txt && pre-commit install --install-hooks",
+  "postCreateCommand": "npm install && uv venv --python 3.12 && uv pip install pre-commit sphinx-autobuild -r docs/requirements.txt && pre-commit install --install-hooks",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -36,6 +33,7 @@
       ]
     }
   },
+  "initializeCommand": "mkdir -p ${localEnv:HOME}/.claude",
   "mounts": [
     // Persist gh auth across container rebuilds with per-repo scoped PAT
     {
@@ -48,6 +46,12 @@
       "source": "devcontainer-shared-cache",
       "target": "/cache",
       "type": "volume"
+    },
+    // Mount Claude config from host
+    {
+      "source": "${localEnv:HOME}/.claude",
+      "target": "/root/.claude",
+      "type": "bind"
     }
   ],
   // Mount the parent as /workspaces so we can pip install peers as editable
