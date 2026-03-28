@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { saveTokens } from "@/lib/auth-token";
+import { getStoredToken, getStoredRefreshToken, saveTokens } from "@/lib/auth-token";
 
 interface TokenDialogProps {
   open: boolean;
@@ -17,8 +17,8 @@ interface TokenDialogProps {
 }
 
 export function TokenDialog({ open, onTokenSubmit }: TokenDialogProps) {
-  const [authToken, setAuthToken] = useState("");
-  const [refreshToken, setRefreshToken] = useState("");
+  const [authToken, setAuthToken] = useState(() => getStoredToken() ?? "");
+  const [refreshToken, setRefreshToken] = useState(() => getStoredRefreshToken() ?? "");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
