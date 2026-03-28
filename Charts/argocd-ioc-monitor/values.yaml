@@ -1,0 +1,29 @@
+image:
+  repository: ghcr.io/epics-containers/argocd-ioc-monitor
+  tag: ""
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+argocd:
+  # The ArgoCD instance URL to proxy API requests to
+  url: https://argocd.diamond.ac.uk
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  host: ""
+  tls: []
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
