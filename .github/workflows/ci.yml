@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+  pull_request:
+
+jobs:
+  lint:
+    uses: ./.github/workflows/_lint.yml
+
+  container:
+    needs: lint
+    if: always()
+    uses: ./.github/workflows/_container.yml
+    with:
+      publish: ${{ needs.lint.result == 'success' }}
+    permissions:
+      contents: read
+      packages: write
+
+  helm:
+    needs: lint
+    if: always()
+    uses: ./.github/workflows/_helm.yml
+    with:
+      publish: ${{ needs.lint.result == 'success' }}
+    permissions:
+      contents: read
+      packages: write
+
+  docs:
+    uses: ./.github/workflows/_docs.yml
+    permissions:
+      contents: write

@@ -1,0 +1,47 @@
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Avoid git conflicts when tag and branch pushed at same time
+        if: github.ref_type == 'tag'
+        run: sleep 60
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install doc dependencies
+        run: pip install -r docs/requirements.txt
+
+      - name: Build docs
+        run: sphinx-build --fresh-env --fail-on-warning docs build/html
+
+      - name: Remove environment.pickle
+        run: rm -f build/html/.doctrees/environment.pickle
+
+      - name: Sanitize ref name for docs version
+        run: echo "DOCS_VERSION=${GITHUB_REF_NAME//[^A-Za-z0-9._-]/_}" >> $GITHUB_ENV
+
+      - name: Move to versioned directory
+        run: mv build/html .github/pages/$DOCS_VERSION
+
+      - name: Write switcher.json
+        run: python .github/pages/make_switcher.py --add $DOCS_VERSION ${{ github.repository }} .github/pages/switcher.json
+
+      - name: Publish Docs to gh-pages
+        if: github.ref_type == 'tag' || github.ref_name == 'main'
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .github/pages
+          keep_files: true

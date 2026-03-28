@@ -2,6 +2,8 @@
 
 A React + TypeScript + Vite dashboard for monitoring ArgoCD application state.
 
+<!-- README only content -->
+
 ## Getting Started with Dev Containers
 
 The easiest way to run this project is using a [Dev Container](https://containers.dev/), which provides a fully configured development environment.

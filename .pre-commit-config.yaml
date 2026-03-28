@@ -1,0 +1,31 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-yaml
+        exclude: ^(helm|Charts)/.*/templates/
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+
+  - repo: local
+    hooks:
+      - id: eslint
+        name: lint with eslint
+        language: system
+        entry: npx eslint --fix
+        types_or: [javascript, jsx, ts, tsx]
+        require_serial: true
+
+      - id: tsc
+        name: type check with tsc
+        language: system
+        entry: npx tsc --noEmit
+        pass_filenames: false
+        types_or: [ts, tsx]
+        require_serial: true
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks

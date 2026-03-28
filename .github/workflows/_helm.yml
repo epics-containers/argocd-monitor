@@ -1,0 +1,31 @@
+on:
+  workflow_call:
+    inputs:
+      publish:
+        type: boolean
+        description: If true, pushes chart to OCI registry
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Log in to GitHub OCI Registry
+        if: github.event_name != 'pull_request'
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Lint chart
+        run: helm lint helm/argocd-ioc-monitor
+
+      - name: Package chart
+        run: helm package helm/argocd-ioc-monitor -d .helm-pkg
+
+      - name: Push chart to OCI registry
+        if: inputs.publish && github.ref_type == 'tag'
+        run: helm push .helm-pkg/*.tgz oci://ghcr.io/${{ github.repository_owner }}/charts
