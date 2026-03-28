@@ -9,7 +9,7 @@ import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { useApplications } from "@/hooks/use-applications";
 
 export function ApplicationsPage() {
-  const project = import.meta.env.VITE_ARGOCD_PROJECT || undefined;
+  const project = (import.meta.env.VITE_ARGOCD_PROJECT as string) || undefined;
   const { data: applications, isLoading, error, dataUpdatedAt } = useApplications(project);
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
@@ -46,7 +46,7 @@ export function ApplicationsPage() {
             variant="outline"
             size="sm"
             onClick={() =>
-              queryClient.invalidateQueries({ queryKey: ["applications"] })
+              void queryClient.invalidateQueries({ queryKey: ["applications"] })
             }
           >
             <RefreshCw className="mr-1 h-4 w-4" />

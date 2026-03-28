@@ -48,7 +48,7 @@ export function DataTable<TData, TValue>({
   const namespaces = useMemo(() => {
     const col = columns.find((c) => "id" in c && c.id === namespaceColumnId);
     if (!col || !("accessorFn" in col) || !col.accessorFn) return [];
-    const values = new Set(data.map((row) => String(col.accessorFn!(row, 0))));
+    const values = new Set(data.map((row) => String(col.accessorFn(row, 0))));
     return [...values].sort();
   }, [data, columns, namespaceColumnId]);
 
@@ -79,7 +79,7 @@ export function DataTable<TData, TValue>({
       globalFilter,
     },
     onSortingChange: setSorting,
-    onGlobalFilterChange: (value) => updateParams({ q: value }),
+    onGlobalFilterChange: (value: string) => updateParams({ q: value }),
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),

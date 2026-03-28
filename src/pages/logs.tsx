@@ -85,7 +85,7 @@ export function LogsPage() {
         onTailLinesChange={setTailLines}
         isStreaming={isStreaming}
         onStop={stop}
-        onRestart={restart}
+        onRestart={() => void restart()}
       />
 
       {error && (

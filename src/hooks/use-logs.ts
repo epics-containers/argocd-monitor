@@ -60,7 +60,7 @@ export function useLogs({ appName, params, enabled = true, appNamespace }: UseLo
   // Start on mount, restart when params change
   useEffect(() => {
     if (enabled) {
-      start();
+      void start();
     }
     return stop;
     // eslint-disable-next-line react-hooks/exhaustive-deps

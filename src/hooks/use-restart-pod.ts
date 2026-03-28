@@ -15,13 +15,13 @@ export function useRestartPod() {
     mutationFn: ({ appName, podName, namespace, appNamespace }: RestartParams) =>
       deletePod(appName, podName, namespace, appNamespace),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: ["resourceTree", variables.appName],
       });
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: ["application", variables.appName],
       });
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: ["applications"],
       });
     },

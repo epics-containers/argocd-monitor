@@ -21,7 +21,7 @@ export class ApiError extends Error {
 }
 
 function getBaseUrl(): string {
-  return import.meta.env.VITE_ARGOCD_BASE_URL || "";
+  return (import.meta.env.VITE_ARGOCD_BASE_URL as string) || "";
 }
 
 /** Singleton refresh promise so concurrent 401s don't race. */

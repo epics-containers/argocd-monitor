@@ -1,5 +1,5 @@
 {
-  "name": "ArgoCD IOC Monitor",
+  "name": "ArgoCD Monitor",
   "build": {
     "dockerfile": "Dockerfile"
   },
@@ -9,6 +9,9 @@
   "remoteEnv": {
     // Disable SSH agent forwarding to prevent prompt injection from using SSH keys
     "SSH_AUTH_SOCK": "",
+    // Prevent Git from reading system config or prompting for credentials
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_TERMINAL_PROMPT": "0",
     // Put things that allow it in the persistent cache
     "PRE_COMMIT_HOME": "/cache/pre-commit",
     "UV_CACHE_DIR": "/cache/uv",
@@ -23,6 +26,10 @@
   "postCreateCommand": ".devcontainer/postCreate.sh",
   "customizations": {
     "vscode": {
+      "settings": {
+        "remote.containers.copyGitConfig": false,
+        "remote.containers.gitCredentialHelperConfigLocation": "none"
+      },
       "extensions": [
         "dbaeumer.vscode-eslint",
         "bradlc.vscode-tailwindcss",

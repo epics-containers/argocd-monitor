@@ -14,7 +14,7 @@ export function Header() {
 
   function handleLogout() {
     clearStoredToken();
-    queryClient.invalidateQueries({ queryKey: ["auth"] });
+    void queryClient.invalidateQueries({ queryKey: ["auth"] });
   }
 
   return (
@@ -24,7 +24,7 @@ export function Header() {
           type="button"
           onClick={() => {
             const filters = sessionStorage.getItem("tableFilters");
-            navigate(filters ? `/?${filters}` : "/");
+            void navigate(filters ? `/?${filters}` : "/");
           }}
           className="flex items-center gap-2 hover:opacity-80"
         >

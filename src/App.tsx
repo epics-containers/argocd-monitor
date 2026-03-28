@@ -25,7 +25,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     <>
       <TokenDialog
         open={!hasToken}
-        onTokenSubmit={() => queryClient.invalidateQueries()}
+        onTokenSubmit={() => void queryClient.invalidateQueries()}
       />
       {children}
     </>
