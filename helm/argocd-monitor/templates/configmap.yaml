@@ -6,23 +6,13 @@ metadata:
     {{- include "argocd-monitor.labels" . | nindent 4 }}
 data:
   default.conf: |
-    map $http_upgrade $connection_upgrade {
-        default upgrade;
-        ''      '';
-    }
-
     server {
         listen 8080;
         root /usr/share/nginx/html;
         index index.html;
 
-        # Docker DNS + public fallback; variable proxy_pass defers resolution to
-        # request time so nginx starts even when the upstream is unreachable.
-        resolver 127.0.0.11 8.8.8.8 valid=30s;
-        set $argocd_upstream "{{ .Values.argocd.url }}";
-
         location /api/ {
-            proxy_pass $argocd_upstream;
+            proxy_pass {{ .Values.argocd.url }}/api/;
             proxy_ssl_verify off;
             proxy_ssl_server_name on;
             proxy_set_header Host {{ .Values.argocd.url | trimPrefix "https://" | trimPrefix "http://" }};
@@ -31,10 +21,9 @@ data:
             proxy_set_header Cookie $http_cookie;
             proxy_pass_header Set-Cookie;
 
-            # HTTP/1.1 for chunked streaming; upgrade only when client requests it
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Connection "";
 
             # Disable buffering and compression so chunked streams flush immediately
             proxy_buffering off;
@@ -43,7 +32,7 @@ data:
         }
 
         location /login {
-            proxy_pass $argocd_upstream;
+            proxy_pass {{ .Values.argocd.url }}/login;
             proxy_ssl_verify off;
             proxy_ssl_server_name on;
             proxy_set_header Host {{ .Values.argocd.url | trimPrefix "https://" | trimPrefix "http://" }};
@@ -52,7 +41,7 @@ data:
         }
 
         location /auth/ {
-            proxy_pass $argocd_upstream;
+            proxy_pass {{ .Values.argocd.url }}/auth/;
             proxy_ssl_verify off;
             proxy_ssl_server_name on;
             proxy_set_header Host {{ .Values.argocd.url | trimPrefix "https://" | trimPrefix "http://" }};
