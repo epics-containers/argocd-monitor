@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import {
   type ColumnDef,
@@ -18,25 +18,57 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  /** Column id to use for the namespace dropdown filter. */
+  namespaceColumnId?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  namespaceColumnId = "namespace",
 }: DataTableProps<TData, TValue>) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const globalFilter = searchParams.get("q") ?? "";
-  const setGlobalFilter = (value: string) => {
-    setSearchParams(value ? { q: value } : {}, { replace: true });
-  };
+  const namespaceFilter = searchParams.get("ns") ?? "";
+
+  const namespaces = useMemo(() => {
+    const col = columns.find((c) => "id" in c && c.id === namespaceColumnId);
+    if (!col || !("accessorFn" in col) || !col.accessorFn) return [];
+    const values = new Set(data.map((row) => String(col.accessorFn!(row, 0))));
+    return [...values].sort();
+  }, [data, columns, namespaceColumnId]);
+
+  const columnFilters = useMemo<ColumnFiltersState>(
+    () =>
+      namespaceFilter
+        ? [{ id: namespaceColumnId, value: namespaceFilter }]
+        : [],
+    [namespaceFilter, namespaceColumnId],
+  );
+
+  function updateParams(updates: Record<string, string>) {
+    const next: Record<string, string> = {};
+    if (updates.q ?? globalFilter) next.q = updates.q ?? globalFilter;
+    if (updates.ns ?? namespaceFilter) next.ns = updates.ns ?? namespaceFilter;
+    for (const k of Object.keys(next)) {
+      if (!next[k]) delete next[k];
+    }
+    setSearchParams(next, { replace: true });
+  }
 
   const table = useReactTable({
     data,
@@ -47,8 +79,7 @@ export function DataTable<TData, TValue>({
       globalFilter,
     },
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
+    onGlobalFilterChange: (value) => updateParams({ q: value }),
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -56,14 +87,34 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Search applications..."
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="pl-9"
-        />
+      <div className="flex items-center gap-3">
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search applications..."
+            value={globalFilter}
+            onChange={(e) => updateParams({ q: e.target.value })}
+            className="pl-9"
+          />
+        </div>
+        {namespaces.length > 1 && (
+          <Select
+            value={namespaceFilter}
+            onValueChange={(value) => updateParams({ ns: value })}
+          >
+            <SelectTrigger size="default">
+              <SelectValue placeholder="All namespaces" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All namespaces</SelectItem>
+              {namespaces.map((ns) => (
+                <SelectItem key={ns} value={ns}>
+                  {ns}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
       <div className="rounded-md border">
         <Table>

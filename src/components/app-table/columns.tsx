@@ -81,6 +81,8 @@ export const columns: ColumnDef<Application>[] = [
     cell: ({ getValue }) => (
       <span className="text-muted-foreground">{getValue() as string}</span>
     ),
+    filterFn: (row, id, value: string) =>
+      row.getValue<string>(id) === value,
   },
   {
     accessorFn: (row) =>
