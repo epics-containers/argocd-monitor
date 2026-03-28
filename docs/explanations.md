@@ -5,4 +5,5 @@
 
 explanations/architecture
 explanations/devcontainer-features
+explanations/oidc-auth-plan
 ```

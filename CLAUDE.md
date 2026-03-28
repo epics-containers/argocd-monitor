@@ -13,7 +13,9 @@ uv run tox -p        # Run all pre-commit checks in parallel
 uv run tox -e docs   # Build Sphinx documentation
 ```
 
-Pre-commit hooks run automatically on commit: ESLint with `--fix`, `tsc --noEmit`, gitleaks, YAML validation, and end-of-file fixing. **If you changed documentation, also run `uv run tox -e docs` to verify the Sphinx build.**
+Pre-commit hooks run automatically on commit: ESLint with `--fix`, `tsc --noEmit`, gitleaks, YAML validation, and end-of-file fixing.
+
+**IMPORTANT: If you changed or added any file under `docs/`, you MUST run `uv run tox -e docs` and confirm it succeeds BEFORE committing.** New pages must be added to the appropriate `toctree` in the parent index (e.g. `docs/explanations.md`) or the build will fail with a `toc.not_included` warning. CI treats Sphinx warnings as errors.
 
 ## Architecture
 
