@@ -39,7 +39,11 @@ export function getStoredRefreshToken(): string | null {
 }
 
 export function onAuthFailure(): void {
-  clearStoredToken();
+  // Only clear the auth token; preserve the refresh token so the user
+  // doesn't have to re-enter it in the login dialog.
+  localStorage.removeItem(TOKEN_KEY);
+  deleteCookie("argocd.token");
+  notifyTokenChange();
 }
 
 export function applyStoredTokens(): void {
