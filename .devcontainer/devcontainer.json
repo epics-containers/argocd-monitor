@@ -20,7 +20,7 @@
     "PATH": "/cache/venv-for${localWorkspaceFolder}/bin:${containerEnv:PATH}"
   },
   "remoteUser": "root",
-  "postCreateCommand": "npm install && uv venv --python 3.12 && uv pip install pre-commit sphinx-autobuild -r docs/requirements.txt && pre-commit install --install-hooks",
+  "postCreateCommand": ".devcontainer/postCreate.sh",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -33,7 +33,7 @@
       ]
     }
   },
-  "initializeCommand": "mkdir -p ${localEnv:HOME}/.claude",
+  "initializeCommand": "mkdir -p ${localEnv:HOME}/.claude ${localEnv:HOME}/.config/terminal-config",
   "mounts": [
     // Persist gh auth across container rebuilds with per-repo scoped PAT
     {
@@ -51,6 +51,12 @@
     {
       "source": "${localEnv:HOME}/.claude",
       "target": "/root/.claude",
+      "type": "bind"
+    },
+    // Mount in the user terminal config folder so it can be edited
+    {
+      "source": "${localEnv:HOME}/.config/terminal-config",
+      "target": "/user-terminal-config",
       "type": "bind"
     }
   ],

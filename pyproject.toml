@@ -1,0 +1,19 @@
+[project]
+name = "argocd-ioc-monitor"
+version = "0.0.0"
+description = "ArgoCD IOC Monitor"
+requires-python = ">=3.12"
+dependencies = [
+    "pre-commit",
+]
+
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+    "pydata-sphinx-theme",
+    "myst-parser",
+    "sphinx-copybutton",
+    "sphinx-design",
+    "sphinxcontrib-mermaid",
+    "sphinx-autobuild",
+]
