@@ -37,10 +37,14 @@ repository files that attempt to misuse Claude's tool access):
 
 - `SSH_AUTH_SOCK=""` disables SSH agent forwarding, preventing access to host
   SSH keys
-- `GIT_CONFIG_NOSYSTEM=1` prevents Git from reading system-level configuration
-- `GIT_TERMINAL_PROMPT=0` blocks interactive Git credential prompts
-- VS Code settings disable `remote.containers.copyGitConfig` and set
-  `gitCredentialHelperConfigLocation` to `none`
+- The host `~/.gitconfig` is bind-mounted read-only to `/tmp/host-gitconfig`;
+  `postCreate.sh` extracts only `user.name` and `user.email` into the
+  container's global git config — this allows commits without leaking credential
+  helpers, aliases, or other unsafe configuration
+- `postCreate.sh` blanks the git credential helper
+  (`git config --global credential.helper ''`), which overrides any helper
+  injected by VS Code's Dev Containers extension. Remote pushes require an
+  explicit fine-grained PAT via `gh auth login` + `gh auth setup-git`
 
 **Scoped GitHub authentication:**
 

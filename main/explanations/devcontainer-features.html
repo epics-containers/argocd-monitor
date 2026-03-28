@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Devcontainer Features &#8212; argocd-monitor 0.1.0-beta.3-16-g54d65ea documentation</title>
+    <title>Devcontainer Features &#8212; argocd-monitor 0.1.0-beta.3-18-g6d46f84 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=bcfa5273"></script>
+    <script src="../_static/documentation_options.js?v=199988d0"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -898,10 +898,14 @@ repository files that attempt to misuse Claude’s tool access):</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">SSH_AUTH_SOCK=&quot;&quot;</span></code> disables SSH agent forwarding, preventing access to host
 SSH keys</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">GIT_CONFIG_NOSYSTEM=1</span></code> prevents Git from reading system-level configuration</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">GIT_TERMINAL_PROMPT=0</span></code> blocks interactive Git credential prompts</p></li>
-<li><p>VS Code settings disable <code class="docutils literal notranslate"><span class="pre">remote.containers.copyGitConfig</span></code> and set
-<code class="docutils literal notranslate"><span class="pre">gitCredentialHelperConfigLocation</span></code> to <code class="docutils literal notranslate"><span class="pre">none</span></code></p></li>
+<li><p>The host <code class="docutils literal notranslate"><span class="pre">~/.gitconfig</span></code> is bind-mounted read-only to <code class="docutils literal notranslate"><span class="pre">/tmp/host-gitconfig</span></code>;
+<code class="docutils literal notranslate"><span class="pre">postCreate.sh</span></code> extracts only <code class="docutils literal notranslate"><span class="pre">user.name</span></code> and <code class="docutils literal notranslate"><span class="pre">user.email</span></code> into the
+container’s global git config — this allows commits without leaking credential
+helpers, aliases, or other unsafe configuration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">postCreate.sh</span></code> blanks the git credential helper
+(<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">config</span> <span class="pre">--global</span> <span class="pre">credential.helper</span> <span class="pre">''</span></code>), which overrides any helper
+injected by VS Code’s Dev Containers extension. Remote pushes require an
+explicit fine-grained PAT via <code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">auth</span> <span class="pre">login</span></code> + <code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">auth</span> <span class="pre">setup-git</span></code></p></li>
 </ul>
 <p><strong>Scoped GitHub authentication:</strong></p>
 <ul class="simple">
