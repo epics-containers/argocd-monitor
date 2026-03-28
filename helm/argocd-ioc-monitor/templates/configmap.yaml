@@ -14,7 +14,8 @@ data:
         location /api/ {
             proxy_pass {{ .Values.argocd.url }}/api/;
             proxy_ssl_verify off;
-            proxy_set_header Host $host;
+            proxy_ssl_server_name on;
+            proxy_set_header Host {{ .Values.argocd.url | trimPrefix "https://" | trimPrefix "http://" }};
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header Cookie $http_cookie;
@@ -31,7 +32,8 @@ data:
         location /login {
             proxy_pass {{ .Values.argocd.url }}/login;
             proxy_ssl_verify off;
-            proxy_set_header Host $host;
+            proxy_ssl_server_name on;
+            proxy_set_header Host {{ .Values.argocd.url | trimPrefix "https://" | trimPrefix "http://" }};
             proxy_set_header Cookie $http_cookie;
             proxy_pass_header Set-Cookie;
         }
@@ -39,7 +41,8 @@ data:
         location /auth/ {
             proxy_pass {{ .Values.argocd.url }}/auth/;
             proxy_ssl_verify off;
-            proxy_set_header Host $host;
+            proxy_ssl_server_name on;
+            proxy_set_header Host {{ .Values.argocd.url | trimPrefix "https://" | trimPrefix "http://" }};
             proxy_set_header Cookie $http_cookie;
             proxy_pass_header Set-Cookie;
         }
