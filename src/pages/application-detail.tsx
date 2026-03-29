@@ -16,19 +16,8 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { useApplication, useResourceTree } from "@/hooks/use-application";
 import { useRestartPod } from "@/hooks/use-restart-pod";
+import { formatAge } from "@/lib/format";
 import type { ResourceNode } from "@/types/resource";
-
-function formatAge(dateStr?: string): string {
-  if (!dateStr) return "-";
-  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (seconds < 60) return `${seconds}s`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
-  const days = Math.floor(hours / 24);
-  return `${days}d`;
-}
 
 export function ApplicationDetailPage() {
   const { name } = useParams<{ name: string }>();

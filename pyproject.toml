@@ -41,7 +41,7 @@ commands = [["pre-commit", "run", "--all-files", "--show-diff-on-failure"]]
 description = "Run JavaScript tests with vitest"
 skip_install = true
 allowlist_externals = ["npm"]
-commands = [["npm", "test"]]
+commands = [["npm", "run", "test:coverage"]]
 
 [tool.tox.env.docs]
 description = "Build Sphinx documentation"
