@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Explanations &#8212; argocd-monitor 0.3.0-1-g4dbb9aa documentation</title>
+    <title>Explanations &#8212; argocd-monitor 0.3.1-1-gf9304fc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=6ced66c9"></script>
+    <script src="_static/documentation_options.js?v=60ffae04"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Architecture" href="explanations/architecture.html" />
-    <link rel="prev" title="Configure ArgoCD Connection" href="how-to/configure-argocd.html" />
+    <link rel="prev" title="Helm Deployment" href="how-to/helm-deployment.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -364,8 +364,11 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="explanations/architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explanations/auth-flow.html">Authentication Flow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="explanations/devcontainer-features.html">Devcontainer Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="explanations/oidc-auth-plan.html">OIDC Authentication via Keycloak</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explanations/data-fetching.html">Data Fetching Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explanations/ci-cd-pipeline.html">CI/CD Pipeline</a></li>
 </ul>
 </div>
 </nav></div>
@@ -434,12 +437,19 @@
 <li class="toctree-l2"><a class="reference internal" href="explanations/architecture.html#deployment">Deployment</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="explanations/auth-flow.html">Authentication Flow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="explanations/auth-flow.html#token-lifecycle">Token lifecycle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/auth-flow.html#cookie-security-flags">Cookie security flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/auth-flow.html#handling-401s-the-singleton-refresh-promise">Handling 401s: the singleton refresh promise</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/auth-flow.html#asymmetric-token-clearing-on-failure">Asymmetric token clearing on failure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/auth-flow.html#the-authgate-pattern">The AuthGate pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/auth-flow.html#why-useauth-disables-refetchonwindowfocus">Why useAuth disables refetchOnWindowFocus</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="explanations/devcontainer-features.html">Devcontainer Features</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="explanations/devcontainer-features.html#base-image">Base Image</a></li>
 <li class="toctree-l2"><a class="reference internal" href="explanations/devcontainer-features.html#claude-code-integration">Claude Code Integration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="explanations/devcontainer-features.html#linting-and-type-checking">Linting and Type Checking</a></li>
-<li class="toctree-l2"><a class="reference internal" href="explanations/devcontainer-features.html#documentation">Documentation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="explanations/devcontainer-features.html#ci-cd-pipeline">CI/CD Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/devcontainer-features.html#linting-testing-and-ci-cd">Linting, Testing, and CI/CD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="explanations/devcontainer-features.html#persistent-caches">Persistent Caches</a></li>
 <li class="toctree-l2"><a class="reference internal" href="explanations/devcontainer-features.html#workspace-mounting">Workspace Mounting</a></li>
 </ul>
@@ -449,6 +459,26 @@
 <li class="toctree-l2"><a class="reference internal" href="explanations/oidc-auth-plan.html#keycloak-setup">Keycloak setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="explanations/oidc-auth-plan.html#frontend-changes">Frontend changes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="explanations/oidc-auth-plan.html#verifying-argocd-accepts-the-token">Verifying ArgoCD accepts the token</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="explanations/data-fetching.html">Data Fetching Patterns</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="explanations/data-fetching.html#query-key-hierarchy">Query key hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/data-fetching.html#polling-with-refetch-intervals">Polling with refetch intervals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/data-fetching.html#mutation-invalidation">Mutation invalidation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/data-fetching.html#streaming-logs-with-async-generators">Streaming logs with async generators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/data-fetching.html#cancellation-with-abortcontroller">Cancellation with AbortController</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/data-fetching.html#api-client-and-auth-retry">API client and auth retry</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="explanations/ci-cd-pipeline.html">CI/CD Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="explanations/ci-cd-pipeline.html#pipeline-overview">Pipeline overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/ci-cd-pipeline.html#lint-test-and-type-check">Lint, test, and type check</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/ci-cd-pipeline.html#container-image-build-and-publish">Container image build and publish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/ci-cd-pipeline.html#helm-chart-packaging-and-publish">Helm chart packaging and publish</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/ci-cd-pipeline.html#documentation-publishing">Documentation publishing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/ci-cd-pipeline.html#pre-commit-hooks">Pre-commit hooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/ci-cd-pipeline.html#local-quality-gate-just-check">Local quality gate: <code class="docutils literal notranslate"><span class="pre">just</span> <span class="pre">check</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="explanations/ci-cd-pipeline.html#the-release-process">The release process</a></li>
 </ul>
 </li>
 </ul>
@@ -466,12 +496,12 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="how-to/configure-argocd.html"
+       href="how-to/helm-deployment.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Configure ArgoCD Connection</p>
+        <p class="prev-next-title">Helm Deployment</p>
       </div>
     </a>
     <a class="right-next"

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Environment Variables &#8212; argocd-monitor 0.3.1-1-gf9304fc documentation</title>
+    <title>Authentication Flow &#8212; argocd-monitor 0.3.1-1-gf9304fc documentation</title>
   
   
   
@@ -46,7 +46,7 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/environment-variables';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/auth-flow';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/argocd-monitor/switcher.json';
@@ -56,7 +56,8 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Reference" href="../reference.html" />
+    <link rel="next" title="Devcontainer Features" href="devcontainer-features.html" />
+    <link rel="prev" title="Architecture" href="architecture.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -149,14 +150,14 @@
 </li>
 
 
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../explanations.html">
     Explanations
   </a>
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../reference.html">
     Reference
   </a>
@@ -285,14 +286,14 @@
 </li>
 
 
-<li class="nav-item ">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../explanations.html">
     Explanations
   </a>
 </li>
 
 
-<li class="nav-item current active">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../reference.html">
     Reference
   </a>
@@ -362,7 +363,12 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Authentication Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devcontainer-features.html">Devcontainer Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oidc-auth-plan.html">OIDC Authentication via Keycloak</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-fetching.html">Data Fetching Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci-cd-pipeline.html">CI/CD Pipeline</a></li>
 </ul>
 </div>
 </nav></div>
@@ -404,9 +410,9 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../reference.html" class="nav-link">Reference</a></li>
+    <li class="breadcrumb-item"><a href="../explanations.html" class="nav-link">Explanations</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Environment Variables</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Authentication Flow</span></li>
   </ul>
 </nav>
 </div>
@@ -423,121 +429,98 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="environment-variables">
-<h1>Environment Variables<a class="headerlink" href="#environment-variables" title="Link to this heading">#</a></h1>
-<section id="development-variables">
-<h2>Development Variables<a class="headerlink" href="#development-variables" title="Link to this heading">#</a></h2>
-<p>These are used by the Vite dev server (set in <code class="docutils literal notranslate"><span class="pre">.env</span></code>):</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Variable</p></th>
-<th class="head"><p>Description</p></th>
-<th class="head"><p>Default</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ARGOCD_AUTH_TOKEN</span></code></p></td>
-<td><p>ArgoCD auth token cookie value for dev proxy (dev only)</p></td>
-<td><p>(required for dev)</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">VITE_ARGOCD_PROJECT</span></code></p></td>
-<td><p>Filter to a specific ArgoCD project</p></td>
-<td><p>(none)</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">VITE_ARGOCD_HOST</span></code></p></td>
-<td><p>ArgoCD hostname shown in login instructions</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">argocd.diamond.ac.uk</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">VITE_ARGOCD_BASE_URL</span></code></p></td>
-<td><p>Base URL prefix for API requests</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> (same origin)</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">VITE_APP_VERSION</span></code></p></td>
-<td><p>Version shown in header (set by CI from git tag)</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">dev</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">VITE_REFRESH_INTERVAL</span></code></p></td>
-<td><p>Auto-refresh interval in milliseconds</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">30000</span></code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
+  <section id="authentication-flow">
+<h1>Authentication Flow<a class="headerlink" href="#authentication-flow" title="Link to this heading">#</a></h1>
+<p>This page explains how the app authenticates with ArgoCD, from initial
+token entry through to automatic refresh and failure recovery.</p>
+<section id="token-lifecycle">
+<h2>Token lifecycle<a class="headerlink" href="#token-lifecycle" title="Link to this heading">#</a></h2>
+<p>Authentication starts when a user runs <code class="docutils literal notranslate"><span class="pre">argocd</span> <span class="pre">login</span> <span class="pre">--sso</span></code> on their
+workstation to authenticate via Keycloak, then copies the resulting
+<code class="docutils literal notranslate"><span class="pre">auth-token</span></code> and (optionally) <code class="docutils literal notranslate"><span class="pre">refresh-token</span></code> from
+<code class="docutils literal notranslate"><span class="pre">~/.config/argocd/config</span></code> into the app’s login dialog.</p>
+<p>When the user submits tokens in the <code class="docutils literal notranslate"><span class="pre">TokenDialog</span></code>
+(<code class="docutils literal notranslate"><span class="pre">src/components/shared/token-dialog.tsx:23</span></code>), <code class="docutils literal notranslate"><span class="pre">saveTokens()</span></code> writes
+both values to localStorage <strong>and</strong> sets them as browser cookies
+(<code class="docutils literal notranslate"><span class="pre">src/lib/auth-token.ts:62</span></code>). This dual storage is intentional –
+localStorage is the durable source of truth, while cookies are needed
+because <code class="docutils literal notranslate"><span class="pre">fetch()</span></code> calls use <code class="docutils literal notranslate"><span class="pre">credentials:</span> <span class="pre">&quot;include&quot;</span></code> so the browser
+automatically attaches them to every API request
+(<code class="docutils literal notranslate"><span class="pre">src/api/argocd-client.ts:67</span></code>).</p>
+<p>On page load, <code class="docutils literal notranslate"><span class="pre">applyStoredTokens()</span></code> runs at module-import time
+(<code class="docutils literal notranslate"><span class="pre">src/api/argocd-client.ts:9</span></code>) to re-sync localStorage values back
+into cookies, since cookies may have expired or been cleared by the
+browser between sessions.</p>
 </section>
-<section id="helm-chart-values">
-<h2>Helm Chart Values<a class="headerlink" href="#helm-chart-values" title="Link to this heading">#</a></h2>
-<p>Key configuration values for production deployment:</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Value</p></th>
-<th class="head"><p>Description</p></th>
-<th class="head"><p>Default</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">argocd.url</span></code></p></td>
-<td><p>ArgoCD instance URL</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">https://argocd.diamond.ac.uk</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">image.repository</span></code></p></td>
-<td><p>Container image repository</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">ghcr.io/epics-containers/argocd-monitor</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">image.tag</span></code></p></td>
-<td><p>Container image tag</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">appVersion</span></code> from Chart.yaml</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">replicaCount</span></code></p></td>
-<td><p>Number of pod replicas</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">service.type</span></code></p></td>
-<td><p>Kubernetes service type</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">LoadBalancer</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">service.port</span></code></p></td>
-<td><p>Service port</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">80</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ingress.enabled</span></code></p></td>
-<td><p>Enable ingress</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ingress.className</span></code></p></td>
-<td><p>Ingress class name</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ingress.host</span></code></p></td>
-<td><p>Ingress hostname</p></td>
-<td><p>(none)</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ingress.annotations</span></code></p></td>
-<td><p>Ingress annotations</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">{}</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ingress.tls</span></code></p></td>
-<td><p>TLS configuration</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">[]</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">resources.limits.cpu</span></code></p></td>
-<td><p>CPU limit</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">100m</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resources.limits.memory</span></code></p></td>
-<td><p>Memory limit</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">128Mi</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">resources.requests.cpu</span></code></p></td>
-<td><p>CPU request</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">50m</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">resources.requests.memory</span></code></p></td>
-<td><p>Memory request</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">64Mi</span></code></p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<section id="cookie-security-flags">
+<h2>Cookie security flags<a class="headerlink" href="#cookie-security-flags" title="Link to this heading">#</a></h2>
+<p>Cookies are set with <code class="docutils literal notranslate"><span class="pre">SameSite=Strict</span></code> to prevent CSRF, and with
+<code class="docutils literal notranslate"><span class="pre">Secure</span></code> when the page is served over HTTPS
+(<code class="docutils literal notranslate"><span class="pre">src/lib/auth-token.ts:9-10</span></code>). The <code class="docutils literal notranslate"><span class="pre">Secure</span></code> flag is conditional
+because the app may run over plain HTTP during local development.</p>
+</section>
+<section id="handling-401s-the-singleton-refresh-promise">
+<h2>Handling 401s: the singleton refresh promise<a class="headerlink" href="#handling-401s-the-singleton-refresh-promise" title="Link to this heading">#</a></h2>
+<p>When any API call returns a 401, the client attempts to refresh the
+auth token before giving up. The key design challenge here is
+concurrency: if multiple API requests are in flight and they all
+receive 401s simultaneously, the app must not fire multiple refresh
+requests in parallel.</p>
+<p>The solution is a module-level singleton promise
+(<code class="docutils literal notranslate"><span class="pre">src/api/argocd-client.ts:28</span></code>). The first 401 that calls
+<code class="docutils literal notranslate"><span class="pre">tryRefreshToken()</span></code> creates the promise and stores it in
+<code class="docutils literal notranslate"><span class="pre">refreshPromise</span></code>. Any subsequent 401 that arrives while that refresh
+is still in progress receives the <strong>same</strong> promise, so all callers
+wait on a single network request. The <code class="docutils literal notranslate"><span class="pre">finally</span></code> block clears
+<code class="docutils literal notranslate"><span class="pre">refreshPromise</span></code> back to <code class="docutils literal notranslate"><span class="pre">null</span></code> once the attempt settles
+(<code class="docutils literal notranslate"><span class="pre">src/api/argocd-client.ts:52</span></code>), allowing future 401s to try again.</p>
+<p>If the refresh succeeds, <code class="docutils literal notranslate"><span class="pre">saveTokens()</span></code> writes the new auth token to
+both localStorage and cookies, and the original request is retried. If
+it fails, the flow falls through to <code class="docutils literal notranslate"><span class="pre">onAuthFailure()</span></code>.</p>
+</section>
+<section id="asymmetric-token-clearing-on-failure">
+<h2>Asymmetric token clearing on failure<a class="headerlink" href="#asymmetric-token-clearing-on-failure" title="Link to this heading">#</a></h2>
+<p>When authentication fails irrecoverably, <code class="docutils literal notranslate"><span class="pre">onAuthFailure()</span></code>
+(<code class="docutils literal notranslate"><span class="pre">src/lib/auth-token.ts:47</span></code>) clears only the auth token and its
+cookie. The refresh token is deliberately preserved. This means the
+<code class="docutils literal notranslate"><span class="pre">TokenDialog</span></code> will re-appear (because the auth token snapshot becomes
+falsy), but the refresh token field will still be pre-populated with
+the previously stored value. The user only needs to paste a new auth
+token rather than re-entering both.</p>
+<p>By contrast, <code class="docutils literal notranslate"><span class="pre">clearStoredToken()</span></code> (<code class="docutils literal notranslate"><span class="pre">src/lib/auth-token.ts:35</span></code>) removes
+<strong>both</strong> tokens and is used for explicit logout.</p>
+</section>
+<section id="the-authgate-pattern">
+<h2>The AuthGate pattern<a class="headerlink" href="#the-authgate-pattern" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">AuthGate</span></code> (<code class="docutils literal notranslate"><span class="pre">src/App.tsx:22</span></code>) is a thin wrapper around all routes that
+uses React’s <code class="docutils literal notranslate"><span class="pre">useSyncExternalStore</span></code> to subscribe to the token store.
+It reads <code class="docutils literal notranslate"><span class="pre">getTokenSnapshot()</span></code>, which returns a boolean indicating
+whether an auth token exists in localStorage.</p>
+<p>When the snapshot is <code class="docutils literal notranslate"><span class="pre">false</span></code>, the <code class="docutils literal notranslate"><span class="pre">TokenDialog</span></code> opens as a modal
+overlay. Crucially, the child routes are still rendered behind the
+dialog – <code class="docutils literal notranslate"><span class="pre">AuthGate</span></code> does not conditionally unmount them. This avoids
+losing React state if a token expires mid-session: the dialog appears,
+the user pastes a new token, and the app continues from where it left
+off.</p>
+<p>After a successful token submission, the <code class="docutils literal notranslate"><span class="pre">onTokenSubmit</span></code> callback
+invalidates all React Query caches
+(<code class="docutils literal notranslate"><span class="pre">src/App.tsx:29</span></code>), causing every active query to refetch with the new
+credentials.</p>
+</section>
+<section id="why-useauth-disables-refetchonwindowfocus">
+<h2>Why useAuth disables refetchOnWindowFocus<a class="headerlink" href="#why-useauth-disables-refetchonwindowfocus" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">useAuth</span></code> hook (<code class="docutils literal notranslate"><span class="pre">src/hooks/use-auth.ts:4</span></code>) queries the
+<code class="docutils literal notranslate"><span class="pre">/api/v1/session/userinfo</span></code> endpoint to check whether the current
+session is valid. It explicitly sets <code class="docutils literal notranslate"><span class="pre">refetchOnWindowFocus:</span> <span class="pre">false</span></code>,
+overriding the app-wide default of <code class="docutils literal notranslate"><span class="pre">true</span></code>
+(<code class="docutils literal notranslate"><span class="pre">src/App.tsx:17</span></code>).</p>
+<p>Without this override, every tab switch or window focus would fire a
+userinfo request. If the token has expired, that request returns a 401,
+which triggers <code class="docutils literal notranslate"><span class="pre">onAuthFailure()</span></code>, which clears the auth token and pops
+the login dialog – even though the user may simply be switching back
+to the app. Disabling focus-based refetch for this specific query
+prevents the dialog from appearing unexpectedly on every window focus
+event when the token is stale.</p>
 </section>
 </section>
 
@@ -552,13 +535,22 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../reference.html"
+       href="architecture.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Reference</p>
+        <p class="prev-next-title">Architecture</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="devcontainer-features.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Devcontainer Features</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
@@ -579,8 +571,12 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development-variables">Development Variables</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#helm-chart-values">Helm Chart Values</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#token-lifecycle">Token lifecycle</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cookie-security-flags">Cookie security flags</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-401s-the-singleton-refresh-promise">Handling 401s: the singleton refresh promise</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#asymmetric-token-clearing-on-failure">Asymmetric token clearing on failure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-authgate-pattern">The AuthGate pattern</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-useauth-disables-refetchonwindowfocus">Why useAuth disables refetchOnWindowFocus</a></li>
 </ul>
   </nav></div>
 
@@ -588,7 +584,7 @@
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/epics-containers/argocd-monitor/edit/main/docs/reference/environment-variables.md">
+    <a href="https://github.com/epics-containers/argocd-monitor/edit/main/docs/explanations/auth-flow.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -604,7 +600,7 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/reference/environment-variables.md.txt"
+      <li><a href="../_sources/explanations/auth-flow.md.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

@@ -19,7 +19,7 @@ graph LR
 
 - **Frontend**: React + TypeScript + Vite
 - **Styling**: Tailwind CSS
-- **UI Components**: base-ui + custom components
+- **UI Components**: base-ui headless components with Tailwind styling (shadcn pattern)
 - **Data Fetching**: TanStack React Query
 - **Routing**: React Router
 - **Production Server**: Nginx (reverse proxy + static files)

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Architecture &#8212; argocd-monitor 0.3.0-1-g4dbb9aa documentation</title>
+    <title>Architecture &#8212; argocd-monitor 0.3.1-1-gf9304fc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=6ced66c9"></script>
+    <script src="../_static/documentation_options.js?v=60ffae04"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -492,7 +492,7 @@ window.runMermaid = runMermaid;</script>
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Devcontainer Features" href="devcontainer-features.html" />
+    <link rel="next" title="Authentication Flow" href="auth-flow.html" />
     <link rel="prev" title="Explanations" href="../explanations.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -800,8 +800,11 @@ window.runMermaid = runMermaid;</script>
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auth-flow.html">Authentication Flow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="devcontainer-features.html">Devcontainer Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="oidc-auth-plan.html">OIDC Authentication via Keycloak</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-fetching.html">Data Fetching Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci-cd-pipeline.html">CI/CD Pipeline</a></li>
 </ul>
 </div>
 </nav></div>
@@ -882,7 +885,7 @@ applications.</p>
 <ul class="simple">
 <li><p><strong>Frontend</strong>: React + TypeScript + Vite</p></li>
 <li><p><strong>Styling</strong>: Tailwind CSS</p></li>
-<li><p><strong>UI Components</strong>: base-ui + custom components</p></li>
+<li><p><strong>UI Components</strong>: base-ui headless components with Tailwind styling (shadcn pattern)</p></li>
 <li><p><strong>Data Fetching</strong>: TanStack React Query</p></li>
 <li><p><strong>Routing</strong>: React Router</p></li>
 <li><p><strong>Production Server</strong>: Nginx (reverse proxy + static files)</p></li>
@@ -927,11 +930,11 @@ a ConfigMap so the ArgoCD target URL can be configured per environment.</p>
       </div>
     </a>
     <a class="right-next"
-       href="devcontainer-features.html"
+       href="auth-flow.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Devcontainer Features</p>
+        <p class="prev-next-title">Authentication Flow</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

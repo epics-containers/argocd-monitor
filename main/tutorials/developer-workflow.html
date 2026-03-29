@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Developer Workflow &#8212; argocd-monitor 0.3.0-1-g4dbb9aa documentation</title>
+    <title>Developer Workflow &#8212; argocd-monitor 0.3.1-1-gf9304fc documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=6ced66c9"></script>
+    <script src="../_static/documentation_options.js?v=60ffae04"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -447,6 +447,7 @@ errors, type errors, test failures, and broken documentation in one go.</p>
 just<span class="w"> </span><span class="nb">test</span><span class="w">          </span><span class="c1"># Run vitest with coverage report</span>
 just<span class="w"> </span>test-watch<span class="w">    </span><span class="c1"># Run vitest in watch mode (re-runs on file change)</span>
 just<span class="w"> </span>pre-commit<span class="w">    </span><span class="c1"># Run all pre-commit hooks on every file</span>
+just<span class="w"> </span>e2e<span class="w">           </span><span class="c1"># Run Playwright end-to-end smoke tests</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">just</span> <span class="pre">lint</span></code> runs ESLint with type-aware rules followed by a full TypeScript
@@ -474,7 +475,7 @@ just<span class="w"> </span>build<span class="w">         </span><span class="c1
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">just</span> <span class="pre">dev</span></code> starts the Vite dev server with hot module replacement and a
 proxy that forwards <code class="docutils literal notranslate"><span class="pre">/api/</span></code> and <code class="docutils literal notranslate"><span class="pre">/auth/</span></code> requests to ArgoCD. You need a
-valid <code class="docutils literal notranslate"><span class="pre">ARGOCD_AUTH_TOKEN</span></code> in your <code class="docutils literal notranslate"><span class="pre">.env</span></code> file (see <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a>).</p>
+valid <code class="docutils literal notranslate"><span class="pre">ARGOCD_AUTH_TOKEN</span></code> in your <code class="docutils literal notranslate"><span class="pre">.env</span></code> file (see <a class="reference internal" href="../how-to/configure-argocd.html"><span class="doc">Configure ArgoCD Connection</span></a>).</p>
 </section>
 </section>
 <section id="typical-workflow">
