@@ -37,10 +37,12 @@ jobs:
 
       - name: Test container starts and serves health check
         run: |
-          docker run --rm -d --name test_container -p 8080:8080 tag_for_testing
+          docker run -d --name test_container -p 8080:8080 tag_for_testing
           sleep 2
+          docker logs test_container
           curl -sf http://localhost:8080/healthz
           docker stop test_container
+          docker rm test_container
 
       - name: Create tags for publishing image
         id: meta
