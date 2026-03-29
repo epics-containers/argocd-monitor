@@ -67,12 +67,6 @@
       "target": "/user-terminal-config",
       "type": "bind"
     },
-    // Mount host gitconfig read-only so postCreate can extract safe keys (user.name/email)
-    {
-      "source": "${localEnv:HOME}/.gitconfig",
-      "target": "/tmp/host-gitconfig",
-      "type": "bind"
-    }
   ],
   // Mount the parent as /workspaces so we can pip install peers as editable
   "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind"

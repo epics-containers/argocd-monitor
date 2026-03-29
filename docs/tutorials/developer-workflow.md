@@ -24,6 +24,7 @@ just lint          # ESLint + TypeScript type check
 just test          # Run vitest with coverage report
 just test-watch    # Run vitest in watch mode (re-runs on file change)
 just pre-commit    # Run all pre-commit hooks on every file
+just e2e           # Run Playwright end-to-end smoke tests
 ```
 
 `just lint` runs ESLint with type-aware rules followed by a full TypeScript
@@ -55,7 +56,7 @@ just build         # Production build (type check + Vite build)
 
 `just dev` starts the Vite dev server with hot module replacement and a
 proxy that forwards `/api/` and `/auth/` requests to ArgoCD. You need a
-valid `ARGOCD_AUTH_TOKEN` in your `.env` file (see {doc}`installation`).
+valid `ARGOCD_AUTH_TOKEN` in your `.env` file (see {doc}`/how-to/configure-argocd`).
 
 ## Typical workflow
 

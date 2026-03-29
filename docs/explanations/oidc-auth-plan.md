@@ -1,5 +1,7 @@
 # OIDC Authentication via Keycloak
 
+**Status: Planned Feature** — This document outlines a proposed enhancement. Currently, the app uses manual token-paste authentication. This OIDC flow is not yet implemented.
+
 Replace the manual token-paste login with a standard OAuth2 Authorization Code
 flow so users authenticate via the same SSO they use for ArgoCD.
 
@@ -61,8 +63,11 @@ that:
 - The JWT signature is valid
 - The required claims/groups are present
 
-Check ArgoCD's `argocd-rbac-cm` ConfigMap to see which claims grant access
-(usually group membership via a `groups` scope/claim).
+Note: The token *scope* and *claims* may differ between clients (web SPA vs CLI).
+Ensure the web client is configured to request the same scopes and groups that
+ArgoCD expects (typically `groups` claim for RBAC). Check ArgoCD's
+`argocd-rbac-cm` ConfigMap to see which claims grant access (usually group
+membership via a `groups` scope/claim).
 
 ### What to remove
 
