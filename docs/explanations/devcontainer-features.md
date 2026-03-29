@@ -64,114 +64,24 @@ execution in ephemeral containers, see the
 [Claude safety documentation](https://diamondlightsource.github.io/robot-arm-sim/main/explanations/claude-safety.html)
 in the robot-arm-sim project.
 
-## Linting and Type Checking
+## Linting, Testing, and CI/CD
 
-### Pre-commit Hooks
+Pre-commit hooks, the just task runner, and the CI/CD pipeline are covered in
+detail elsewhere:
 
-Every commit runs through pre-commit hooks defined in
-`.pre-commit-config.yaml`:
+- {doc}`/tutorials/developer-workflow` — all `just` commands and the typical
+  dev loop
+- {doc}`/explanations/ci-cd-pipeline` — GitHub Actions workflows, container
+  publishing, and Helm chart versioning
 
-| Hook                     | Purpose                                    |
-| ------------------------ | ------------------------------------------ |
-| `check-added-large-files`| Prevents accidental commit of large files  |
-| `check-yaml`             | Validates YAML syntax (excluding Helm templates) |
-| `check-merge-conflict`   | Detects unresolved merge conflict markers  |
-| `end-of-file-fixer`      | Ensures files end with a newline           |
-| `eslint --fix`           | Lints and auto-fixes TypeScript/JavaScript |
-| `tsc --noEmit`           | Full TypeScript type checking              |
-| `gitleaks`               | Detects secrets before they reach Git      |
-
-### Type-Aware ESLint
-
-ESLint is configured with `tseslint.configs.recommendedTypeChecked`, which
-enables rules that use TypeScript's type information for deeper analysis.
-This catches issues that basic linting misses:
-
-- **Floating promises** (`no-floating-promises`) — unhandled async calls that
-  silently swallow errors
-- **Unsafe `any` usage** (`no-unsafe-return`, `no-unsafe-assignment`) —
-  values that bypass type checking entirely
-- **Misused promises** (`no-misused-promises`) — passing async functions
-  where synchronous callbacks are expected
-
-VS Code is configured (`.vscode/settings.json`) to run ESLint validation on
-TypeScript files and auto-fix on save.
-
-### Just Task Runner
-
-[just](https://just.systems/) provides a unified command interface for all
-development tasks (both JavaScript and Python tooling). Run `just --list`
-to see all available commands. See {doc}`/tutorials/developer-workflow` for
-a full guide.
-
-```bash
-just check       # Run lint, test, docs in parallel — do this before committing
-just lint        # ESLint + TypeScript type check
-just test        # Run vitest with coverage
-just docs        # Build Sphinx documentation
-just dev         # Start Vite dev server
-```
-
-## Documentation
+ESLint uses `tseslint.configs.recommendedTypeChecked` for type-aware rules
+(floating promises, unsafe `any`, misused promises). VS Code is configured
+(`.vscode/settings.json`) to run ESLint on save.
 
 Documentation is built with [Sphinx](https://www.sphinx-doc.org/) using the
 [PyData theme](https://pydata-sphinx-theme.readthedocs.io/) and
-[MyST](https://myst-parser.readthedocs.io/) for Markdown support. Additional
-extensions provide:
-
-- **Mermaid diagrams** via `sphinxcontrib-mermaid`
-- **Copy buttons** on code blocks via `sphinx_copybutton`
-- **Grid layouts** via `sphinx_design`
-
-A live-rebuild mode is available for local development:
-
-```bash
-just docs-watch
-```
-
-### Multi-Version Publishing
-
-The docs CI workflow publishes versioned documentation to GitHub Pages. Each
-tagged release and the `main` branch get their own directory, with a
-`switcher.json` file generated automatically for the version selector in the
-PyData theme.
-
-## CI/CD Pipeline
-
-The GitHub Actions CI pipeline is organised as composable reusable workflows
-orchestrated by `ci.yml`:
-
-```{mermaid}
-graph LR
-    push[Push / PR] --> lint[_lint.yml]
-    push --> docs[_docs.yml]
-    lint --> container[_container.yml]
-    lint --> helm[_helm.yml]
-```
-
-### Lint & Test (`_lint.yml`)
-
-Runs ESLint, TypeScript type checking, and vitest with coverage on every
-push and PR. This is the gate for all other workflows.
-
-### Container (`_container.yml`)
-
-Builds the Docker image, verifies it starts correctly, and publishes to
-`ghcr.io` on tagged releases.
-
-### Helm (`_helm.yml`)
-
-Lints and packages the Helm chart, then pushes to the GitHub OCI registry on
-tagged releases. The chart is installable via:
-
-```bash
-helm install argocd-monitor oci://ghcr.io/epics-containers/charts/argocd-monitor
-```
-
-### Docs (`_docs.yml`)
-
-Builds Sphinx documentation and publishes to GitHub Pages with versioned
-directories on `main` and tagged releases.
+[MyST](https://myst-parser.readthedocs.io/) for Markdown support, with
+extensions for Mermaid diagrams, copy buttons, and grid layouts.
 
 ## Persistent Caches
 
