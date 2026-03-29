@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router";
-import { ArrowLeft, RotateCcw, ScrollText } from "lucide-react";
+import { ArrowLeft, ArrowUpDown, RotateCcw, ScrollText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -29,12 +29,29 @@ export function ApplicationDetailPage() {
 
   const [restartTarget, setRestartTarget] = useState<ResourceNode | null>(null);
   const [restartError, setRestartError] = useState<string | null>(null);
+  const [podSort, setPodSort] = useState<{ key: string; asc: boolean }>({ key: "name", asc: true });
   const tableFilters = sessionStorage.getItem("tableFilters");
   const backTo = tableFilters ? `/?${tableFilters}` : "/";
-  const pods = useMemo(
-    () => tree?.nodes?.filter((n) => n.kind === "Pod") ?? [],
-    [tree?.nodes],
-  );
+  const pods = useMemo(() => {
+    const filtered = tree?.nodes?.filter((n) => n.kind === "Pod") ?? [];
+    return [...filtered].sort((a, b) => {
+      let cmp = 0;
+      switch (podSort.key) {
+        case "name":
+          cmp = a.name.localeCompare(b.name);
+          break;
+        case "status":
+          cmp = (a.health?.status ?? "").localeCompare(b.health?.status ?? "");
+          break;
+        case "age":
+          cmp = (a.createdAt ?? "").localeCompare(b.createdAt ?? "");
+          break;
+        default:
+          cmp = 0;
+      }
+      return podSort.asc ? cmp : -cmp;
+    });
+  }, [tree?.nodes, podSort]);
 
   if (appLoading || treeLoading) {
     return <LoadingSpinner message="Loading application..." />;
@@ -142,10 +159,22 @@ export function ApplicationDetailPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Pod Name</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>
+                    <Button variant="ghost" className="-ml-4" onClick={() => setPodSort((s) => ({ key: "name", asc: s.key === "name" ? !s.asc : true }))}>
+                      Pod Name <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button variant="ghost" className="-ml-4" onClick={() => setPodSort((s) => ({ key: "status", asc: s.key === "status" ? !s.asc : true }))}>
+                      Status <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </TableHead>
                   <TableHead>Image</TableHead>
-                  <TableHead>Age</TableHead>
+                  <TableHead>
+                    <Button variant="ghost" className="-ml-4" onClick={() => setPodSort((s) => ({ key: "age", asc: s.key === "age" ? !s.asc : true }))}>
+                      Age <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </TableHead>
                   <TableHead>Info</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
