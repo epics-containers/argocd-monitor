@@ -3,9 +3,13 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    # Resolve upstream at request time so nginx starts even when unreachable
+    resolver 127.0.0.11 8.8.8.8 valid=30s;
+    set $argocd_url "${ARGOCD_URL}";
+
     # Dedicated location for log streaming — must be above /api/ catch-all
     location ~ ^/api/v1/applications/[^/]+/logs {
-        proxy_pass ${ARGOCD_URL};
+        proxy_pass $argocd_url;
         proxy_ssl_verify off;
         proxy_ssl_server_name on;
         proxy_set_header Host ${ARGOCD_HOST};
@@ -24,7 +28,7 @@ server {
 
     # Proxy ArgoCD API requests
     location /api/ {
-        proxy_pass ${ARGOCD_URL}/api/;
+        proxy_pass $argocd_url;
         proxy_ssl_verify off;
         proxy_ssl_server_name on;
         proxy_set_header Host ${ARGOCD_HOST};
@@ -39,7 +43,7 @@ server {
 
     # Proxy ArgoCD login/auth
     location /login {
-        proxy_pass ${ARGOCD_URL}/login;
+        proxy_pass $argocd_url;
         proxy_ssl_verify off;
         proxy_ssl_server_name on;
         proxy_set_header Host ${ARGOCD_HOST};
@@ -48,7 +52,7 @@ server {
     }
 
     location /auth/ {
-        proxy_pass ${ARGOCD_URL}/auth/;
+        proxy_pass $argocd_url;
         proxy_ssl_verify off;
         proxy_ssl_server_name on;
         proxy_set_header Host ${ARGOCD_HOST};
