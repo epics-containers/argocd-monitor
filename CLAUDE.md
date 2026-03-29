@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build and Development Commands
 
 ```bash
+just --list          # Show all available commands
 just check           # Run lint, test, docs in parallel — do this before committing
 just lint            # ESLint + TypeScript type check
 just test            # Run vitest with coverage
