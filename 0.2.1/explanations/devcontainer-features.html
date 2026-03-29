@@ -1,0 +1,1234 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Devcontainer Features &#8212; argocd-monitor 0.2.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=37f418d5"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}`;
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        all_mermaids.forEach((el) => {
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+        await mermaid.run();
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+const load = async () => {
+    initStyles();
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...JSON.parse(
+                    `{"startOnLoad": false}`
+                ),
+                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...JSON.parse(
+        `{"startOnLoad": false}`
+    ),
+    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/devcontainer-features';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/argocd-monitor/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="OIDC Authentication via Keycloak" href="oidc-auth-plan.html" />
+    <link rel="prev" title="Architecture" href="architecture.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.2.1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">argocd-monitor</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/argocd-monitor" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/argocd-monitor" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Devcontainer Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oidc-auth-plan.html">OIDC Authentication via Keycloak</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../explanations.html" class="nav-link">Explanations</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Devcontainer Features</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="devcontainer-features">
+<h1>Devcontainer Features<a class="headerlink" href="#devcontainer-features" title="Link to this heading">#</a></h1>
+<p>This project uses a <a class="reference external" href="https://containers.dev/">Dev Container</a> to provide a
+fully configured, reproducible development environment. The setup is derived
+from the
+<a class="reference external" href="https://github.com/diamondlightsource/python-copier-template">python-copier-template</a>
+pattern used across Diamond Light Source projects, extended for a TypeScript
+React application with Claude Code integration.</p>
+<section id="base-image">
+<h2>Base Image<a class="headerlink" href="#base-image" title="Link to this heading">#</a></h2>
+<p>The Dockerfile uses <code class="docutils literal notranslate"><span class="pre">ghcr.io/diamondlightsource/ubuntu-devcontainer:noble</span></code> as
+the base image. This provides a minimal Ubuntu Noble environment with common
+development tools pre-installed. The <code class="docutils literal notranslate"><span class="pre">postCreate.sh</span></code> script adds
+project-specific tooling on first launch:</p>
+<ul class="simple">
+<li><p><strong>Node.js 22</strong> for the React/TypeScript frontend</p></li>
+<li><p><strong>Claude Code CLI</strong> for AI-assisted development</p></li>
+<li><p><strong>just</strong> task runner for unified dev commands</p></li>
+<li><p><strong>GitHub CLI</strong> (<code class="docutils literal notranslate"><span class="pre">gh</span></code>) for push/PR workflows</p></li>
+<li><p><strong>npm dependencies</strong> via <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">install</span></code></p></li>
+<li><p><strong>Python dependencies</strong> via <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span> <span class="pre">--all-extras</span></code></p></li>
+<li><p><strong>Pre-commit hooks</strong> installed and ready</p></li>
+</ul>
+</section>
+<section id="claude-code-integration">
+<h2>Claude Code Integration<a class="headerlink" href="#claude-code-integration" title="Link to this heading">#</a></h2>
+<p>Claude Code is installed in the devcontainer and configured via
+<code class="docutils literal notranslate"><span class="pre">.claude/settings.json</span></code>. A <code class="docutils literal notranslate"><span class="pre">UserPromptSubmit</span></code> hook enforces that Claude Code
+can only run inside the devcontainer by checking the <code class="docutils literal notranslate"><span class="pre">$REMOTE_CONTAINERS</span></code>
+environment variable. This ensures the permission model is always active.</p>
+<section id="protection-from-prompt-injection">
+<h3>Protection from Prompt Injection<a class="headerlink" href="#protection-from-prompt-injection" title="Link to this heading">#</a></h3>
+<p>The devcontainer applies several layers of protection against prompt injection
+attacks (malicious instructions hidden in GitHub issues, web content, or
+repository files that attempt to misuse Claude’s tool access):</p>
+<p><strong>Credential isolation:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SSH_AUTH_SOCK=&quot;&quot;</span></code> disables SSH agent forwarding, preventing access to host
+SSH keys</p></li>
+<li><p>The host <code class="docutils literal notranslate"><span class="pre">~/.gitconfig</span></code> is bind-mounted read-only to <code class="docutils literal notranslate"><span class="pre">/tmp/host-gitconfig</span></code>;
+<code class="docutils literal notranslate"><span class="pre">postCreate.sh</span></code> extracts only <code class="docutils literal notranslate"><span class="pre">user.name</span></code> and <code class="docutils literal notranslate"><span class="pre">user.email</span></code> into the
+container’s global git config — this allows commits without leaking credential
+helpers, aliases, or other unsafe configuration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">postCreate.sh</span></code> blanks the git credential helper
+(<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">config</span> <span class="pre">--global</span> <span class="pre">credential.helper</span> <span class="pre">''</span></code>), which overrides any helper
+injected by VS Code’s Dev Containers extension. Remote pushes require an
+explicit fine-grained PAT via <code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">auth</span> <span class="pre">login</span></code> + <code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">auth</span> <span class="pre">setup-git</span></code></p></li>
+</ul>
+<p><strong>Scoped GitHub authentication:</strong></p>
+<ul class="simple">
+<li><p>GitHub CLI auth is persisted in a per-repo Docker volume
+(<code class="docutils literal notranslate"><span class="pre">gh-auth-${localWorkspaceFolderBasename}</span></code>)</p></li>
+<li><p>Use a fine-grained PAT scoped to only the repositories needed, rather than a
+broad OAuth token</p></li>
+<li><p>The volume isolation means each project gets its own credential scope</p></li>
+</ul>
+<p><strong>Permission rules in <code class="docutils literal notranslate"><span class="pre">.claude/settings.json</span></code>:</strong></p>
+<ul class="simple">
+<li><p><strong>Allow:</strong> file operations, bash commands, web search/fetch</p></li>
+<li><p><strong>Prompt (requires confirmation):</strong> force push, hard reset, SSH/SCP/RSYNC,
+and other network escape vectors</p></li>
+<li><p>Destructive or externally-visible operations require human approval</p></li>
+</ul>
+<p>For a deeper discussion of this security pattern, including autonomous
+execution in ephemeral containers, see the
+<a class="reference external" href="https://diamondlightsource.github.io/robot-arm-sim/main/explanations/claude-safety.html">Claude safety documentation</a>
+in the robot-arm-sim project.</p>
+</section>
+</section>
+<section id="linting-and-type-checking">
+<h2>Linting and Type Checking<a class="headerlink" href="#linting-and-type-checking" title="Link to this heading">#</a></h2>
+<section id="pre-commit-hooks">
+<h3>Pre-commit Hooks<a class="headerlink" href="#pre-commit-hooks" title="Link to this heading">#</a></h3>
+<p>Every commit runs through pre-commit hooks defined in
+<code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Hook</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">check-added-large-files</span></code></p></td>
+<td><p>Prevents accidental commit of large files</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">check-yaml</span></code></p></td>
+<td><p>Validates YAML syntax (excluding Helm templates)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">check-merge-conflict</span></code></p></td>
+<td><p>Detects unresolved merge conflict markers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">end-of-file-fixer</span></code></p></td>
+<td><p>Ensures files end with a newline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">eslint</span> <span class="pre">--fix</span></code></p></td>
+<td><p>Lints and auto-fixes TypeScript/JavaScript</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tsc</span> <span class="pre">--noEmit</span></code></p></td>
+<td><p>Full TypeScript type checking</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gitleaks</span></code></p></td>
+<td><p>Detects secrets before they reach Git</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="type-aware-eslint">
+<h3>Type-Aware ESLint<a class="headerlink" href="#type-aware-eslint" title="Link to this heading">#</a></h3>
+<p>ESLint is configured with <code class="docutils literal notranslate"><span class="pre">tseslint.configs.recommendedTypeChecked</span></code>, which
+enables rules that use TypeScript’s type information for deeper analysis.
+This catches issues that basic linting misses:</p>
+<ul class="simple">
+<li><p><strong>Floating promises</strong> (<code class="docutils literal notranslate"><span class="pre">no-floating-promises</span></code>) — unhandled async calls that
+silently swallow errors</p></li>
+<li><p><strong>Unsafe <code class="docutils literal notranslate"><span class="pre">any</span></code> usage</strong> (<code class="docutils literal notranslate"><span class="pre">no-unsafe-return</span></code>, <code class="docutils literal notranslate"><span class="pre">no-unsafe-assignment</span></code>) —
+values that bypass type checking entirely</p></li>
+<li><p><strong>Misused promises</strong> (<code class="docutils literal notranslate"><span class="pre">no-misused-promises</span></code>) — passing async functions
+where synchronous callbacks are expected</p></li>
+</ul>
+<p>VS Code is configured (<code class="docutils literal notranslate"><span class="pre">.vscode/settings.json</span></code>) to run ESLint validation on
+TypeScript files and auto-fix on save.</p>
+</section>
+<section id="just-task-runner">
+<h3>Just Task Runner<a class="headerlink" href="#just-task-runner" title="Link to this heading">#</a></h3>
+<p><a class="reference external" href="https://just.systems/">just</a> provides a unified command interface for all
+development tasks (both JavaScript and Python tooling). Run <code class="docutils literal notranslate"><span class="pre">just</span> <span class="pre">--list</span></code>
+to see all available commands. See <a class="reference internal" href="../tutorials/developer-workflow.html"><span class="doc">Developer Workflow</span></a> for
+a full guide.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>just<span class="w"> </span>check<span class="w">       </span><span class="c1"># Run lint, test, docs in parallel — do this before committing</span>
+just<span class="w"> </span>lint<span class="w">        </span><span class="c1"># ESLint + TypeScript type check</span>
+just<span class="w"> </span><span class="nb">test</span><span class="w">        </span><span class="c1"># Run vitest with coverage</span>
+just<span class="w"> </span>docs<span class="w">        </span><span class="c1"># Build Sphinx documentation</span>
+just<span class="w"> </span>dev<span class="w">         </span><span class="c1"># Start Vite dev server</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<p>Documentation is built with <a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a> using the
+<a class="reference external" href="https://pydata-sphinx-theme.readthedocs.io/">PyData theme</a> and
+<a class="reference external" href="https://myst-parser.readthedocs.io/">MyST</a> for Markdown support. Additional
+extensions provide:</p>
+<ul class="simple">
+<li><p><strong>Mermaid diagrams</strong> via <code class="docutils literal notranslate"><span class="pre">sphinxcontrib-mermaid</span></code></p></li>
+<li><p><strong>Copy buttons</strong> on code blocks via <code class="docutils literal notranslate"><span class="pre">sphinx_copybutton</span></code></p></li>
+<li><p><strong>Grid layouts</strong> via <code class="docutils literal notranslate"><span class="pre">sphinx_design</span></code></p></li>
+</ul>
+<p>A live-rebuild mode is available for local development:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>just<span class="w"> </span>docs-watch
+</pre></div>
+</div>
+<section id="multi-version-publishing">
+<h3>Multi-Version Publishing<a class="headerlink" href="#multi-version-publishing" title="Link to this heading">#</a></h3>
+<p>The docs CI workflow publishes versioned documentation to GitHub Pages. Each
+tagged release and the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch get their own directory, with a
+<code class="docutils literal notranslate"><span class="pre">switcher.json</span></code> file generated automatically for the version selector in the
+PyData theme.</p>
+</section>
+</section>
+<section id="ci-cd-pipeline">
+<h2>CI/CD Pipeline<a class="headerlink" href="#ci-cd-pipeline" title="Link to this heading">#</a></h2>
+<p>The GitHub Actions CI pipeline is organised as composable reusable workflows
+orchestrated by <code class="docutils literal notranslate"><span class="pre">ci.yml</span></code>:</p>
+<pre  class="mermaid">
+        graph LR
+    push[Push / PR] --&gt; lint[_lint.yml]
+    push --&gt; docs[_docs.yml]
+    lint --&gt; container[_container.yml]
+    lint --&gt; helm[_helm.yml]
+    </pre><section id="lint-test-lint-yml">
+<h3>Lint &amp; Test (<code class="docutils literal notranslate"><span class="pre">_lint.yml</span></code>)<a class="headerlink" href="#lint-test-lint-yml" title="Link to this heading">#</a></h3>
+<p>Runs ESLint, TypeScript type checking, and vitest with coverage on every
+push and PR. This is the gate for all other workflows.</p>
+</section>
+<section id="container-container-yml">
+<h3>Container (<code class="docutils literal notranslate"><span class="pre">_container.yml</span></code>)<a class="headerlink" href="#container-container-yml" title="Link to this heading">#</a></h3>
+<p>Builds the Docker image, verifies it starts correctly, and publishes to
+<code class="docutils literal notranslate"><span class="pre">ghcr.io</span></code> on tagged releases.</p>
+</section>
+<section id="helm-helm-yml">
+<h3>Helm (<code class="docutils literal notranslate"><span class="pre">_helm.yml</span></code>)<a class="headerlink" href="#helm-helm-yml" title="Link to this heading">#</a></h3>
+<p>Lints and packages the Helm chart, then pushes to the GitHub OCI registry on
+tagged releases. The chart is installable via:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>helm<span class="w"> </span>install<span class="w"> </span>argocd-monitor<span class="w"> </span>oci://ghcr.io/epics-containers/charts/argocd-monitor
+</pre></div>
+</div>
+</section>
+<section id="docs-docs-yml">
+<h3>Docs (<code class="docutils literal notranslate"><span class="pre">_docs.yml</span></code>)<a class="headerlink" href="#docs-docs-yml" title="Link to this heading">#</a></h3>
+<p>Builds Sphinx documentation and publishes to GitHub Pages with versioned
+directories on <code class="docutils literal notranslate"><span class="pre">main</span></code> and tagged releases.</p>
+</section>
+</section>
+<section id="persistent-caches">
+<h2>Persistent Caches<a class="headerlink" href="#persistent-caches" title="Link to this heading">#</a></h2>
+<p>The devcontainer uses Docker volumes for persistence across container rebuilds:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Volume</p></th>
+<th class="head"><p>Mount</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">devcontainer-shared-cache</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/cache</span></code></p></td>
+<td><p>uv, pre-commit, Python venvs</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">gh-auth-${workspaceFolderBase}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">~/.config/gh</span></code></p></td>
+<td><p>Per-repo GitHub CLI auth</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The workspace-specific venv path
+(<code class="docutils literal notranslate"><span class="pre">/cache/venv-for${localWorkspaceFolder}</span></code>) prevents conflicts when multiple
+projects share the cache volume. Environment variables (<code class="docutils literal notranslate"><span class="pre">VIRTUAL_ENV</span></code>, <code class="docutils literal notranslate"><span class="pre">PATH</span></code>)
+activate the venv automatically so <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span></code> is not needed for every command.</p>
+</section>
+<section id="workspace-mounting">
+<h2>Workspace Mounting<a class="headerlink" href="#workspace-mounting" title="Link to this heading">#</a></h2>
+<p>The parent directory is mounted as <code class="docutils literal notranslate"><span class="pre">/workspaces</span></code> rather than just the project
+directory:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;workspaceMount&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;source=${localWorkspaceFolder}/..,target=/workspaces,type=bind&quot;</span>
+</pre></div>
+</div>
+<p>This allows <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">../sibling-project</span></code> for developing against peer
+projects. The host’s <code class="docutils literal notranslate"><span class="pre">~/.claude</span></code> directory is bind-mounted so Claude Code
+configuration and memory persist across container rebuilds.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="architecture.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Architecture</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="oidc-auth-plan.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">OIDC Authentication via Keycloak</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#base-image">Base Image</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#claude-code-integration">Claude Code Integration</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#protection-from-prompt-injection">Protection from Prompt Injection</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linting-and-type-checking">Linting and Type Checking</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pre-commit-hooks">Pre-commit Hooks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#type-aware-eslint">Type-Aware ESLint</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#just-task-runner">Just Task Runner</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-version-publishing">Multi-Version Publishing</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ci-cd-pipeline">CI/CD Pipeline</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lint-test-lint-yml">Lint &amp; Test (<code class="docutils literal notranslate"><span class="pre">_lint.yml</span></code>)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#container-container-yml">Container (<code class="docutils literal notranslate"><span class="pre">_container.yml</span></code>)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#helm-helm-yml">Helm (<code class="docutils literal notranslate"><span class="pre">_helm.yml</span></code>)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#docs-docs-yml">Docs (<code class="docutils literal notranslate"><span class="pre">_docs.yml</span></code>)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#persistent-caches">Persistent Caches</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#workspace-mounting">Workspace Mounting</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/argocd-monitor/edit/0.2.1/docs/explanations/devcontainer-features.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/explanations/devcontainer-features.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
