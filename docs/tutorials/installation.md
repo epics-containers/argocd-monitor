@@ -29,34 +29,16 @@ The easiest way to get started is using a [Dev Container](https://containers.dev
 
 6. The app is available at `http://localhost:5173`.
 
-## Running Checks with Tox
+## Running Checks
 
-[Tox](https://tox.wiki/) is used as a task runner for linting and
-documentation builds. Run all default checks in parallel with:
-
-```bash
-uv run tox -p
-```
-
-### Available Environments
-
-| Environment      | Command                        | Description                          |
-| ---------------- | ------------------------------ | ------------------------------------ |
-| `pre-commit`     | `uv run tox -e pre-commit`    | Run all pre-commit hooks on all files |
-| `docs`           | `uv run tox -e docs`          | Build Sphinx documentation            |
-| `docs-autobuild` | `uv run tox -e docs-autobuild`| Live-rebuild docs on file changes     |
-
-Run a specific environment:
+The project uses [just](https://just.systems/) as its task runner. Run all
+checks (lint, test, docs) in parallel before committing:
 
 ```bash
-uv run tox -e docs
+just check
 ```
 
-Run multiple environments:
-
-```bash
-uv run tox -e pre-commit,docs
-```
+See {doc}`developer-workflow` for details on all available commands.
 
 ## Production Deployment
 

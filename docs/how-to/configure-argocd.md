@@ -5,16 +5,24 @@
 In development, the Vite dev server proxies API requests to ArgoCD.
 You need an auth token from the ArgoCD instance.
 
-1. Log in to your ArgoCD instance in the browser.
-2. Open DevTools > Application > Cookies.
-3. Copy the `argocd.token` cookie value.
-4. Set it in your `.env` file:
+1. Log in via the ArgoCD CLI:
+
+   ```bash
+   argocd login argocd.diamond.ac.uk --grpc-web --sso
+   ```
+
+2. Copy the `auth-token` from `~/.config/argocd/config`.
+3. Set it in your `.env` file:
 
    ```bash
    ARGOCD_AUTH_TOKEN=<your-token>
    ```
 
-5. Restart the dev server.
+4. Restart the dev server.
+
+If your ArgoCD instance is at a different hostname, also set
+`VITE_ARGOCD_HOST` in `.env` — this updates the login instructions
+shown in the app's token dialog.
 
 ## Production
 
@@ -26,5 +34,6 @@ argocd:
   url: https://argocd.diamond.ac.uk
 ```
 
-Authentication flows through ArgoCD's OIDC/Keycloak integration
-automatically via cookie-based sessions.
+Users currently authenticate by pasting tokens into the app's login
+dialog. OIDC authentication via Keycloak is planned — see
+{doc}`/explanations/oidc-auth-plan`.

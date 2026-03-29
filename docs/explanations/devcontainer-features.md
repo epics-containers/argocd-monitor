@@ -104,7 +104,9 @@ TypeScript files and auto-fix on save.
 ### Just Task Runner
 
 [just](https://just.systems/) provides a unified command interface for all
-development tasks (both JavaScript and Python tooling):
+development tasks (both JavaScript and Python tooling). Run `just --list`
+to see all available commands. See {doc}`/tutorials/developer-workflow` for
+a full guide.
 
 ```bash
 just check       # Run lint, test, docs in parallel — do this before committing
