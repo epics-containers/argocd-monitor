@@ -37,3 +37,31 @@ argocd:
 Users currently authenticate by pasting tokens into the app's login
 dialog. OIDC authentication via Keycloak is planned — see
 {doc}`/explanations/oidc-auth-plan`.
+
+### Additional Helm values
+
+The chart also exposes service, ingress, and resource configuration:
+
+```yaml
+service:
+  type: LoadBalancer   # or ClusterIP, NodePort
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  host: argocd-monitor.example.com
+  annotations: {}
+  tls: []
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+```
+
+See `helm/argocd-monitor/values.yaml` for the complete reference and
+{doc}`/reference/environment-variables` for all configurable values.

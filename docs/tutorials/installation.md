@@ -14,7 +14,8 @@ The easiest way to get started is using a [Dev Container](https://containers.dev
 1. Clone the repository and open it in VS Code.
 2. VS Code will prompt **"Reopen in Container"** — click it.
 3. Wait for the container to build. The `postCreate` script will install
-   Node.js, npm dependencies, Python dependencies, and pre-commit hooks.
+   Node.js, npm dependencies, Python dependencies, pre-commit hooks, and
+   development tools (Claude Code CLI, just task runner, GitHub CLI).
 4. Copy `.env.example` to `.env` and fill in the required values:
 
    ```bash
