@@ -3,6 +3,13 @@ html_theme.sidebar_secondary.remove: true
 ---
 
 ```{include} ../README.md
+:end-before: <!-- begin screenshot
+```
+
+![ArgoCD Monitor applications table](images/monitor-main-screen.png)
+
+```{include} ../README.md
+:start-after: <!-- end screenshot -->
 :end-before: <!-- README only content
 ```
 

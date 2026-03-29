@@ -21,6 +21,12 @@ Releases        | <https://github.com/epics-containers/argocd-monitor/releases>
 - Automatic token refresh for uninterrupted sessions
 - Light and dark theme support
 
+## Example Screenshot
+
+<!-- begin screenshot -->
+![ArgoCD Monitor applications table](docs/images/monitor-main-screen.png)
+<!-- end screenshot -->
+
 ## Quick Start
 
 The easiest way to run this project is using a
