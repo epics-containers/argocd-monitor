@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm run dev          # Start Vite dev server on http://localhost:5173
 npm run build        # Type check (tsc -b) then Vite production build
 npm run lint         # ESLint with type-aware rules (all files)
+npm test             # Run vitest (also: uv run tox -e tests)
 npx tsc --noEmit     # Type check only
 uv run tox -p        # Run all pre-commit checks in parallel
 uv run tox -e docs   # Build Sphinx documentation

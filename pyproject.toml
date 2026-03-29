@@ -26,7 +26,7 @@ dev = [
 
 [tool.tox]
 skipsdist = true
-env_list = ["pre-commit", "docs"]
+env_list = ["pre-commit", "tests", "docs"]
 
 [tool.tox.env_run_base]
 passenv = ["*"]
@@ -36,6 +36,12 @@ description = "Run pre-commit on all files"
 skip_install = true
 deps = ["pre-commit"]
 commands = [["pre-commit", "run", "--all-files", "--show-diff-on-failure"]]
+
+[tool.tox.env.tests]
+description = "Run JavaScript tests with vitest"
+skip_install = true
+allowlist_externals = ["npm"]
+commands = [["npm", "test"]]
 
 [tool.tox.env.docs]
 description = "Build Sphinx documentation"
