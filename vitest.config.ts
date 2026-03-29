@@ -10,6 +10,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
+    exclude: ["e2e/**", "node_modules/**"],
     testTimeout: 10000,
     coverage: {
       include: ["src/**/*.{ts,tsx}"],

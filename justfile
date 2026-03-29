@@ -32,6 +32,11 @@ docs:
 docs-watch:
     uv run sphinx-autobuild --show-traceback --watch README.md docs build/html
 
+# Run Playwright E2E smoke tests (requires dev server or starts one)
+e2e:
+    npx playwright install --with-deps chromium
+    npm run test:e2e
+
 # Run pre-commit hooks on all files
 pre-commit:
     uv run pre-commit run --all-files --show-diff-on-failure
