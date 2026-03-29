@@ -5,17 +5,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build and Development Commands
 
 ```bash
-npm run dev          # Start Vite dev server on http://localhost:5173
-npm run build        # Type check (tsc -b) then Vite production build
-npm run lint         # ESLint with type-aware rules (all files)
-npx tsc --noEmit     # Type check only
-uv run tox -p        # Run all pre-commit checks in parallel
-uv run tox -e docs   # Build Sphinx documentation
+just check           # Run lint, test, docs in parallel — do this before committing
+just lint            # ESLint + TypeScript type check
+just test            # Run vitest with coverage
+just docs            # Build Sphinx documentation
+just dev             # Start Vite dev server on http://localhost:5173
+just build           # Production build
 ```
 
 Pre-commit hooks run automatically on commit: ESLint with `--fix`, `tsc --noEmit`, gitleaks, YAML validation, and end-of-file fixing.
 
-**IMPORTANT: If you changed or added any file under `docs/`, you MUST run `uv run tox -e docs` and confirm it succeeds BEFORE committing.** New pages must be added to the appropriate `toctree` in the parent index (e.g. `docs/explanations.md`) or the build will fail with a `toc.not_included` warning. CI treats Sphinx warnings as errors.
+**IMPORTANT: If you changed or added any file under `docs/`, you MUST run `just docs` and confirm it succeeds BEFORE committing.** New pages must be added to the appropriate `toctree` in the parent index (e.g. `docs/explanations.md`) or the build will fail with a `toc.not_included` warning. CI treats Sphinx warnings as errors.
 
 ## Architecture
 
