@@ -6,7 +6,7 @@ The easiest way to get started is using a [Dev Container](https://containers.dev
 
 ### Prerequisites
 
-- [Docker](https://www.docker.com/get-started/) installed and running
+- [Podman](https://podman.io/) (recommended) or [Docker](https://www.docker.com/get-started/) installed and running
 - [VS Code](https://code.visualstudio.com/) with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
 ### Steps

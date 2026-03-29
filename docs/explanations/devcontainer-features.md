@@ -48,7 +48,7 @@ repository files that attempt to misuse Claude's tool access):
 
 **Scoped GitHub authentication:**
 
-- GitHub CLI auth is persisted in a per-repo Docker volume
+- GitHub CLI auth is persisted in a per-repo container volume
   (`gh-auth-${localWorkspaceFolderBasename}`)
 - Use a fine-grained PAT scoped to only the repositories needed, rather than a
   broad OAuth token

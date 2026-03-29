@@ -84,13 +84,13 @@ nginx can start even if the ArgoCD server is temporarily unreachable.
 
 Two resolvers are configured:
 
-- **`127.0.0.11`** -- The built-in DNS resolver provided by Docker's
-  embedded DNS server. Inside a Docker or Kubernetes network this resolves
-  internal service names.
+- **`127.0.0.11`** -- The built-in DNS resolver provided by the container
+  runtime's embedded DNS server (Podman or Docker). Inside a container
+  network or Kubernetes cluster this resolves internal service names.
 
 - **`8.8.8.8`** -- Google's public DNS, used as a fallback. If the
   ArgoCD URL points to an external hostname (not a cluster-internal
-  service), the Docker-internal resolver may not be able to resolve it.
+  service), the container-internal resolver may not be able to resolve it.
   The external fallback ensures resolution still works.
 
 The `valid=30s` parameter caches DNS results for 30 seconds, balancing
@@ -100,7 +100,7 @@ responsiveness to DNS changes against query volume.
 When deployed via the Helm chart, the ConfigMap renders the ArgoCD URL
 directly into `proxy_pass` directives (no variable or resolver), because
 the Kubernetes DNS service handles resolution and the URL is known at
-deploy time. The resolver configuration only applies to standalone Docker
+deploy time. The resolver configuration only applies to standalone container
 usage.
 ```
 
