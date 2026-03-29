@@ -55,7 +55,7 @@ export function ApplicationDetailPage() {
     );
   }
 
-  const pods = tree?.nodes.filter((n) => n.kind === "Pod") ?? [];
+  const pods = tree?.nodes?.filter((n) => n.kind === "Pod") ?? [];
   const namespace = app.spec.destination.namespace ?? "";
 
   return (
@@ -76,8 +76,8 @@ export function ApplicationDetailPage() {
             {app.metadata.name}
           </h2>
           <div className="flex items-center gap-3">
-            <HealthBadge status={app.status.health.status} />
-            <SyncBadge status={app.status.sync.status} />
+            <HealthBadge status={app.status.health?.status ?? "Unknown"} />
+            <SyncBadge status={app.status.sync?.status ?? "Unknown"} />
             <Badge variant="secondary">project: {app.spec.project}</Badge>
             {namespace && <Badge variant="outline">ns: {namespace}</Badge>}
           </div>

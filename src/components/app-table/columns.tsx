@@ -46,7 +46,7 @@ export const columns: ColumnDef<Application>[] = [
     },
   },
   {
-    accessorFn: (row) => row.status.health.status,
+    accessorFn: (row) => row.status.health?.status ?? "Unknown",
     id: "health",
     header: ({ column }) => (
       <Button
@@ -59,13 +59,13 @@ export const columns: ColumnDef<Application>[] = [
       </Button>
     ),
     cell: ({ row }) => (
-      <HealthBadge status={row.original.status.health.status} />
+      <HealthBadge status={row.original.status.health?.status ?? "Unknown"} />
     ),
     filterFn: (row, _id, value: string[]) =>
-      value.includes(row.original.status.health.status),
+      value.includes(row.original.status.health?.status ?? "Unknown"),
   },
   {
-    accessorFn: (row) => row.status.sync.status,
+    accessorFn: (row) => row.status.sync?.status ?? "Unknown",
     id: "sync",
     header: ({ column }) => (
       <Button
@@ -78,10 +78,10 @@ export const columns: ColumnDef<Application>[] = [
       </Button>
     ),
     cell: ({ row }) => (
-      <SyncBadge status={row.original.status.sync.status} />
+      <SyncBadge status={row.original.status.sync?.status ?? "Unknown"} />
     ),
     filterFn: (row, _id, value: string[]) =>
-      value.includes(row.original.status.sync.status),
+      value.includes(row.original.status.sync?.status ?? "Unknown"),
   },
   {
     accessorFn: (row) => row.spec.destination.namespace ?? "",
