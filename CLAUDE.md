@@ -48,6 +48,11 @@ Token management lives in `src/lib/auth-token.ts`. Tokens are stored in localSto
 - Helm chart lives in `helm/argocd-monitor/`
 - Dev proxy in `vite.config.ts` forwards `/api/` and `/auth/` to ArgoCD
 
+## Git Workflow
+
+- **NEVER push directly to main.** All changes go through PRs.
+- **Releases:** Create via GitHub Releases UI with auto-generated release notes. Do NOT tag manually from the CLI. The tag triggers CI to publish the container image and Helm chart.
+
 ## Deployment
 
 Docker container with nginx serving the SPA and proxying API requests. Helm chart published to `oci://ghcr.io/epics-containers/charts/argocd-monitor`. CI runs lint → container build → helm package → docs publish.
