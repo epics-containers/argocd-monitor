@@ -10,7 +10,7 @@ The CI pipeline is defined in `.github/workflows/ci.yml` and is
 composed of four reusable workflow files:
 
 ```
-lint  ──────┬──► container (build & optionally push)
+check  ─────┬──► container (build & optionally push)
             │
             └──► helm      (package & optionally push)
 
@@ -18,13 +18,13 @@ docs  ────────► build & optionally publish to GitHub Pages
 ```
 
 Every push to `main`, every pull request, and every tag triggers the
-full pipeline. The `lint` job must succeed before `container` and `helm`
-run (they depend on it via `needs: lint`). The `docs` job runs
+full pipeline. The `check` job must succeed before `container` and `helm`
+run (they depend on it via `needs: check`). The `docs` job runs
 independently with no dependencies.
 
-## Lint, test, and type check
+## Check: lint, type check, and test
 
-The `_lint.yml` workflow installs Node 22, runs `npm ci`, then executes
+The `_check.yml` workflow installs Node 22, runs `npm ci`, then executes
 three checks in sequence:
 
 1. **ESLint** (`npm run lint`) -- catches style and correctness issues.
@@ -61,7 +61,7 @@ pushes and `dev` otherwise, so the app can display its own version.
 The image is only pushed to the registry when **both** conditions are
 met:
 
-- The `lint` job passed (`inputs.publish` is true).
+- The `check` job passed (`inputs.publish` is true).
 - The git ref is a **tag** (`github.ref_type == 'tag'`).
 
 This means pull requests and pushes to `main` build and test the image
@@ -91,7 +91,7 @@ whatever version is in `Chart.yaml` (useful for local testing).
 
 ### Conditional publishing
 
-Like the container image, the chart is only pushed when lint passes and
+Like the container image, the chart is only pushed when check passes and
 the ref is a tag:
 
 ```yaml
@@ -137,35 +137,17 @@ on every `git commit`:
 | `end-of-file-fixer` | pre-commit-hooks | Ensure files end with a newline |
 | `eslint` | local | Lint and auto-fix JS/TS files |
 | `tsc` | local | TypeScript type checking |
+| `conventional-pre-commit` | compilerla | Validate conventional commit message format |
 | `gitleaks` | gitleaks | Scan for accidentally committed secrets |
 
 These hooks catch common issues before code reaches CI, reducing
 round-trip time.
 
-## Local quality gate: `just check`
-
-The `just check` command runs lint, tests, and docs build **in
-parallel** using background shell processes:
-
-```bash
-# from justfile
-just lint & pid_lint=$!
-just test & pid_test=$!
-just docs & pid_docs=$!
-wait $pid_lint  || fail=1
-wait $pid_test  || fail=1
-wait $pid_docs  || fail=1
-```
-
-This mirrors the CI pipeline locally and is the recommended command to
-run before committing. It exits non-zero if any of the three jobs fail.
-
 ## The release process
 
 Releases follow this workflow:
 
-1. A maintainer creates a **GitHub Release** through the GitHub UI,
-   which creates a git tag (e.g. `v1.2.3`).
+1. A maintainer pushes a git tag (e.g. `git tag v1.2.3 && git push origin v1.2.3`).
 2. The tag push triggers the CI pipeline.
 3. Because the ref is a tag:
    - The container image is built with `VITE_APP_VERSION=v1.2.3` and
@@ -173,8 +155,6 @@ Releases follow this workflow:
    - The Helm chart is packaged as version `1.2.3` and pushed to the
      OCI chart registry.
    - Documentation is built and published under the version directory.
-4. GitHub auto-generates release notes from merged PRs.
-
-Tags should **not** be created manually from the CLI. The GitHub
-Releases UI is the single entry point for cutting a release, ensuring
-release notes are generated and the tag triggers CI correctly.
+4. The `_release.yml` workflow creates a **GitHub Release** with
+   auto-generated release notes from merged PRs. Tags containing `a`,
+   `b`, or `rc` are marked as pre-releases.

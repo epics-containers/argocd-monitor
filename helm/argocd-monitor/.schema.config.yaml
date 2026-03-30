@@ -1,0 +1,18 @@
+# Schema generation config for helm-values-schema-json plugin
+# https://github.com/losisin/helm-values-schema-json
+
+values:
+  - helm/argocd-monitor/values.yaml
+
+output: helm/argocd-monitor/values.schema.json
+
+bundle: false
+useHelmDocs: false
+noAdditionalProperties: true
+
+schemaRoot:
+  title: argocd-monitor Helm chart
+  description: Helm chart for deploying an ArgoCD monitoring dashboard
+  additionalProperties: false
+
+k8sSchemaVersion: v1.33.3

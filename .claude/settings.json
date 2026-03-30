@@ -9,10 +9,12 @@
       "WebFetch(*)",
       "mcp__claude-in-chrome__*"
     ],
-    "prompt": [
+    "deny": [
       "Bash(git push --force *)",
       "Bash(git reset --hard*)",
       "Bash(ssh *)",
+      "Bash(ssh-agent *)",
+      "Bash(*ssh-agent*)",
       "Bash(scp *)",
       "Bash(rsync *)",
       "Bash(sftp *)",
@@ -28,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -z \"$REMOTE_CONTAINERS\" ]; then echo 'BLOCKED: This project requires the devcontainer. Please reopen in the devcontainer before using Claude Code.'; exit 2; fi"
+            "command": "if [ -z \"$REMOTE_CONTAINERS\" ]; then echo 'BLOCKED: This project requires the devcontainer. Please reopen in the devcontainer before using Claude Code.'; exit 2; fi; if [ -n \"$SSH_AUTH_SOCK\" ]; then echo 'BLOCKED: SSH_AUTH_SOCK is set — agent forwarding must be disabled in the devcontainer.'; exit 2; fi"
           }
         ]
       }

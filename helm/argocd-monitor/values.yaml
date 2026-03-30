@@ -1,29 +1,50 @@
+# yaml-language-server: $schema=values.schema.json
+
 image:
+  # @schema description: Container image repository
   repository: ghcr.io/epics-containers/argocd-monitor
+  # @schema description: Image tag (defaults to Chart.appVersion)
   tag: ""
+  # @schema description: Image pull policy
+  # @schema enum: [Always, IfNotPresent, Never]
   pullPolicy: IfNotPresent
 
+# @schema description: Number of pod replicas
+# @schema minimum: 1
 replicaCount: 1
 
 argocd:
-  # The ArgoCD instance URL to proxy API requests to
+  # @schema description: The ArgoCD instance URL to proxy API requests to
   url: https://argocd.diamond.ac.uk
 
 service:
+  # @schema description: Kubernetes Service type
+  # @schema enum: [ClusterIP, LoadBalancer, NodePort]
   type: LoadBalancer
+  # @schema description: Service port
   port: 80
 
 ingress:
+  # @schema description: Enable Ingress resource
   enabled: false
+  # @schema description: Ingress class name
   className: ""
+  # @schema description: Ingress annotations
+  # @schema additionalProperties: {"type": "string"}
   annotations: {}
+  # @schema description: Ingress hostname
   host: ""
+  # @schema description: TLS configuration
   tls: []
 
 resources:
   limits:
+    # @schema description: CPU limit
     cpu: 100m
+    # @schema description: Memory limit
     memory: 128Mi
   requests:
+    # @schema description: CPU request
     cpu: 50m
+    # @schema description: Memory request
     memory: 64Mi

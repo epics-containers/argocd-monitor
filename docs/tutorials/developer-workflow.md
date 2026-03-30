@@ -56,7 +56,7 @@ just gh-auth       # Authenticate gh CLI with a GitHub PAT
 `just gh-auth` prompts for a fine-grained PAT (input is hidden), authenticates
 the GitHub CLI, and prints the resulting auth status. The token is stored in a
 per-repo container volume so it persists across rebuilds. See
-{doc}`/explanations/devcontainer-features` for the security model.
+{doc}`/explanations/project-conventions` for the security model.
 
 ### Development
 
