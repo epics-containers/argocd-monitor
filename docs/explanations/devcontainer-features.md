@@ -93,6 +93,21 @@ detail elsewhere:
 - {doc}`/explanations/ci-cd-pipeline` — GitHub Actions workflows, container
   publishing, and Helm chart versioning
 
+### `just check` vs pre-commit hooks
+
+Both `just check` and the pre-commit hooks run ESLint and `tsc --noEmit`, but
+they serve different purposes and the overlap is intentional:
+
+- **Pre-commit hooks** gate each commit. They run only on staged files, apply
+  ESLint with `--fix` to auto-correct issues, and include housekeeping checks
+  (large files, merge conflicts, end-of-file fixing, gitleaks).
+- **`just check`** is a full-project validation. It runs lint, tests, and the
+  docs build in parallel — read-only, no `--fix` — intended for manual use
+  before committing or as a CI gate.
+
+Removing either would leave a gap: pre-commit catches issues at commit time on
+changed files, while `just check` validates the entire project.
+
 ESLint uses `tseslint.configs.recommendedTypeChecked` for type-aware rules
 (floating promises, unsafe `any`, misused promises). VS Code is configured
 (`.vscode/settings.json`) to run ESLint on save.
