@@ -154,33 +154,16 @@ and volume persistence strategy.
 
 ## Cross-language conventions
 
-The following conventions are shared across all projects that use this
-pattern, regardless of language:
-
-| Convention | Purpose |
-|-----------|---------|
-| Devcontainer with isolation hook | Safe autonomous execution |
-| [Conventional Commits](https://www.conventionalcommits.org/) | Consistent commit messages |
-| [Sphinx](https://www.sphinx-doc.org/) + [MyST](https://myst-parser.readthedocs.io/) docs | Documentation builds |
-| [Diataxis](https://diataxis.fr) framework | Documentation structure |
-| Pre-commit hooks | Catch issues before commit |
-| Single check command (`just check` / `tox -p` / `make ci`) | Local CI equivalent |
-| GitHub Actions CI | Lint → test → container → docs → release |
-| [Renovate](https://docs.renovatebot.com/) | Automated dependency updates |
-| `CLAUDE.md` + skills + settings.json | Claude Code configuration |
-
-What varies per language stack:
-
-| Concern | TypeScript | Python | Go |
-|---------|-----------|--------|-----|
-| Task runner | just | tox (via uv) | make |
-| Linter | ESLint + tsc | Ruff + Pyright | golangci-lint |
-| Test runner | vitest | pytest | go test |
-| Package manager | npm | uv | go modules |
-| Formatter | ESLint | Ruff | gofmt |
+The Claude Code integration pattern sits on top of a set of
+language-agnostic project conventions — `just` as the task runner,
+Conventional Commits, Sphinx + Diataxis docs, pre-commit hooks, and a
+consistent GitHub Actions CI structure. These are documented separately
+in {doc}`cross-language-conventions`.
 
 ## Further reading
 
+- {doc}`cross-language-conventions` — shared tooling and conventions
+  across TypeScript, Python, and Go projects
 - {doc}`devcontainer-features` — full devcontainer setup, volumes, and
   security assumptions
 - [Building a Robot Simulator with Claude](https://diamondlightsource.github.io/robot-arm-sim/main/explanations/building-with-claude.html)
