@@ -33,6 +33,12 @@ jobs:
           helm package helm/argocd-monitor -d .helm-pkg
           ${{ steps.version.outputs.chart_version && format('--version {0} --app-version {0}', steps.version.outputs.chart_version) || '' }}
 
+      - name: Upload values schema as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: helm-chart-schemas
+          path: helm/argocd-monitor/values.schema.json
+
       - name: Push chart to OCI registry
         if: inputs.publish && github.ref_type == 'tag'
         run: helm push .helm-pkg/*.tgz oci://ghcr.io/${{ github.repository_owner }}/charts
