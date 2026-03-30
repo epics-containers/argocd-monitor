@@ -13,16 +13,28 @@ React application with Claude Code integration.
 
 The Dockerfile uses `ghcr.io/diamondlightsource/ubuntu-devcontainer:noble` as
 the base image. This provides a minimal Ubuntu Noble environment with common
-development tools pre-installed. The `postCreate.sh` script adds
-project-specific tooling on first launch:
+development tools pre-installed. System-level tooling is baked into the Docker
+image for faster container starts:
 
 - **Node.js 22** for the React/TypeScript frontend
-- **Claude Code CLI** for AI-assisted development
 - **just** task runner for unified dev commands
 - **GitHub CLI** (`gh`) for push/PR workflows
+
+The `postCreate.sh` script runs once on first container creation to install
+tools and dependencies that change more frequently:
+
+- **Claude Code CLI** for AI-assisted development
 - **npm dependencies** via `npm install`
 - **Python dependencies** via `uv sync --all-extras`
 - **Pre-commit hooks** installed and ready
+
+A separate `postStart.sh` script runs on every container start (including
+restarts and reopens). This is necessary because VS Code's Dev Containers
+extension copies the host gitconfig into the container *after*
+`postCreateCommand` runs, which can re-inject credential helpers that were
+already blanked. The `postStart.sh` script resets the credential helper each
+time to maintain isolation (see [Credential isolation](#credential-isolation)
+below).
 
 ## Claude Code Integration
 
@@ -37,14 +49,18 @@ The devcontainer applies several layers of protection against prompt injection
 attacks (malicious instructions hidden in GitHub issues, web content, or
 repository files that attempt to misuse Claude's tool access):
 
+(credential-isolation)=
 **Credential isolation:**
 
 - `SSH_AUTH_SOCK=""` disables SSH agent forwarding, preventing access to host
   SSH keys
-- `postCreate.sh` blanks the git credential helper
-  (`git config --global credential.helper ''`), which overrides any helper
-  injected by VS Code's Dev Containers extension. Remote pushes require an
-  explicit fine-grained PAT via `gh auth login` + `gh auth setup-git`
+- `postStart.sh` blanks the git credential helper
+  (`git config --global credential.helper ''`) on every container start. This
+  must run at start time rather than create time because VS Code's Dev
+  Containers extension copies the host gitconfig (and its credential helpers)
+  into the container after `postCreateCommand` completes. Remote pushes
+  require an explicit fine-grained PAT via `just gh-auth` (which wraps
+  `gh auth login` + `gh auth setup-git`)
 
 **Scoped GitHub authentication:**
 
@@ -102,7 +118,7 @@ activate the venv automatically so `uv run` is not needed for every command.
 ### GitHub CLI credentials in a volume
 
 The `gh-auth` volume stores a fine-grained PAT (set up via
-`gh auth login` + `gh auth setup-git`). This is safe under rootless Podman,
+`just gh-auth`). This is safe under rootless Podman,
 which is the intended runtime for this devcontainer:
 
 - **No daemon socket** — there is no privileged Docker socket to compromise.

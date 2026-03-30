@@ -25,6 +25,7 @@
   ],
   "remoteUser": "root",
   "postCreateCommand": ".devcontainer/postCreate.sh",
+  "postStartCommand": ".devcontainer/postStart.sh",
   "customizations": {
     "vscode": {
       "settings": {

@@ -47,6 +47,17 @@ so always run this before committing documentation changes.
 `just docs-watch` starts a local server with auto-reload — useful when
 writing or editing docs.
 
+### Setup
+
+```bash
+just gh-auth       # Authenticate gh CLI with a GitHub PAT
+```
+
+`just gh-auth` prompts for a fine-grained PAT (input is hidden), authenticates
+the GitHub CLI, and prints the resulting auth status. The token is stored in a
+per-repo container volume so it persists across rebuilds. See
+{doc}`/explanations/devcontainer-features` for the security model.
+
 ### Development
 
 ```bash

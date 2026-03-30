@@ -48,3 +48,11 @@ dev:
 # Production build
 build:
     npm run build
+
+# Authenticate gh CLI with a GitHub PAT (token not stored in shell history)
+gh-auth:
+    #!/bin/bash
+    read -sp "GitHub PAT: " t && echo
+    echo "$t" | gh auth login --with-token
+    unset t
+    gh auth status
