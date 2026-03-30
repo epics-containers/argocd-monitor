@@ -9,25 +9,25 @@ on:
   pull_request:
 
 jobs:
-  lint:
-    uses: ./.github/workflows/_lint.yml
+  check:
+    uses: ./.github/workflows/_check.yml
 
   container:
-    needs: lint
+    needs: check
     if: always()
     uses: ./.github/workflows/_container.yml
     with:
-      publish: ${{ needs.lint.result == 'success' }}
+      publish: ${{ needs.check.result == 'success' }}
     permissions:
       contents: read
       packages: write
 
   helm:
-    needs: lint
+    needs: check
     if: always()
     uses: ./.github/workflows/_helm.yml
     with:
-      publish: ${{ needs.lint.result == 'success' }}
+      publish: ${{ needs.check.result == 'success' }}
     permissions:
       contents: read
       packages: write

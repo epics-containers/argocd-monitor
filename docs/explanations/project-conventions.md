@@ -116,8 +116,7 @@ workflow files:
 ```
 .github/workflows/
 ├── ci.yml              # Main orchestrator
-├── _lint.yml           # Linting and type checking
-├── _test.yml           # Tests (with coverage)
+├── _check.yml          # Lint, type check, and test
 ├── _container.yml      # Docker image build and publish
 ├── _docs.yml           # Sphinx docs build and GitHub Pages deploy
 ├── _helm.yml           # Helm chart packaging (if applicable)
