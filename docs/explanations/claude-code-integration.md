@@ -116,9 +116,9 @@ Good candidates for skills:
 | `yaml` | Python code that reads/writes YAML |
 | `memo` | Saving work state to persistent memory |
 
-Skills should be **project-agnostic** where possible so they can be shared
-across repositories via a copier template. Project-specific knowledge
-belongs in `CLAUDE.md` or in the documentation.
+Skills that are **project-agnostic** can be shared
+across repositories via the copier template. Project-specific information
+can be added to per project skills or go in the documentation.
 
 (keeping-claude-md-lean)=
 ## Keeping CLAUDE.md lean
