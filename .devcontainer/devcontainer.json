@@ -3,9 +3,6 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "forwardPorts": [
-    5173
-  ],
   "remoteEnv": {
     // Disable SSH agent forwarding to prevent prompt injection from using SSH keys
     "SSH_AUTH_SOCK": "",
