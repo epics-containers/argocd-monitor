@@ -84,16 +84,22 @@ Controls what Claude Code is allowed to do. The key sections:
     "UserPromptSubmit": [{
       "hooks": [{
         "type": "command",
-        "command": "if [ -z \"$REMOTE_CONTAINERS\" ]; then echo 'BLOCKED: ...'; exit 2; fi"
+        "command": "if [ -z \"$REMOTE_CONTAINERS\" ]; then echo 'BLOCKED: ...'; exit 2; fi; if [ -n \"$SSH_AUTH_SOCK\" ]; then echo 'BLOCKED: ...'; exit 2; fi"
       }]
     }]
   }
 }
 ```
 
-The `$REMOTE_CONTAINERS` variable is set by VS Code when running inside a
-devcontainer. If it is absent, every prompt is blocked. This prevents
-accidental use of the permissive settings on the host.
+The hook runs two checks on every prompt:
+
+1. `$REMOTE_CONTAINERS` must be set — confirms we are inside a devcontainer.
+   If absent, every prompt is blocked, preventing accidental use of the
+   permissive settings on the host.
+2. `$SSH_AUTH_SOCK` must be empty — confirms SSH agent forwarding is
+   disabled. The devcontainer blanks this variable, but this check catches
+   cases where it gets re-introduced (e.g. by a shell profile or a
+   manually started agent).
 
 ### `.claude/skills/` — on-demand knowledge
 
