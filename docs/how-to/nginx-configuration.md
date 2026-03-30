@@ -106,7 +106,7 @@ usage.
 
 ## The envsubst pattern and read-only ConfigMap fallback
 
-The Docker entrypoint script (`docker-entrypoint.sh`) bridges the gap
+The Docker entrypoint script (`docker/docker-entrypoint.sh`) bridges the gap
 between the template and a running config:
 
 ```sh
