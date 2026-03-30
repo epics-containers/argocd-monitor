@@ -11,6 +11,10 @@ RUN (type -p wget >/dev/null || (apt-get update -y && apt-get install -y --no-in
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends just gh curl
 
+# Install Helm and schema plugin
+RUN curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash \
+  && helm plugin install https://github.com/losisin/helm-values-schema-json
+
 # language specific setup ######################################################
 
 # Install Node.js 22
