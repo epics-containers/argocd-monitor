@@ -36,3 +36,10 @@ jobs:
     uses: ./.github/workflows/_docs.yml
     permissions:
       contents: write
+
+  release:
+    needs: [check, container, helm]
+    if: github.ref_type == 'tag'
+    uses: ./.github/workflows/_release.yml
+    permissions:
+      contents: write

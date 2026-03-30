@@ -51,7 +51,7 @@ Token management lives in `src/lib/auth-token.ts`. Tokens are stored in localSto
 ## Git Workflow
 
 - **NEVER push directly to main.** All changes go through PRs.
-- **Releases:** Create via GitHub Releases UI with auto-generated release notes. Do NOT tag manually from the CLI. The tag triggers CI to publish the container image and Helm chart.
+- **Releases:** Push a git tag (e.g. `git tag v1.2.3 && git push origin v1.2.3`). CI publishes the container image, Helm chart, and creates a GitHub Release with auto-generated notes.
 
 ## Deployment
 

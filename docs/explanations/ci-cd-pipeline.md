@@ -147,8 +147,7 @@ round-trip time.
 
 Releases follow this workflow:
 
-1. A maintainer creates a **GitHub Release** through the GitHub UI,
-   which creates a git tag (e.g. `v1.2.3`).
+1. A maintainer pushes a git tag (e.g. `git tag v1.2.3 && git push origin v1.2.3`).
 2. The tag push triggers the CI pipeline.
 3. Because the ref is a tag:
    - The container image is built with `VITE_APP_VERSION=v1.2.3` and
@@ -156,8 +155,6 @@ Releases follow this workflow:
    - The Helm chart is packaged as version `1.2.3` and pushed to the
      OCI chart registry.
    - Documentation is built and published under the version directory.
-4. GitHub auto-generates release notes from merged PRs.
-
-Tags should **not** be created manually from the CLI. The GitHub
-Releases UI is the single entry point for cutting a release, ensuring
-release notes are generated and the tag triggers CI correctly.
+4. The `_release.yml` workflow creates a **GitHub Release** with
+   auto-generated release notes from merged PRs. Tags containing `a`,
+   `b`, or `rc` are marked as pre-releases.

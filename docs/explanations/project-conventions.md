@@ -156,10 +156,11 @@ releases.
 
 ## Releases: GitHub Releases
 
-Releases are created via the GitHub Releases UI with auto-generated
-release notes. **Never tag manually from the CLI** — the tag is created by
-the release and triggers CI to publish artifacts (container images, Helm
-charts, PyPI packages).
+Releases are triggered by pushing a git tag (e.g.
+`git tag v1.2.3 && git push origin v1.2.3`). CI publishes artifacts
+(container images, Helm charts) and the `_release.yml` workflow creates
+a GitHub Release with auto-generated notes. Tags containing `a`, `b`,
+or `rc` are marked as pre-releases.
 
 ## Dependency updates: Renovate
 
