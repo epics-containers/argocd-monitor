@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Claude Code Integration &#8212; argocd-monitor 0.4.0-1-gb8e9ab1 documentation</title>
+    <title>Claude Code Integration &#8212; argocd-monitor 0.4.0-3-g963129c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=dc82afd4"></script>
+    <script src="../_static/documentation_options.js?v=da9469ab"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,7 +450,8 @@ way for TypeScript (this project), Python
 <li><p><a class="reference internal" href="#keeping-claude-md-lean" id="id7">Keeping CLAUDE.md lean</a></p></li>
 <li><p><a class="reference internal" href="#credential-isolation" id="id8">Credential isolation</a></p></li>
 <li><p><a class="reference internal" href="#cross-language-conventions" id="id9">Cross-language conventions</a></p></li>
-<li><p><a class="reference internal" href="#further-reading" id="id10">Further reading</a></p></li>
+<li><p><a class="reference internal" href="#tool-compatibility-claude-code-and-github-copilot" id="id10">Tool compatibility: Claude Code and GitHub Copilot</a></p></li>
+<li><p><a class="reference internal" href="#further-reading" id="id11">Further reading</a></p></li>
 </ul>
 </nav>
 <section id="design-principle-autonomy-through-isolation">
@@ -611,8 +612,24 @@ Conventional Commits, Sphinx + Diataxis docs, pre-commit hooks, and a
 consistent GitHub Actions CI structure. These are documented separately
 in <a class="reference internal" href="project-conventions.html"><span class="doc">Project Conventions</span></a>.</p>
 </section>
+<section id="tool-compatibility-claude-code-and-github-copilot">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Tool compatibility: Claude Code and GitHub Copilot</a><a class="headerlink" href="#tool-compatibility-claude-code-and-github-copilot" title="Link to this heading">#</a></h2>
+<p>The configuration in this project works with both
+<a class="reference external" href="https://claude.com/claude-code">Claude Code</a> and
+<a class="reference external" href="https://github.com/features/copilot">GitHub Copilot</a>. Copilot reads
+<code class="docutils literal notranslate"><span class="pre">CLAUDE.md</span></code> directly (alongside its own <code class="docutils literal notranslate"><span class="pre">.github/copilot-instructions.md</span></code>
+and <code class="docutils literal notranslate"><span class="pre">AGENTS.md</span></code> formats), so there is no need to duplicate project
+instructions. Skills in <code class="docutils literal notranslate"><span class="pre">.claude/skills/</span></code> are also picked up automatically
+by Copilot — the <code class="docutils literal notranslate"><span class="pre">SKILL.md</span></code> frontmatter format is an open standard shared
+across Claude Code, Copilot, Cursor, Gemini CLI, and other tools.</p>
+<p>The difference is in the safety layer. The <code class="docutils literal notranslate"><span class="pre">.claude/settings.json</span></code>
+permissions, hooks, and deny rules are Claude Code features — Copilot does
+not enforce them. For Copilot users, the devcontainer still provides
+isolation, but the fine-grained permission and hook controls described
+above are not applied.</p>
+</section>
 <section id="further-reading">
-<h2><a class="toc-backref" href="#id10" role="doc-backlink">Further reading</a><a class="headerlink" href="#further-reading" title="Link to this heading">#</a></h2>
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Further reading</a><a class="headerlink" href="#further-reading" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="project-conventions.html"><span class="doc">Project Conventions</span></a> — shared tooling, devcontainer setup, and
 conventions across TypeScript, Python, and Go projects</p></li>
@@ -682,6 +699,7 @@ prompting principles and lessons learned</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#keeping-claude-md-lean">Keeping CLAUDE.md lean</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#credential-isolation">Credential isolation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cross-language-conventions">Cross-language conventions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tool-compatibility-claude-code-and-github-copilot">Tool compatibility: Claude Code and GitHub Copilot</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-reading">Further reading</a></li>
 </ul>
   </nav></div>

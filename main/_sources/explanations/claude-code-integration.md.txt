@@ -160,6 +160,23 @@ Conventional Commits, Sphinx + Diataxis docs, pre-commit hooks, and a
 consistent GitHub Actions CI structure. These are documented separately
 in {doc}`project-conventions`.
 
+## Tool compatibility: Claude Code and GitHub Copilot
+
+The configuration in this project works with both
+[Claude Code](https://claude.com/claude-code) and
+[GitHub Copilot](https://github.com/features/copilot). Copilot reads
+`CLAUDE.md` directly (alongside its own `.github/copilot-instructions.md`
+and `AGENTS.md` formats), so there is no need to duplicate project
+instructions. Skills in `.claude/skills/` are also picked up automatically
+by Copilot — the `SKILL.md` frontmatter format is an open standard shared
+across Claude Code, Copilot, Cursor, Gemini CLI, and other tools.
+
+The difference is in the safety layer. The `.claude/settings.json`
+permissions, hooks, and deny rules are Claude Code features — Copilot does
+not enforce them. For Copilot users, the devcontainer still provides
+isolation, but the fine-grained permission and hook controls described
+above are not applied.
+
 ## Further reading
 
 - {doc}`project-conventions` — shared tooling, devcontainer setup, and
