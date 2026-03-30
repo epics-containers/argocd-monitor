@@ -24,8 +24,11 @@ curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt-get install -y --no-install-recommends nodejs
 rm -rf /var/lib/apt/lists/*
 
+# Install ArgoCD CLI
+curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+chmod +x /usr/local/bin/argocd
 
 # Install npm and Python dependencies
 npm install
 uv sync --all-extras
-pre-commit install --install-hooks
+uv run pre-commit install --install-hooks

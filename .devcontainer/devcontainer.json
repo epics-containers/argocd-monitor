@@ -28,7 +28,6 @@
         // container. They are kept here as documentation; set them in your
         // host VS Code settings for defence-in-depth. The real guard is
         // `git config --global credential.helper ''` in postCreate.sh.
-        "dev.containers.copyGitConfig": false,
         "dev.containers.gitCredentialHelperConfigLocation": "none"
       },
       "extensions": [

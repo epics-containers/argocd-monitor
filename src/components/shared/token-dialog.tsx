@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -7,9 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { getStoredToken, getStoredRefreshToken, saveTokens } from "@/lib/auth-token";
+import { getStoredRefreshToken, getStoredToken, saveTokens } from "@/lib/auth-token";
+import { useState } from "react";
 
 interface TokenDialogProps {
   open: boolean;
@@ -30,7 +30,7 @@ export function TokenDialog({ open, onTokenSubmit }: TokenDialogProps) {
 
   return (
     <Dialog open={open}>
-      <DialogContent showCloseButton={false}>
+      <DialogContent showCloseButton={false} className="sm:max-w-2xl">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>ArgoCD Authentication</DialogTitle>
@@ -39,9 +39,8 @@ export function TokenDialog({ open, onTokenSubmit }: TokenDialogProps) {
             </DialogDescription>
           </DialogHeader>
           <div className="my-4 flex flex-col gap-3">
-            <pre className="rounded-md bg-muted p-2 text-xs whitespace-pre-wrap">
-{`module load ec
-argocd login ${(import.meta.env.VITE_ARGOCD_HOST as string) || "argocd.diamond.ac.uk"} --grpc-web --sso
+            <pre className="rounded-md bg-muted p-2 text-xs overflow-x-auto">
+{`/dls_sw/work/ec-modules/argocd login ${(import.meta.env.VITE_ARGOCD_HOST as string) || "argocd.diamond.ac.uk"} --grpc-web --sso
 cat ~/.config/argocd/config`}
             </pre>
             <p className="text-xs text-muted-foreground">
