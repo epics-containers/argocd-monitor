@@ -23,9 +23,6 @@
     // Allow SELinux to permit host file copies (e.g. copyGitConfig via podman cp)
     "--security-opt=label=disable"
   ],
-  "remoteUser": "root",
-  "postCreateCommand": ".devcontainer/postCreate.sh",
-  "postStartCommand": ".devcontainer/postStart.sh",
   "customizations": {
     "vscode": {
       "settings": {
@@ -46,6 +43,13 @@
       ]
     }
   },
+  // rootless podman + root "inside" the container is the gold standard!
+  // it makes host mounts of the source folder seamless.
+  "remoteUser": "root",
+  // Additional setup once the container is created and running.
+  // This is where we install dependencies, set up git config, etc.
+  "postCreateCommand": ".devcontainer/postCreate.sh",
+  "postStartCommand": ".devcontainer/postStart.sh",
   "initializeCommand": "mkdir -p ${localEnv:HOME}/.claude ${localEnv:HOME}/.config/terminal-config",
   "mounts": [
     // Persist gh auth across container rebuilds with per-repo scoped PAT
@@ -71,7 +75,7 @@
       "source": "${localEnv:HOME}/.config/terminal-config",
       "target": "/user-terminal-config",
       "type": "bind"
-    },
+    }
   ],
   // Mount the parent as /workspaces so we can pip install peers as editable
   "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind"
