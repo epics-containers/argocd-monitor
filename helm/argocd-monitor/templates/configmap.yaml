@@ -21,6 +21,14 @@ data:
             {{- end }}
         }
 
+        {{- if .Values.oauth2Proxy.enabled }}
+        # User info from oauth2-proxy headers (ArgoCD's userinfo doesn't work with Bearer tokens)
+        location = /api/oauth2/userinfo {
+            default_type application/json;
+            return 200 '{"loggedIn":true,"username":"$http_x_forwarded_preferred_username","email":"$http_x_forwarded_email"}';
+        }
+        {{- end }}
+
         # Dedicated location for log streaming — must be above /api/ catch-all
         location ~ ^/api/v1/applications/[^/]+/logs {
             proxy_pass {{ .Values.argocd.url }};

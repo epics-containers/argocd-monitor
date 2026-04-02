@@ -54,7 +54,24 @@ docs-watch:
 pre-commit:
     uv run pre-commit run --all-files --show-diff-on-failure
 
-# Create a SealedSecret for oauth2-proxy (client-secret + cookie-secret)
+# Create a SealedSecret for oauth2-proxy (plaintext client secret)
+seal-secret-plain namespace:
+    #!/bin/bash
+    set -euo pipefail
+    read -sp "Client secret: " client_secret && echo
+    cookie_secret=$(openssl rand -hex 16)
+    echo "Creating SealedSecret in namespace '{{namespace}}'..."
+    kubectl create secret generic argocd-monitor-oauth2 \
+        --namespace="{{namespace}}" \
+        --from-literal=client-secret="$client_secret" \
+        --from-literal=cookie-secret="$cookie_secret" \
+        --dry-run=client -o json \
+    | kubeseal --format yaml \
+        --namespace="{{namespace}}" \
+    | kubectl apply -f -
+    echo "SealedSecret applied to namespace '{{namespace}}'"
+
+# Create a SealedSecret for oauth2-proxy (PGP-encrypted client secret)
 seal-secret namespace:
     #!/bin/bash
     set -euo pipefail
