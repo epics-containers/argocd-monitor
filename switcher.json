@@ -4,6 +4,10 @@
     "url": "https://epics-containers.github.io/argocd-monitor/main/"
   },
   {
+    "version": "v0.5.0-beta.5",
+    "url": "https://epics-containers.github.io/argocd-monitor/v0.5.0-beta.5/"
+  },
+  {
     "version": "0.5.0-beta.4",
     "url": "https://epics-containers.github.io/argocd-monitor/0.5.0-beta.4/"
   },

@@ -1,0 +1,819 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>API and Authentication &#8212; argocd-monitor v0.5.0-beta.5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=0adba3fc"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/api-and-auth';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/argocd-monitor/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Claude Code Integration" href="claude-code-integration.html" />
+    <link rel="prev" title="Architecture" href="architecture.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="dev" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">argocd-monitor</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/argocd-monitor" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/argocd-monitor" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">API and Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="claude-code-integration.html">Claude Code Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project-conventions.html">Project Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci-cd-pipeline.html">CI/CD Pipeline</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../explanations.html" class="nav-link">Explanations</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">API and Authentication</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="api-and-authentication">
+<h1>API and Authentication<a class="headerlink" href="#api-and-authentication" title="Link to this heading">#</a></h1>
+<p>This page explains how the app communicates with the ArgoCD API —
+authentication, data fetching, caching, and log streaming.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#token-lifecycle" id="id1">Token lifecycle</a></p>
+<ul>
+<li><p><a class="reference internal" href="#cookie-security-flags" id="id2">Cookie security flags</a></p></li>
+<li><p><a class="reference internal" href="#handling-401s-the-singleton-refresh-promise" id="id3">Handling 401s: the singleton refresh promise</a></p></li>
+<li><p><a class="reference internal" href="#asymmetric-token-clearing-on-failure" id="id4">Asymmetric token clearing on failure</a></p></li>
+<li><p><a class="reference internal" href="#the-authgate-pattern" id="id5">The AuthGate pattern</a></p></li>
+<li><p><a class="reference internal" href="#why-useauth-disables-refetchonwindowfocus" id="id6">Why useAuth disables refetchOnWindowFocus</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#data-fetching-with-react-query" id="id7">Data fetching with React Query</a></p>
+<ul>
+<li><p><a class="reference internal" href="#query-key-hierarchy" id="id8">Query key hierarchy</a></p></li>
+<li><p><a class="reference internal" href="#polling-with-refetch-intervals" id="id9">Polling with refetch intervals</a></p></li>
+<li><p><a class="reference internal" href="#mutation-invalidation" id="id10">Mutation invalidation</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#streaming-logs" id="id11">Streaming logs</a></p>
+<ul>
+<li><p><a class="reference internal" href="#the-transport-layer" id="id12">The transport layer</a></p></li>
+<li><p><a class="reference internal" href="#the-async-generator" id="id13">The async generator</a></p></li>
+<li><p><a class="reference internal" href="#the-react-hook" id="id14">The React hook</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#cancellation-with-abortcontroller" id="id15">Cancellation with AbortController</a></p></li>
+</ul>
+</nav>
+<section id="token-lifecycle">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Token lifecycle</a><a class="headerlink" href="#token-lifecycle" title="Link to this heading">#</a></h2>
+<p>Authentication starts when a user runs <code class="docutils literal notranslate"><span class="pre">argocd</span> <span class="pre">login</span> <span class="pre">--sso</span></code> on their
+workstation to authenticate via Keycloak, then copies the resulting
+<code class="docutils literal notranslate"><span class="pre">auth-token</span></code> and (optionally) <code class="docutils literal notranslate"><span class="pre">refresh-token</span></code> from
+<code class="docutils literal notranslate"><span class="pre">~/.config/argocd/config</span></code> into the app’s login dialog.</p>
+<p>When the user submits tokens in the <code class="docutils literal notranslate"><span class="pre">TokenDialog</span></code>
+(<code class="docutils literal notranslate"><span class="pre">src/components/shared/token-dialog.tsx:23</span></code>), <code class="docutils literal notranslate"><span class="pre">saveTokens()</span></code> writes
+both values to localStorage <strong>and</strong> sets them as browser cookies
+(<code class="docutils literal notranslate"><span class="pre">src/lib/auth-token.ts:62</span></code>). This dual storage is intentional –
+localStorage is the durable source of truth, while cookies are needed
+because <code class="docutils literal notranslate"><span class="pre">fetch()</span></code> calls use <code class="docutils literal notranslate"><span class="pre">credentials:</span> <span class="pre">&quot;include&quot;</span></code> so the browser
+automatically attaches them to every API request
+(<code class="docutils literal notranslate"><span class="pre">src/api/argocd-client.ts:67</span></code>).</p>
+<p>On page load, <code class="docutils literal notranslate"><span class="pre">applyStoredTokens()</span></code> runs at module-import time
+(<code class="docutils literal notranslate"><span class="pre">src/api/argocd-client.ts:9</span></code>) to re-sync localStorage values back
+into cookies, since cookies may have expired or been cleared by the
+browser between sessions.</p>
+<section id="cookie-security-flags">
+<h3><a class="toc-backref" href="#id2" role="doc-backlink">Cookie security flags</a><a class="headerlink" href="#cookie-security-flags" title="Link to this heading">#</a></h3>
+<p>Cookies are set with <code class="docutils literal notranslate"><span class="pre">SameSite=Strict</span></code> to prevent CSRF, and with
+<code class="docutils literal notranslate"><span class="pre">Secure</span></code> when the page is served over HTTPS
+(<code class="docutils literal notranslate"><span class="pre">src/lib/auth-token.ts:9-10</span></code>). The <code class="docutils literal notranslate"><span class="pre">Secure</span></code> flag is conditional
+because the app may run over plain HTTP during local development.</p>
+</section>
+<section id="handling-401s-the-singleton-refresh-promise">
+<h3><a class="toc-backref" href="#id3" role="doc-backlink">Handling 401s: the singleton refresh promise</a><a class="headerlink" href="#handling-401s-the-singleton-refresh-promise" title="Link to this heading">#</a></h3>
+<p>When any API call returns a 401, the client attempts to refresh the
+auth token before giving up. The key design challenge here is
+concurrency: if multiple API requests are in flight and they all
+receive 401s simultaneously, the app must not fire multiple refresh
+requests in parallel.</p>
+<p>The solution is a module-level singleton promise
+(<code class="docutils literal notranslate"><span class="pre">src/api/argocd-client.ts:28</span></code>). The first 401 that calls
+<code class="docutils literal notranslate"><span class="pre">tryRefreshToken()</span></code> creates the promise and stores it in
+<code class="docutils literal notranslate"><span class="pre">refreshPromise</span></code>. Any subsequent 401 that arrives while that refresh
+is still in progress receives the <strong>same</strong> promise, so all callers
+wait on a single network request. The <code class="docutils literal notranslate"><span class="pre">finally</span></code> block clears
+<code class="docutils literal notranslate"><span class="pre">refreshPromise</span></code> back to <code class="docutils literal notranslate"><span class="pre">null</span></code> once the attempt settles
+(<code class="docutils literal notranslate"><span class="pre">src/api/argocd-client.ts:52</span></code>), allowing future 401s to try again.</p>
+<p>If the refresh succeeds, <code class="docutils literal notranslate"><span class="pre">saveTokens()</span></code> writes the new auth token to
+both localStorage and cookies, and the original request is retried. If
+it fails, the flow falls through to <code class="docutils literal notranslate"><span class="pre">onAuthFailure()</span></code>.</p>
+</section>
+<section id="asymmetric-token-clearing-on-failure">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Asymmetric token clearing on failure</a><a class="headerlink" href="#asymmetric-token-clearing-on-failure" title="Link to this heading">#</a></h3>
+<p>When authentication fails irrecoverably, <code class="docutils literal notranslate"><span class="pre">onAuthFailure()</span></code>
+(<code class="docutils literal notranslate"><span class="pre">src/lib/auth-token.ts:47</span></code>) clears only the auth token and its
+cookie. The refresh token is deliberately preserved. This means the
+<code class="docutils literal notranslate"><span class="pre">TokenDialog</span></code> will re-appear (because the auth token snapshot becomes
+falsy), but the refresh token field will still be pre-populated with
+the previously stored value. The user only needs to paste a new auth
+token rather than re-entering both.</p>
+<p>By contrast, <code class="docutils literal notranslate"><span class="pre">clearStoredToken()</span></code> (<code class="docutils literal notranslate"><span class="pre">src/lib/auth-token.ts:35</span></code>) removes
+<strong>both</strong> tokens and is used for explicit logout.</p>
+</section>
+<section id="the-authgate-pattern">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">The AuthGate pattern</a><a class="headerlink" href="#the-authgate-pattern" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">AuthGate</span></code> (<code class="docutils literal notranslate"><span class="pre">src/App.tsx:22</span></code>) is a thin wrapper around all routes that
+uses React’s <code class="docutils literal notranslate"><span class="pre">useSyncExternalStore</span></code> to subscribe to the token store.
+It reads <code class="docutils literal notranslate"><span class="pre">getTokenSnapshot()</span></code>, which returns a boolean indicating
+whether an auth token exists in localStorage.</p>
+<p>When the snapshot is <code class="docutils literal notranslate"><span class="pre">false</span></code>, the <code class="docutils literal notranslate"><span class="pre">TokenDialog</span></code> opens as a modal
+overlay. Crucially, the child routes are still rendered behind the
+dialog – <code class="docutils literal notranslate"><span class="pre">AuthGate</span></code> does not conditionally unmount them. This avoids
+losing React state if a token expires mid-session: the dialog appears,
+the user pastes a new token, and the app continues from where it left
+off.</p>
+<p>After a successful token submission, the <code class="docutils literal notranslate"><span class="pre">onTokenSubmit</span></code> callback
+invalidates all React Query caches
+(<code class="docutils literal notranslate"><span class="pre">src/App.tsx:29</span></code>), causing every active query to refetch with the new
+credentials.</p>
+</section>
+<section id="why-useauth-disables-refetchonwindowfocus">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Why useAuth disables refetchOnWindowFocus</a><a class="headerlink" href="#why-useauth-disables-refetchonwindowfocus" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">useAuth</span></code> hook (<code class="docutils literal notranslate"><span class="pre">src/hooks/use-auth.ts:4</span></code>) queries the
+<code class="docutils literal notranslate"><span class="pre">/api/v1/session/userinfo</span></code> endpoint to check whether the current
+session is valid. It explicitly sets <code class="docutils literal notranslate"><span class="pre">refetchOnWindowFocus:</span> <span class="pre">false</span></code>,
+overriding the app-wide default of <code class="docutils literal notranslate"><span class="pre">true</span></code>
+(<code class="docutils literal notranslate"><span class="pre">src/App.tsx:17</span></code>).</p>
+<p>Without this override, every tab switch or window focus would fire a
+userinfo request. If the token has expired, that request returns a 401,
+which triggers <code class="docutils literal notranslate"><span class="pre">onAuthFailure()</span></code>, which clears the auth token and pops
+the login dialog – even though the user may simply be switching back
+to the app. Disabling focus-based refetch for this specific query
+prevents the dialog from appearing unexpectedly on every window focus
+event when the token is stale.</p>
+</section>
+</section>
+<section id="data-fetching-with-react-query">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Data fetching with React Query</a><a class="headerlink" href="#data-fetching-with-react-query" title="Link to this heading">#</a></h2>
+<p>All HTTP calls flow through <code class="docutils literal notranslate"><span class="pre">argocdFetch&lt;T&gt;</span></code> (JSON) and
+<code class="docutils literal notranslate"><span class="pre">argocdFetchStream</span></code> (streaming) in <code class="docutils literal notranslate"><span class="pre">src/api/argocd-client.ts</span></code>. Both
+share the same 401-handling logic described above.</p>
+<section id="query-key-hierarchy">
+<h3><a class="toc-backref" href="#id8" role="doc-backlink">Query key hierarchy</a><a class="headerlink" href="#query-key-hierarchy" title="Link to this heading">#</a></h3>
+<p>React Query uses <strong>query keys</strong> to identify cached data. This app
+organises keys into a hierarchy that mirrors the API resource model:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Hook</p></th>
+<th class="head"><p>Query key</p></th>
+<th class="head"><p>Scope</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">useApplications</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[&quot;applications&quot;,</span> <span class="pre">project]</span></code></p></td>
+<td><p>All apps, optionally filtered by project</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">useApplication</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[&quot;application&quot;,</span> <span class="pre">name,</span> <span class="pre">appNamespace]</span></code></p></td>
+<td><p>Single app metadata</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">useResourceTree</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[&quot;resourceTree&quot;,</span> <span class="pre">appName,</span> <span class="pre">appNamespace]</span></code></p></td>
+<td><p>Kubernetes resources owned by one app</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The first element of each key acts as a <strong>category tag</strong>. Because React
+Query matches keys by prefix, invalidating <code class="docutils literal notranslate"><span class="pre">[&quot;applications&quot;]</span></code> (without
+a project) clears every project-scoped variant too.</p>
+<p>Key definitions live alongside the hooks that use them
+(<code class="docutils literal notranslate"><span class="pre">src/hooks/use-applications.ts:10</span></code>, <code class="docutils literal notranslate"><span class="pre">src/hooks/use-application.ts:7</span></code>,
+<code class="docutils literal notranslate"><span class="pre">src/hooks/use-application.ts:15</span></code>).</p>
+</section>
+<section id="polling-with-refetch-intervals">
+<h3><a class="toc-backref" href="#id9" role="doc-backlink">Polling with refetch intervals</a><a class="headerlink" href="#polling-with-refetch-intervals" title="Link to this heading">#</a></h3>
+<p>Two hooks set up automatic background polling so the UI stays current
+without manual refreshes:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">useApplications</span></code></strong> refetches every <code class="docutils literal notranslate"><span class="pre">VITE_REFRESH_INTERVAL</span></code>
+milliseconds (default 30 000) and marks data stale after 10 seconds.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">useResourceTree</span></code></strong> refetches every 15 seconds to keep the pod
+table up to date.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">useApplication</span></code> does <strong>not</strong> poll – the detail page relies on
+<code class="docutils literal notranslate"><span class="pre">useResourceTree</span></code> for live resource state while the app metadata
+changes infrequently.</p>
+</section>
+<section id="mutation-invalidation">
+<h3><a class="toc-backref" href="#id10" role="doc-backlink">Mutation invalidation</a><a class="headerlink" href="#mutation-invalidation" title="Link to this heading">#</a></h3>
+<p>When a user restarts a pod, the <code class="docutils literal notranslate"><span class="pre">useRestartPod</span></code> mutation needs to
+update three levels of the cache so every view reflects the change. Its
+<code class="docutils literal notranslate"><span class="pre">onSuccess</span></code> handler (<code class="docutils literal notranslate"><span class="pre">src/hooks/use-restart-pod.ts:17-26</span></code>) invalidates
+queries in a cascade:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[&quot;resourceTree&quot;,</span> <span class="pre">appName]</span></code> – the pod table for the affected
+application.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[&quot;application&quot;,</span> <span class="pre">appName]</span></code> – the application detail (health status
+may change).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[&quot;applications&quot;]</span></code> – the top-level application list (sync/health
+summary columns).</p></li>
+</ol>
+<p>Because keys are matched by prefix, the <code class="docutils literal notranslate"><span class="pre">[&quot;applications&quot;]</span></code> invalidation
+covers all project-filtered variants in a single call.</p>
+</section>
+</section>
+<section id="streaming-logs">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Streaming logs</a><a class="headerlink" href="#streaming-logs" title="Link to this heading">#</a></h2>
+<p>Log streaming is the most complex data-fetching pattern in the app. It
+bypasses React Query entirely because log data is an append-only stream,
+not a cacheable query result.</p>
+<section id="the-transport-layer">
+<h3><a class="toc-backref" href="#id12" role="doc-backlink">The transport layer</a><a class="headerlink" href="#the-transport-layer" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">argocdFetchStream</span></code> (<code class="docutils literal notranslate"><span class="pre">src/api/argocd-client.ts:97-127</span></code>) returns a raw
+<code class="docutils literal notranslate"><span class="pre">ReadableStream&lt;Uint8Array&gt;</span></code> from the Fetch API. It handles 401
+responses the same way <code class="docutils literal notranslate"><span class="pre">argocdFetch</span></code> does – attempting a token refresh
+before giving up.</p>
+</section>
+<section id="the-async-generator">
+<h3><a class="toc-backref" href="#id13" role="doc-backlink">The async generator</a><a class="headerlink" href="#the-async-generator" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">streamLogs</span></code> (<code class="docutils literal notranslate"><span class="pre">src/api/logs.ts:14-85</span></code>) wraps the readable stream in an
+<strong>async generator</strong>. It reads chunks from the stream, accumulates them
+in a text buffer, splits on newline boundaries, and <code class="docutils literal notranslate"><span class="pre">yield</span></code>s each
+parsed <code class="docutils literal notranslate"><span class="pre">LogEntry</span></code>. This approach:</p>
+<ul class="simple">
+<li><p>Lets the consumer use a simple <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">await...of</span></code> loop.</p></li>
+<li><p>Handles partial JSON lines that span chunk boundaries by keeping a
+buffer (<code class="docutils literal notranslate"><span class="pre">src/api/logs.ts:61</span></code>).</p></li>
+<li><p>Releases the stream reader lock in a <code class="docutils literal notranslate"><span class="pre">finally</span></code> block
+(<code class="docutils literal notranslate"><span class="pre">src/api/logs.ts:83</span></code>) so the connection is cleaned up regardless of
+how the loop exits.</p></li>
+</ul>
+</section>
+<section id="the-react-hook">
+<h3><a class="toc-backref" href="#id14" role="doc-backlink">The React hook</a><a class="headerlink" href="#the-react-hook" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">useLogs</span></code> (<code class="docutils literal notranslate"><span class="pre">src/hooks/use-logs.ts:15-90</span></code>) manages the stream lifecycle
+inside a React component:</p>
+<ul class="simple">
+<li><p><strong>Start/stop</strong> – the <code class="docutils literal notranslate"><span class="pre">start</span></code> callback creates a new
+<code class="docutils literal notranslate"><span class="pre">AbortController</span></code>, clears accumulated lines, and kicks off the stream.
+The <code class="docutils literal notranslate"><span class="pre">stop</span></code> callback aborts the controller, resetting state.</p></li>
+<li><p><strong>Appending lines</strong> – each yielded entry is appended to state via
+<code class="docutils literal notranslate"><span class="pre">setLines(prev</span> <span class="pre">=&gt;</span> <span class="pre">[...prev,</span> <span class="pre">entry.content])</span></code>.</p></li>
+<li><p><strong>Auto-reconnect</strong> – when <code class="docutils literal notranslate"><span class="pre">follow</span></code> mode is enabled and the stream
+errors, the hook retries up to <code class="docutils literal notranslate"><span class="pre">MAX_RETRIES</span></code> (3) times with a
+2-second delay between attempts. A successful read resets the retry
+counter, so only <em>consecutive</em> failures count towards the limit.</p></li>
+</ul>
+</section>
+</section>
+<section id="cancellation-with-abortcontroller">
+<h2><a class="toc-backref" href="#id15" role="doc-backlink">Cancellation with AbortController</a><a class="headerlink" href="#cancellation-with-abortcontroller" title="Link to this heading">#</a></h2>
+<p>The app uses <code class="docutils literal notranslate"><span class="pre">AbortController</span></code> in two places to cancel in-flight HTTP
+requests:</p>
+<ol class="arabic simple">
+<li><p><strong>Log streaming</strong> – <code class="docutils literal notranslate"><span class="pre">useLogs</span></code> stores a controller in a ref. Calling
+<code class="docutils literal notranslate"><span class="pre">stop()</span></code> or unmounting the component aborts the signal, which
+propagates through <code class="docutils literal notranslate"><span class="pre">argocdFetchStream</span></code> into the underlying <code class="docutils literal notranslate"><span class="pre">fetch</span></code>
+call. The async generator’s <code class="docutils literal notranslate"><span class="pre">reader.read()</span></code> rejects with an
+<code class="docutils literal notranslate"><span class="pre">AbortError</span></code>, which the hook catches and silently ignores.</p></li>
+<li><p><strong>React Query queries</strong> – TanStack React Query passes its own
+<code class="docutils literal notranslate"><span class="pre">AbortSignal</span></code> to query functions automatically. When a component
+unmounts or a query is cancelled, React Query aborts the signal. The
+app’s <code class="docutils literal notranslate"><span class="pre">argocdFetch</span></code> receives this through the <code class="docutils literal notranslate"><span class="pre">init</span></code> parameter’s
+<code class="docutils literal notranslate"><span class="pre">signal</span></code> property.</p></li>
+</ol>
+<p>This ensures that navigating away from a page does not leave orphaned
+connections consuming server resources.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="architecture.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Architecture</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="claude-code-integration.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Claude Code Integration</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#token-lifecycle">Token lifecycle</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cookie-security-flags">Cookie security flags</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-401s-the-singleton-refresh-promise">Handling 401s: the singleton refresh promise</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#asymmetric-token-clearing-on-failure">Asymmetric token clearing on failure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-authgate-pattern">The AuthGate pattern</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-useauth-disables-refetchonwindowfocus">Why useAuth disables refetchOnWindowFocus</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-fetching-with-react-query">Data fetching with React Query</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#query-key-hierarchy">Query key hierarchy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#polling-with-refetch-intervals">Polling with refetch intervals</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mutation-invalidation">Mutation invalidation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#streaming-logs">Streaming logs</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-transport-layer">The transport layer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-async-generator">The async generator</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-react-hook">The React hook</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cancellation-with-abortcontroller">Cancellation with AbortController</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/argocd-monitor/edit/dev/docs/explanations/api-and-auth.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/explanations/api-and-auth.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
