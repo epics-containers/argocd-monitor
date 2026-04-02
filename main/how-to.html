@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>How-to Guides &#8212; argocd-monitor 0.4.0-3-g963129c documentation</title>
+    <title>How-to Guides &#8212; argocd-monitor v0.5.0-beta.5-2-g23787ae documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=da9469ab"></script>
+    <script src="_static/documentation_options.js?v=04fa6921"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -366,6 +366,7 @@
 <li class="toctree-l1"><a class="reference internal" href="how-to/configure-argocd.html">Configure ArgoCD Connection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to/nginx-configuration.html">Nginx Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to/helm-deployment.html">Helm Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to/keycloak-authentication.html">Keycloak Authentication</a></li>
 </ul>
 </div>
 </nav></div>
@@ -446,6 +447,17 @@
 <li class="toctree-l2"><a class="reference internal" href="how-to/helm-deployment.html#automatic-pod-restart-on-configmap-changes">Automatic pod restart on ConfigMap changes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="how-to/helm-deployment.html#how-the-configmap-renders-the-nginx-config">How the ConfigMap renders the nginx config</a></li>
 <li class="toctree-l2"><a class="reference internal" href="how-to/helm-deployment.html#ingress-and-tls-configuration">Ingress and TLS configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="how-to/keycloak-authentication.html">Keycloak Authentication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="how-to/keycloak-authentication.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how-to/keycloak-authentication.html#how-it-works">How it works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how-to/keycloak-authentication.html#dex-configuration-required">Dex configuration (required)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how-to/keycloak-authentication.html#step-1-create-the-sealed-secret">Step 1: Create the sealed secret</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how-to/keycloak-authentication.html#step-2-deploy-with-oauth2-proxy-enabled">Step 2: Deploy with oauth2-proxy enabled</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how-to/keycloak-authentication.html#oauth2-proxy-values-reference">OAuth2 proxy values reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how-to/keycloak-authentication.html#passing-additional-oauth2-proxy-arguments">Passing additional oauth2-proxy arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how-to/keycloak-authentication.html#deploying-without-keycloak">Deploying without Keycloak</a></li>
 </ul>
 </li>
 </ul>

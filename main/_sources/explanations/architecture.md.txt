@@ -32,9 +32,9 @@ Currently the app uses manually-pasted ArgoCD tokens. Users run
 the app's login dialog. Tokens are stored in localStorage and synced
 to cookies for API requests.
 
-**Planned:** Direct OIDC authentication via Keycloak so users log in
-through the browser without manual token handling. See
-{doc}`oidc-auth-plan` for details.
+Optionally, Keycloak OIDC authentication can be enabled via an oauth2-proxy
+sidecar so users log in through SSO without manual token handling. See
+{doc}`/how-to/keycloak-authentication` for details.
 
 ## Deployment
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Configure ArgoCD Connection &#8212; argocd-monitor 0.4.0-3-g963129c documentation</title>
+    <title>Configure ArgoCD Connection &#8212; argocd-monitor v0.5.0-beta.5-2-g23787ae documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=da9469ab"></script>
+    <script src="../_static/documentation_options.js?v=04fa6921"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -366,6 +366,7 @@
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Configure ArgoCD Connection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nginx-configuration.html">Nginx Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="helm-deployment.html">Helm Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keycloak-authentication.html">Keycloak Authentication</a></li>
 </ul>
 </div>
 </nav></div>
@@ -458,9 +459,8 @@ configured via the Helm chart’s <code class="docutils literal notranslate"><sp
 <span class="w">  </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://argocd.diamond.ac.uk</span>
 </pre></div>
 </div>
-<p>Users currently authenticate by pasting tokens into the app’s login
-dialog. OIDC authentication via Keycloak is planned — see
-<a class="reference internal" href="../explanations/oidc-auth-plan.html"><span class="doc">OIDC Authentication via Keycloak</span></a>.</p>
+<p>Users can authenticate by pasting tokens into the app’s login dialog,
+or via Keycloak SSO — see <a class="reference internal" href="keycloak-authentication.html"><span class="doc">Keycloak Authentication</span></a>.</p>
 <p>See <a class="reference internal" href="helm-deployment.html"><span class="doc">Helm Deployment</span></a> for full Helm customization including
 service type, Ingress/TLS, and resource limits.</p>
 </section>
