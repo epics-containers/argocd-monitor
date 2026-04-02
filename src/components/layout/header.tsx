@@ -43,12 +43,12 @@ export function Header() {
           </h1>
         </button>
         <div className="flex items-center gap-3">
-          {user?.username && (
+          {(user?.email || user?.username) && (
             <span className="text-sm text-muted-foreground">
-              {user.username}
+              {user.email ? (user.username ? `${user.email} (${user.username})` : user.email) : user.username}
             </span>
           )}
-          {user?.username && (
+          {(user?.email || user?.username) && (
             <Button variant="ghost" size="icon-sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4" />
             </Button>
