@@ -34,9 +34,8 @@ argocd:
   url: https://argocd.diamond.ac.uk
 ```
 
-Users currently authenticate by pasting tokens into the app's login
-dialog. OIDC authentication via Keycloak is planned — see
-{doc}`/explanations/oidc-auth-plan`.
+Users can authenticate by pasting tokens into the app's login dialog,
+or via Keycloak SSO — see {doc}`/how-to/keycloak-authentication`.
 
 See {doc}`/how-to/helm-deployment` for full Helm customization including
 service type, Ingress/TLS, and resource limits.

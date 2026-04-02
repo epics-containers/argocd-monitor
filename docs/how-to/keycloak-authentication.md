@@ -8,6 +8,7 @@ ArgoCD tokens.
 ## Prerequisites
 
 - A Keycloak realm with an OIDC client registered for argocd-monitor
+- ArgoCD configured with OIDC against the same Keycloak realm
 - `gpg`, `kubeseal`, and `kubectl` available locally
 - Access to the target Kubernetes cluster
 
@@ -23,12 +24,32 @@ Browser -> oauth2-proxy (:4180) -> nginx (:8080) -> ArgoCD API
 ```
 
 The proxy handles the full OIDC login flow with Keycloak. After
-authentication, it passes the access token to nginx via the
-`X-Forwarded-Access-Token` header. Nginx injects this as an `argocd.token`
-cookie when proxying requests to ArgoCD.
+authentication, it passes the OIDC ID token to nginx via the
+`Authorization: Bearer` header. Nginx forwards this header when proxying
+API requests to ArgoCD, which validates the token against Keycloak's JWKS.
 
 The frontend detects the auth mode automatically via the `/api/auth-mode`
 endpoint and skips the manual token dialog.
+
+## Keycloak audience mapping (required)
+
+ArgoCD only accepts OIDC tokens where the `aud` (audience) claim includes
+ArgoCD's own client ID. By default, the argocd-monitor client's tokens will
+have `aud` set to its own client ID, which ArgoCD will reject.
+
+To fix this, add an **Audience protocol mapper** to the argocd-monitor client
+in Keycloak:
+
+1. Open the Keycloak admin console for your realm
+2. Go to **Clients** -> your argocd-monitor client -> **Client scopes**
+3. Open the **dedicated** scope -> **Add mapper** -> **By configuration**
+4. Choose **Audience**
+5. Set **Included Client Audience** to ArgoCD's OIDC client ID
+6. Enable **Add to ID token**
+7. Save
+
+This ensures the ID token contains both client IDs in the `aud` claim,
+allowing ArgoCD to accept it.
 
 ## Step 1: Create the sealed secret
 
