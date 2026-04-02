@@ -7,9 +7,10 @@ ArgoCD tokens.
 
 ## Prerequisites
 
-- A Keycloak realm with an OIDC client registered for argocd-monitor
-- ArgoCD configured with OIDC against the same Keycloak realm
-- `gpg`, `kubeseal`, and `kubectl` available locally
+- ArgoCD configured with [Dex](https://dexidp.io/) as its OIDC provider,
+  with Dex connected to Keycloak as an upstream identity provider
+- A Dex static client registered for argocd-monitor (see below)
+- `kubeseal` and `kubectl` available locally
 - Access to the target Kubernetes cluster
 
 ## How it works
@@ -17,59 +18,81 @@ ArgoCD tokens.
 When `oauth2Proxy.enabled` is `true`, the Helm chart deploys an oauth2-proxy
 sidecar container alongside nginx. Traffic flows through the proxy first:
 
-```
-Browser -> oauth2-proxy (:4180) -> nginx (:8080) -> ArgoCD API
-               |
-           Keycloak OIDC
+```{mermaid}
+flowchart LR
+    Browser -->|":80"| oauth2-proxy
+    oauth2-proxy -->|":4180"| nginx
+    nginx -->|":8080"| ArgoCD[ArgoCD API]
+
+    subgraph " "
+        direction TB
+        oauth2-proxy <-->|OIDC| Dex
+        Dex <-->|Upstream IdP| Keycloak
+    end
 ```
 
-The proxy handles the full OIDC login flow with Keycloak. After
-authentication, it passes the OIDC ID token to nginx via the
-`Authorization: Bearer` header. Nginx forwards this header when proxying
-API requests to ArgoCD, which validates the token against Keycloak's JWKS.
+The proxy handles the full OIDC login flow via ArgoCD's Dex instance, which
+in turn authenticates against Keycloak. After authentication, oauth2-proxy
+passes the OIDC ID token to nginx via the `Authorization: Bearer` header.
+Nginx forwards this header when proxying API requests to ArgoCD, which
+validates the token against Dex's JWKS.
 
 The frontend detects the auth mode automatically via the `/api/auth-mode`
 endpoint and skips the manual token dialog.
 
-## Keycloak audience mapping (required)
+## Dex configuration (required)
 
-ArgoCD only accepts OIDC tokens where the `aud` (audience) claim includes
-ArgoCD's own client ID. By default, the argocd-monitor client's tokens will
-have `aud` set to its own client ID, which ArgoCD will reject.
+The ArgoCD team needs to configure two things in Dex:
 
-To fix this, add an **Audience protocol mapper** to the argocd-monitor client
-in Keycloak:
+### 1. Register a static client for argocd-monitor
 
-1. Open the Keycloak admin console for your realm
-2. Go to **Clients** -> your argocd-monitor client -> **Client scopes**
-3. Open the **dedicated** scope -> **Add mapper** -> **By configuration**
-4. Choose **Audience**
-5. Set **Included Client Audience** to ArgoCD's OIDC client ID
-6. Enable **Add to ID token**
-7. Save
+Add a static client to ArgoCD's `argocd-cm` ConfigMap under `dex.config`:
 
-This ensures the ID token contains both client IDs in the `aud` claim,
-allowing ArgoCD to accept it.
+```yaml
+dex.config: |
+  staticClients:
+    - id: argocd-monitor
+      name: ArgoCD Monitor
+      secret: <client-secret>
+      redirectURIs:
+        - https://argocd-monitor.example.com/oauth2/callback
+```
+
+### 2. Enable cross-client trust for the audience claim
+
+ArgoCD only accepts tokens where the `aud` (audience) claim includes its
+own client ID (`argocd`). To make Dex include `argocd` in tokens issued to
+`argocd-monitor`, add `argocd-monitor` as a trusted peer on the `argocd`
+client:
+
+```yaml
+dex.config: |
+  staticClients:
+    - id: argocd
+      # ... existing ArgoCD client config ...
+      trustedPeers:
+        - argocd-monitor
+```
+
+Then set the cross-client audience scope when deploying (see step 2 below).
 
 ## Step 1: Create the sealed secret
 
-The oauth2-proxy needs a **client secret** (from Keycloak) and a **cookie
-secret** (for session encryption). The `seal-secret` just command handles
-both:
+The oauth2-proxy needs a **client secret** (matching the Dex static client)
+and a **cookie secret** (for session encryption). Two just commands are
+available:
 
 ```bash
+# If you have a PGP-encrypted client secret:
 just seal-secret <namespace>
+
+# If you have the client secret in plaintext:
+just seal-secret-plain <namespace>
 ```
 
-This will:
-
-1. Prompt you to paste the PGP-encrypted client secret (press Ctrl-D when done)
-2. Decrypt it using your GPG key
-3. Auto-generate a random cookie secret
-4. Create a SealedSecret and apply it to the cluster
-
-The resulting Kubernetes Secret is named `argocd-monitor-oauth2` with two
-keys: `client-secret` and `cookie-secret`.
+Both will auto-generate a random cookie secret and apply a SealedSecret to
+the cluster. The resulting Kubernetes Secret is named `argocd-monitor-oauth2`
+with two keys: `client-secret` and `cookie-secret`.
 
 ## Step 2: Deploy with oauth2-proxy enabled
 
@@ -81,12 +104,16 @@ helm upgrade --install argocd-monitor \
   --namespace <namespace> \
   --set argocd.url=https://argocd.example.com \
   --set oauth2Proxy.enabled=true \
-  --set oauth2Proxy.clientId=my-client-id \
-  --set oauth2Proxy.issuerUrl=https://identity.example.com/realms/my-realm \
+  --set oauth2Proxy.clientId=argocd-monitor \
+  --set oauth2Proxy.issuerUrl=https://argocd.example.com/api/dex \
   --set oauth2Proxy.existingSecret=argocd-monitor-oauth2 \
   --set ingress.enabled=true \
-  --set ingress.host=argocd-monitor.example.com
+  --set ingress.host=argocd-monitor.example.com \
+  --set 'oauth2Proxy.extraArgs[0]=--scope=openid profile email audience:server:client_id:argocd'
 ```
+
+The `audience:server:client_id:argocd` scope tells Dex to include `argocd`
+in the token's `aud` claim (requires the `trustedPeers` config above).
 
 :::{note}
 Ingress with a real hostname is required for oauth2-proxy because the OIDC
@@ -107,9 +134,11 @@ ingress:
 
 oauth2Proxy:
   enabled: true
-  clientId: my-client-id
-  issuerUrl: https://identity.example.com/realms/my-realm
+  clientId: argocd-monitor
+  issuerUrl: https://argocd.example.com/api/dex
   existingSecret: argocd-monitor-oauth2
+  extraArgs:
+    - "--scope=openid profile email audience:server:client_id:argocd"
 ```
 
 Then deploy:
@@ -128,8 +157,8 @@ helm upgrade --install argocd-monitor \
 | `oauth2Proxy.enabled` | `false` | Enable the oauth2-proxy sidecar |
 | `oauth2Proxy.image.repository` | `quay.io/oauth2-proxy/oauth2-proxy` | Proxy container image |
 | `oauth2Proxy.image.tag` | `v7.7.1` | Proxy image tag |
-| `oauth2Proxy.clientId` | `""` | OIDC client ID from Keycloak |
-| `oauth2Proxy.issuerUrl` | `""` | OIDC issuer URL (e.g. `https://identity.example.com/realms/my-realm`) |
+| `oauth2Proxy.clientId` | `""` | OIDC client ID registered in Dex |
+| `oauth2Proxy.issuerUrl` | `""` | Dex issuer URL (e.g. `https://argocd.example.com/api/dex`) |
 | `oauth2Proxy.existingSecret` | `""` | Name of K8s Secret with `client-secret` and `cookie-secret` keys |
 | `oauth2Proxy.extraArgs` | `[]` | Additional oauth2-proxy command-line arguments |
 | `oauth2Proxy.resources.limits.cpu` | `50m` | CPU limit |
