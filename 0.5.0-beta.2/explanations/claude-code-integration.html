@@ -1,0 +1,767 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Claude Code Integration &#8212; argocd-monitor 0.5.0-beta.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=9c6d660b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/claude-code-integration';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/argocd-monitor/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Project Conventions" href="project-conventions.html" />
+    <link rel="prev" title="API and Authentication" href="api-and-auth.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="dev" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">argocd-monitor</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/argocd-monitor" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/argocd-monitor" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-and-auth.html">API and Authentication</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Claude Code Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project-conventions.html">Project Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oidc-auth-plan.html">OIDC Authentication via Keycloak</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci-cd-pipeline.html">CI/CD Pipeline</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../explanations.html" class="nav-link">Explanations</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Claude Code Integration</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="claude-code-integration">
+<h1>Claude Code Integration<a class="headerlink" href="#claude-code-integration" title="Link to this heading">#</a></h1>
+<p>This project is a showcase for integrating
+<a class="reference external" href="https://claude.com/claude-code">Claude Code</a> into a devcontainer-based
+development workflow. The pattern is language-agnostic — it works the same
+way for TypeScript (this project), Python
+(<a class="reference external" href="https://github.com/gilesknap/robot-arm-sim">robot-arm-sim</a>), and Go
+(<a class="reference external" href="https://github.com/DiamondLightSource/dra-usbip-driver">dra-usbip-driver</a>).</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#design-principle-autonomy-through-isolation" id="id2">Design principle: autonomy through isolation</a></p></li>
+<li><p><a class="reference internal" href="#configuration-layers" id="id3">Configuration layers</a></p>
+<ul>
+<li><p><a class="reference internal" href="#claude-md-project-instructions" id="id4"><code class="docutils literal notranslate"><span class="pre">CLAUDE.md</span></code> — project instructions</a></p></li>
+<li><p><a class="reference internal" href="#claude-settings-json-permissions-and-hooks" id="id5"><code class="docutils literal notranslate"><span class="pre">.claude/settings.json</span></code> — permissions and hooks</a></p></li>
+<li><p><a class="reference internal" href="#claude-skills-on-demand-knowledge" id="id6"><code class="docutils literal notranslate"><span class="pre">.claude/skills/</span></code> — on-demand knowledge</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#keeping-claude-md-lean" id="id7">Keeping CLAUDE.md lean</a></p></li>
+<li><p><a class="reference internal" href="#credential-isolation" id="id8">Credential isolation</a></p></li>
+<li><p><a class="reference internal" href="#cross-language-conventions" id="id9">Cross-language conventions</a></p></li>
+<li><p><a class="reference internal" href="#tool-compatibility-claude-code-and-github-copilot" id="id10">Tool compatibility: Claude Code and GitHub Copilot</a></p></li>
+<li><p><a class="reference internal" href="#further-reading" id="id11">Further reading</a></p></li>
+</ul>
+</nav>
+<section id="design-principle-autonomy-through-isolation">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Design principle: autonomy through isolation</a><a class="headerlink" href="#design-principle-autonomy-through-isolation" title="Link to this heading">#</a></h2>
+<p>Claude Code is most productive when given broad permissions — freedom to
+read, write, run tests, and push code without constant approval prompts.
+But broad permissions are only safe inside a controlled environment. The
+devcontainer provides that environment: a disposable, reproducible sandbox
+where Claude can operate freely without risk to the host machine or
+unrelated repositories.</p>
+<p>This is the central trade-off:</p>
+<blockquote>
+<div><p><strong>More autonomy inside the container, strict enforcement that it runs
+nowhere else.</strong></p>
+</div></blockquote>
+</section>
+<section id="configuration-layers">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Configuration layers</a><a class="headerlink" href="#configuration-layers" title="Link to this heading">#</a></h2>
+<p>Claude Code configuration lives in three layers, each with a different
+scope and audience:</p>
+<section id="claude-md-project-instructions">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink"><code class="docutils literal notranslate"><span class="pre">CLAUDE.md</span></code> — project instructions</a><a class="headerlink" href="#claude-md-project-instructions" title="Link to this heading">#</a></h3>
+<p>Checked into the repo root. Loaded into every conversation, so it must be
+concise (aim for under 50 lines). Contains:</p>
+<ul class="simple">
+<li><p><strong>Build commands</strong> — how to lint, test, build, and run docs</p></li>
+<li><p><strong>Hard rules</strong> — things that cause real damage if forgotten (e.g. “never
+push to main”, “always run <code class="docutils literal notranslate"><span class="pre">just</span> <span class="pre">check</span></code> before committing”)</p></li>
+<li><p><strong>Foot-guns</strong> — silent failures, sync requirements, non-obvious gotchas</p></li>
+<li><p><strong>Conventions</strong> — commit style, coding patterns (one line each)</p></li>
+</ul>
+<p>Everything else belongs in skills (loaded on demand) or in documentation
+(explored when needed). See the
+<a class="reference internal" href="#keeping-claude-md-lean">trim-claude-md pattern</a> below.</p>
+</section>
+<section id="claude-settings-json-permissions-and-hooks">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink"><code class="docutils literal notranslate"><span class="pre">.claude/settings.json</span></code> — permissions and hooks</a><a class="headerlink" href="#claude-settings-json-permissions-and-hooks" title="Link to this heading">#</a></h3>
+<p>Controls what Claude Code is allowed to do. The key sections:</p>
+<p><strong>Permissions</strong> grant broad access inside the devcontainer:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;permissions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;allow&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Read&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Edit&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Write&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Bash(*)&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;WebSearch&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;WebFetch(*)&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;deny&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">&quot;Bash(git push --force *)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;Bash(git reset --hard*)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;Bash(ssh *)&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Bash(ssh-agent *)&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Bash(*ssh-agent*)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;Bash(scp *)&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Bash(rsync *)&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Bash(sftp *)&quot;</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><strong>allow</strong> — operations that proceed without asking. File operations and
+bash are safe inside the container.</p></li>
+<li><p><strong>deny</strong> — operations that are blocked outright. These are “escape
+vectors” — commands that reach outside the container (SSH, SCP) or are
+destructive (force push, hard reset). The <code class="docutils literal notranslate"><span class="pre">ssh-agent</span></code> patterns prevent
+Claude from re-enabling agent forwarding after the devcontainer has
+blanked <code class="docutils literal notranslate"><span class="pre">SSH_AUTH_SOCK</span></code>. We use <code class="docutils literal notranslate"><span class="pre">deny</span></code> rather than <code class="docutils literal notranslate"><span class="pre">prompt</span></code> because the
+prompt dialog has an “always allow” option that is too easy to accept
+accidentally, which would permanently bypass the protection.</p></li>
+</ul>
+<p><strong>Hooks</strong> enforce the devcontainer requirement:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;hooks&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;UserPromptSubmit&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">      </span><span class="nt">&quot;hooks&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;command&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;if [ -z \&quot;$REMOTE_CONTAINERS\&quot; ]; then echo &#39;BLOCKED: ...&#39;; exit 2; fi; if [ -n \&quot;$SSH_AUTH_SOCK\&quot; ]; then echo &#39;BLOCKED: ...&#39;; exit 2; fi&quot;</span>
+<span class="w">      </span><span class="p">}]</span>
+<span class="w">    </span><span class="p">}]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The hook runs two checks on every prompt:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">$REMOTE_CONTAINERS</span></code> must be set — confirms we are inside a devcontainer.
+If absent, every prompt is blocked, preventing accidental use of the
+permissive settings on the host.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$SSH_AUTH_SOCK</span></code> must be empty — confirms SSH agent forwarding is
+disabled. The devcontainer blanks this variable, but this check catches
+cases where it gets re-introduced (e.g. by a shell profile or a
+manually started agent).</p></li>
+</ol>
+</section>
+<section id="claude-skills-on-demand-knowledge">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink"><code class="docutils literal notranslate"><span class="pre">.claude/skills/</span></code> — on-demand knowledge</a><a class="headerlink" href="#claude-skills-on-demand-knowledge" title="Link to this heading">#</a></h3>
+<p>Skills are markdown files that Claude loads only when relevant (based on
+the <code class="docutils literal notranslate"><span class="pre">description</span></code> field). They keep detailed knowledge out of <code class="docutils literal notranslate"><span class="pre">CLAUDE.md</span></code>
+while making it available when needed.</p>
+<p>Good candidates for skills:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Skill</p></th>
+<th class="head"><p>When it triggers</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">documentation</span></code></p></td>
+<td><p>Editing files under <code class="docutils literal notranslate"><span class="pre">docs/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ci-debug</span></code></p></td>
+<td><p>Investigating CI failures</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">yaml</span></code></p></td>
+<td><p>Python code that reads/writes YAML</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">memo</span></code></p></td>
+<td><p>Saving work state to persistent memory</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Skills that are <strong>project-agnostic</strong> can be shared
+across repositories via the copier template. Project-specific information
+can be added to per project skills or go in the documentation.</p>
+</section>
+</section>
+<section id="keeping-claude-md-lean">
+<span id="id1"></span><h2><a class="toc-backref" href="#id7" role="doc-backlink">Keeping CLAUDE.md lean</a><a class="headerlink" href="#keeping-claude-md-lean" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">CLAUDE.md</span></code> is loaded into every conversation turn. A long file wastes
+tokens, slows responses, and dilutes critical instructions. The rule of
+thumb:</p>
+<ul class="simple">
+<li><p><strong>Keep inline:</strong> rules that cause damage if forgotten on any task</p></li>
+<li><p><strong>Move to skills:</strong> stable knowledge only needed sometimes (architecture,
+integration patterns, detailed conventions)</p></li>
+<li><p><strong>Drop entirely:</strong> anything discoverable by exploring the codebase
+(directory trees, file listings, config schemas)</p></li>
+</ul>
+</section>
+<section id="credential-isolation">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Credential isolation</a><a class="headerlink" href="#credential-isolation" title="Link to this heading">#</a></h2>
+<p>The devcontainer isolates credentials from the host to limit the blast
+radius of prompt injection attacks (malicious instructions hidden in
+issues, web content, or repository files):</p>
+<ul class="simple">
+<li><p><strong>SSH agent forwarding disabled</strong> — <code class="docutils literal notranslate"><span class="pre">SSH_AUTH_SOCK=&quot;&quot;</span></code> prevents access
+to host SSH keys</p></li>
+<li><p><strong>Git credential helper blanked</strong> on every container start — the
+<code class="docutils literal notranslate"><span class="pre">postStart.sh</span></code> script removes credential helpers and SSH URL rewrites
+that VS Code copies from the host gitconfig</p></li>
+<li><p><strong>Scoped GitHub PAT</strong> — authentication uses a fine-grained token limited
+to specific repositories, stored in a per-repo container volume</p></li>
+<li><p><strong>Network escape vectors denied</strong> — SSH, SCP, RSYNC are blocked outright
+even inside the container</p></li>
+</ul>
+<p>See <a class="reference internal" href="project-conventions.html"><span class="doc">Project Conventions</span></a> for the full credential isolation setup,
+devcontainer details, and volume persistence strategy.</p>
+</section>
+<section id="cross-language-conventions">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Cross-language conventions</a><a class="headerlink" href="#cross-language-conventions" title="Link to this heading">#</a></h2>
+<p>The Claude Code integration pattern sits on top of a set of
+language-agnostic project conventions — <code class="docutils literal notranslate"><span class="pre">just</span></code> as the task runner,
+Conventional Commits, Sphinx + Diataxis docs, pre-commit hooks, and a
+consistent GitHub Actions CI structure. These are documented separately
+in <a class="reference internal" href="project-conventions.html"><span class="doc">Project Conventions</span></a>.</p>
+</section>
+<section id="tool-compatibility-claude-code-and-github-copilot">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">Tool compatibility: Claude Code and GitHub Copilot</a><a class="headerlink" href="#tool-compatibility-claude-code-and-github-copilot" title="Link to this heading">#</a></h2>
+<p>The configuration in this project works with both
+<a class="reference external" href="https://claude.com/claude-code">Claude Code</a> and
+<a class="reference external" href="https://github.com/features/copilot">GitHub Copilot</a>. Copilot reads
+<code class="docutils literal notranslate"><span class="pre">CLAUDE.md</span></code> directly (alongside its own <code class="docutils literal notranslate"><span class="pre">.github/copilot-instructions.md</span></code>
+and <code class="docutils literal notranslate"><span class="pre">AGENTS.md</span></code> formats), so there is no need to duplicate project
+instructions. Skills in <code class="docutils literal notranslate"><span class="pre">.claude/skills/</span></code> are also picked up automatically
+by Copilot — the <code class="docutils literal notranslate"><span class="pre">SKILL.md</span></code> frontmatter format is an open standard shared
+across Claude Code, Copilot, Cursor, Gemini CLI, and other tools.</p>
+<p>The difference is in the safety layer. The <code class="docutils literal notranslate"><span class="pre">.claude/settings.json</span></code>
+permissions, hooks, and deny rules are Claude Code features — Copilot does
+not enforce them. For Copilot users, the devcontainer still provides
+isolation, but the fine-grained permission and hook controls described
+above are not applied.</p>
+</section>
+<section id="further-reading">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Further reading</a><a class="headerlink" href="#further-reading" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="project-conventions.html"><span class="doc">Project Conventions</span></a> — shared tooling, devcontainer setup, and
+conventions across TypeScript, Python, and Go projects</p></li>
+<li><p><a class="reference external" href="https://diamondlightsource.github.io/robot-arm-sim/main/explanations/building-with-claude.html">Building a Robot Simulator with Claude</a>
+— detailed walkthrough of Claude Code on a Python project, including
+prompting principles and lessons learned</p></li>
+<li><p><a class="reference external" href="https://github.com/DiamondLightSource/python-copier-template">python-copier-template</a>
+— the upstream template this pattern extends</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="api-and-auth.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">API and Authentication</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="project-conventions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Project Conventions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#design-principle-autonomy-through-isolation">Design principle: autonomy through isolation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration-layers">Configuration layers</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#claude-md-project-instructions"><code class="docutils literal notranslate"><span class="pre">CLAUDE.md</span></code> — project instructions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#claude-settings-json-permissions-and-hooks"><code class="docutils literal notranslate"><span class="pre">.claude/settings.json</span></code> — permissions and hooks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#claude-skills-on-demand-knowledge"><code class="docutils literal notranslate"><span class="pre">.claude/skills/</span></code> — on-demand knowledge</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#keeping-claude-md-lean">Keeping CLAUDE.md lean</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#credential-isolation">Credential isolation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cross-language-conventions">Cross-language conventions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tool-compatibility-claude-code-and-github-copilot">Tool compatibility: Claude Code and GitHub Copilot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-reading">Further reading</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/argocd-monitor/edit/dev/docs/explanations/claude-code-integration.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/explanations/claude-code-integration.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

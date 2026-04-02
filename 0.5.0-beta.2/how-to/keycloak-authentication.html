@@ -1,0 +1,716 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Keycloak Authentication &#8212; argocd-monitor 0.5.0-beta.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=9c6d660b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/keycloak-authentication';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/argocd-monitor/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Explanations" href="../explanations.html" />
+    <link rel="prev" title="Helm Deployment" href="helm-deployment.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="dev" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">argocd-monitor</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/argocd-monitor" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/argocd-monitor" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="configure-argocd.html">Configure ArgoCD Connection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nginx-configuration.html">Nginx Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="helm-deployment.html">Helm Deployment</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Keycloak Authentication</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../how-to.html" class="nav-link">How-to Guides</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Keycloak Authentication</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="keycloak-authentication">
+<h1>Keycloak Authentication<a class="headerlink" href="#keycloak-authentication" title="Link to this heading">#</a></h1>
+<p>This guide covers enabling optional Keycloak OIDC authentication using an
+<a class="reference external" href="https://oauth2-proxy.github.io/oauth2-proxy/">oauth2-proxy</a> sidecar. When
+enabled, users authenticate via Keycloak SSO instead of manually pasting
+ArgoCD tokens.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>A Keycloak realm with an OIDC client registered for argocd-monitor</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gpg</span></code>, <code class="docutils literal notranslate"><span class="pre">kubeseal</span></code>, and <code class="docutils literal notranslate"><span class="pre">kubectl</span></code> available locally</p></li>
+<li><p>Access to the target Kubernetes cluster</p></li>
+</ul>
+</section>
+<section id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading">#</a></h2>
+<p>When <code class="docutils literal notranslate"><span class="pre">oauth2Proxy.enabled</span></code> is <code class="docutils literal notranslate"><span class="pre">true</span></code>, the Helm chart deploys an oauth2-proxy
+sidecar container alongside nginx. Traffic flows through the proxy first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Browser</span> <span class="o">-&gt;</span> <span class="n">oauth2</span><span class="o">-</span><span class="n">proxy</span> <span class="p">(:</span><span class="mi">4180</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nginx</span> <span class="p">(:</span><span class="mi">8080</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArgoCD</span> <span class="n">API</span>
+               <span class="o">|</span>
+           <span class="n">Keycloak</span> <span class="n">OIDC</span>
+</pre></div>
+</div>
+<p>The proxy handles the full OIDC login flow with Keycloak. After
+authentication, it passes the access token to nginx via the
+<code class="docutils literal notranslate"><span class="pre">X-Forwarded-Access-Token</span></code> header. Nginx injects this as an <code class="docutils literal notranslate"><span class="pre">argocd.token</span></code>
+cookie when proxying requests to ArgoCD.</p>
+<p>The frontend detects the auth mode automatically via the <code class="docutils literal notranslate"><span class="pre">/api/auth-mode</span></code>
+endpoint and skips the manual token dialog.</p>
+</section>
+<section id="step-1-create-the-sealed-secret">
+<h2>Step 1: Create the sealed secret<a class="headerlink" href="#step-1-create-the-sealed-secret" title="Link to this heading">#</a></h2>
+<p>The oauth2-proxy needs a <strong>client secret</strong> (from Keycloak) and a <strong>cookie
+secret</strong> (for session encryption). The <code class="docutils literal notranslate"><span class="pre">seal-secret</span></code> just command handles
+both:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>just<span class="w"> </span>seal-secret<span class="w"> </span>&lt;namespace&gt;
+</pre></div>
+</div>
+<p>This will:</p>
+<ol class="arabic simple">
+<li><p>Prompt you to paste the PGP-encrypted client secret (press Ctrl-D when done)</p></li>
+<li><p>Decrypt it using your GPG key</p></li>
+<li><p>Auto-generate a random cookie secret</p></li>
+<li><p>Create a SealedSecret and apply it to the cluster</p></li>
+</ol>
+<p>The resulting Kubernetes Secret is named <code class="docutils literal notranslate"><span class="pre">argocd-monitor-oauth2</span></code> with two
+keys: <code class="docutils literal notranslate"><span class="pre">client-secret</span></code> and <code class="docutils literal notranslate"><span class="pre">cookie-secret</span></code>.</p>
+</section>
+<section id="step-2-deploy-with-oauth2-proxy-enabled">
+<h2>Step 2: Deploy with oauth2-proxy enabled<a class="headerlink" href="#step-2-deploy-with-oauth2-proxy-enabled" title="Link to this heading">#</a></h2>
+<section id="using-set-flags">
+<h3>Using <code class="docutils literal notranslate"><span class="pre">--set</span></code> flags<a class="headerlink" href="#using-set-flags" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>argocd-monitor<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>oci://ghcr.io/epics-containers/charts/argocd-monitor<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--namespace<span class="w"> </span>&lt;namespace&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--set<span class="w"> </span>argocd.url<span class="o">=</span>https://argocd.example.com<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--set<span class="w"> </span>oauth2Proxy.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--set<span class="w"> </span>oauth2Proxy.clientId<span class="o">=</span>my-client-id<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--set<span class="w"> </span>oauth2Proxy.issuerUrl<span class="o">=</span>https://identity.example.com/realms/my-realm<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--set<span class="w"> </span>oauth2Proxy.existingSecret<span class="o">=</span>argocd-monitor-oauth2<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--set<span class="w"> </span>ingress.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--set<span class="w"> </span>ingress.host<span class="o">=</span>argocd-monitor.example.com
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ingress with a real hostname is required for oauth2-proxy because the OIDC
+redirect flow needs a stable callback URL.</p>
+</div>
+</section>
+<section id="using-a-values-file">
+<h3>Using a values file<a class="headerlink" href="#using-a-values-file" title="Link to this heading">#</a></h3>
+<p>Create a <code class="docutils literal notranslate"><span class="pre">values-keycloak.yaml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">argocd</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://argocd.example.com</span>
+
+<span class="nt">ingress</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argocd-monitor.example.com</span>
+
+<span class="nt">oauth2Proxy</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">clientId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-client-id</span>
+<span class="w">  </span><span class="nt">issuerUrl</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://identity.example.com/realms/my-realm</span>
+<span class="w">  </span><span class="nt">existingSecret</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argocd-monitor-oauth2</span>
+</pre></div>
+</div>
+<p>Then deploy:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>argocd-monitor<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>oci://ghcr.io/epics-containers/charts/argocd-monitor<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--namespace<span class="w"> </span>&lt;namespace&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-f<span class="w"> </span>values-keycloak.yaml
+</pre></div>
+</div>
+</section>
+</section>
+<section id="oauth2-proxy-values-reference">
+<h2>OAuth2 proxy values reference<a class="headerlink" href="#oauth2-proxy-values-reference" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Value</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">oauth2Proxy.enabled</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td><p>Enable the oauth2-proxy sidecar</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">oauth2Proxy.image.repository</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">quay.io/oauth2-proxy/oauth2-proxy</span></code></p></td>
+<td><p>Proxy container image</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">oauth2Proxy.image.tag</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">v7.7.1</span></code></p></td>
+<td><p>Proxy image tag</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">oauth2Proxy.clientId</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
+<td><p>OIDC client ID from Keycloak</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">oauth2Proxy.issuerUrl</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
+<td><p>OIDC issuer URL (e.g. <code class="docutils literal notranslate"><span class="pre">https://identity.example.com/realms/my-realm</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">oauth2Proxy.existingSecret</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
+<td><p>Name of K8s Secret with <code class="docutils literal notranslate"><span class="pre">client-secret</span></code> and <code class="docutils literal notranslate"><span class="pre">cookie-secret</span></code> keys</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">oauth2Proxy.extraArgs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[]</span></code></p></td>
+<td><p>Additional oauth2-proxy command-line arguments</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">oauth2Proxy.resources.limits.cpu</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">50m</span></code></p></td>
+<td><p>CPU limit</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">oauth2Proxy.resources.limits.memory</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">64Mi</span></code></p></td>
+<td><p>Memory limit</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="passing-additional-oauth2-proxy-arguments">
+<h2>Passing additional oauth2-proxy arguments<a class="headerlink" href="#passing-additional-oauth2-proxy-arguments" title="Link to this heading">#</a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">oauth2Proxy.extraArgs</span></code> for any extra flags:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">oauth2Proxy</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">extraArgs</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--allowed-group=my-team</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--cookie-expire=12h</span>
+</pre></div>
+</div>
+</section>
+<section id="deploying-without-keycloak">
+<h2>Deploying without Keycloak<a class="headerlink" href="#deploying-without-keycloak" title="Link to this heading">#</a></h2>
+<p>When <code class="docutils literal notranslate"><span class="pre">oauth2Proxy.enabled</span></code> is <code class="docutils literal notranslate"><span class="pre">false</span></code> (the default), the chart deploys
+without the proxy sidecar. Users authenticate by pasting ArgoCD tokens
+into the login dialog as before. No secret or additional configuration is
+needed.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="helm-deployment.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Helm Deployment</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../explanations.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Explanations</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">How it works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-create-the-sealed-secret">Step 1: Create the sealed secret</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-deploy-with-oauth2-proxy-enabled">Step 2: Deploy with oauth2-proxy enabled</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-set-flags">Using <code class="docutils literal notranslate"><span class="pre">--set</span></code> flags</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-a-values-file">Using a values file</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#oauth2-proxy-values-reference">OAuth2 proxy values reference</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#passing-additional-oauth2-proxy-arguments">Passing additional oauth2-proxy arguments</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deploying-without-keycloak">Deploying without Keycloak</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/argocd-monitor/edit/dev/docs/how-to/keycloak-authentication.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/how-to/keycloak-authentication.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
