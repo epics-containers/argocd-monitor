@@ -49,6 +49,14 @@ resources:
     # @schema description: Memory request
     memory: 64Mi
 
+# @schema description: Node selector for pod scheduling
+# @schema additionalProperties: {"type": "string"}
+nodeSelector: {}
+
+# @schema description: Tolerations for pod scheduling
+# @schema type: array
+tolerations: []
+
 oauth2Proxy:
   # @schema description: Enable oauth2-proxy sidecar for Keycloak OIDC authentication
   enabled: false

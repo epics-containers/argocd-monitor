@@ -74,6 +74,13 @@
             },
             "additionalProperties": false
         },
+        "nodeSelector": {
+            "description": "Node selector for pod scheduling",
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
         "oauth2Proxy": {
             "type": "object",
             "properties": {
@@ -214,6 +221,10 @@
                 }
             },
             "additionalProperties": false
+        },
+        "tolerations": {
+            "description": "Tolerations for pod scheduling",
+            "type": "array"
         }
     },
     "additionalProperties": false
