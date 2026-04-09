@@ -1,0 +1,742 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CI/CD Pipeline &#8212; argocd-monitor 0.5.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=8e576371"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/ci-cd-pipeline';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/argocd-monitor/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.5.2';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reference" href="../reference.html" />
+    <link rel="prev" title="Project Conventions" href="project-conventions.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.5.2" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">argocd-monitor</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/argocd-monitor" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/argocd-monitor" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-and-auth.html">API and Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="claude-code-integration.html">Claude Code Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project-conventions.html">Project Conventions</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">CI/CD Pipeline</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../explanations.html" class="nav-link">Explanations</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">CI/CD Pipeline</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="ci-cd-pipeline">
+<h1>CI/CD Pipeline<a class="headerlink" href="#ci-cd-pipeline" title="Link to this heading">#</a></h1>
+<p>This page explains how the project’s continuous integration and delivery
+pipeline works, from local pre-commit checks through to published
+container images and Helm charts.</p>
+<section id="pipeline-overview">
+<h2>Pipeline overview<a class="headerlink" href="#pipeline-overview" title="Link to this heading">#</a></h2>
+<p>The CI pipeline is defined in <code class="docutils literal notranslate"><span class="pre">.github/workflows/ci.yml</span></code> and is
+composed of four reusable workflow files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>check  ─────┬──► container (build &amp; optionally push)
+            │
+            └──► helm      (package &amp; optionally push)
+
+docs  ────────► build &amp; optionally publish to GitHub Pages
+</pre></div>
+</div>
+<p>Every push to <code class="docutils literal notranslate"><span class="pre">main</span></code>, every pull request, and every tag triggers the
+full pipeline. The <code class="docutils literal notranslate"><span class="pre">check</span></code> job must succeed before <code class="docutils literal notranslate"><span class="pre">container</span></code> and <code class="docutils literal notranslate"><span class="pre">helm</span></code>
+run (they depend on it via <code class="docutils literal notranslate"><span class="pre">needs:</span> <span class="pre">check</span></code>). The <code class="docutils literal notranslate"><span class="pre">docs</span></code> job runs
+independently with no dependencies.</p>
+</section>
+<section id="check-lint-type-check-and-test">
+<h2>Check: lint, type check, and test<a class="headerlink" href="#check-lint-type-check-and-test" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">_check.yml</span></code> workflow installs Node 22, runs <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">ci</span></code>, then executes
+three checks in sequence:</p>
+<ol class="arabic simple">
+<li><p><strong>ESLint</strong> (<code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">run</span> <span class="pre">lint</span></code>) – catches style and correctness issues.</p></li>
+<li><p><strong>TypeScript type check</strong> (<code class="docutils literal notranslate"><span class="pre">npx</span> <span class="pre">tsc</span> <span class="pre">--noEmit</span></code>) – ensures the project
+compiles without errors.</p></li>
+<li><p><strong>Unit tests with coverage</strong> (<code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">run</span> <span class="pre">test:coverage</span></code>) – runs the
+Vitest suite.</p></li>
+</ol>
+<p>If any step fails the workflow fails, blocking the <code class="docutils literal notranslate"><span class="pre">container</span></code> and
+<code class="docutils literal notranslate"><span class="pre">helm</span></code> jobs downstream.</p>
+</section>
+<section id="container-image-build-and-publish">
+<h2>Container image build and publish<a class="headerlink" href="#container-image-build-and-publish" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">_container.yml</span></code> workflow builds a Docker image, smoke-tests it, and
+conditionally pushes it to the GitHub Container Registry (GHCR).</p>
+<section id="build-and-test">
+<h3>Build and test<a class="headerlink" href="#build-and-test" title="Link to this heading">#</a></h3>
+<p>Every CI run builds the image and loads it into the local Docker daemon.
+A quick health check verifies the container starts and serves
+<code class="docutils literal notranslate"><span class="pre">/healthz</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># from _container.yml</span>
+<span class="l l-Scalar l-Scalar-Plain">docker run -d --name test_container -p 8080:8080 tag_for_testing</span>
+<span class="l l-Scalar l-Scalar-Plain">curl -sf http://localhost:8080/healthz</span>
+</pre></div>
+</div>
+<p>The build argument <code class="docutils literal notranslate"><span class="pre">VITE_APP_VERSION</span></code> is set to the git tag name on tag
+pushes and <code class="docutils literal notranslate"><span class="pre">dev</span></code> otherwise, so the app can display its own version.</p>
+</section>
+<section id="conditional-publishing">
+<h3>Conditional publishing<a class="headerlink" href="#conditional-publishing" title="Link to this heading">#</a></h3>
+<p>The image is only pushed to the registry when <strong>both</strong> conditions are
+met:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">check</span></code> job passed (<code class="docutils literal notranslate"><span class="pre">inputs.publish</span></code> is true).</p></li>
+<li><p>The git ref is a <strong>tag</strong> (<code class="docutils literal notranslate"><span class="pre">github.ref_type</span> <span class="pre">==</span> <span class="pre">'tag'</span></code>).</p></li>
+</ul>
+<p>This means pull requests and pushes to <code class="docutils literal notranslate"><span class="pre">main</span></code> build and test the image
+but never publish it. Only a tagged release produces a registry image.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">docker/metadata-action</span></code> generates two tags for the published image:
+the git tag itself (e.g. <code class="docutils literal notranslate"><span class="pre">v1.2.3</span></code>) and <code class="docutils literal notranslate"><span class="pre">latest</span></code>.</p>
+</section>
+</section>
+<section id="helm-chart-packaging-and-publish">
+<h2>Helm chart packaging and publish<a class="headerlink" href="#helm-chart-packaging-and-publish" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">_helm.yml</span></code> workflow lints, packages, and conditionally pushes the
+Helm chart to an OCI registry.</p>
+<section id="dynamic-versioning-from-git-tags">
+<h3>Dynamic versioning from git tags<a class="headerlink" href="#dynamic-versioning-from-git-tags" title="Link to this heading">#</a></h3>
+<p>When the pipeline runs on a tag, the chart version is derived by
+stripping the leading <code class="docutils literal notranslate"><span class="pre">v</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># from _helm.yml</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;chart_version=</span><span class="si">${</span><span class="nv">GITHUB_REF_NAME</span><span class="p">#v</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$GITHUB_OUTPUT</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>So a git tag <code class="docutils literal notranslate"><span class="pre">v1.2.3</span></code> produces a Helm chart with <code class="docutils literal notranslate"><span class="pre">--version</span> <span class="pre">1.2.3</span> <span class="pre">--app-version</span> <span class="pre">1.2.3</span></code>. On non-tag runs the chart is packaged with
+whatever version is in <code class="docutils literal notranslate"><span class="pre">Chart.yaml</span></code> (useful for local testing).</p>
+</section>
+<section id="id1">
+<h3>Conditional publishing<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<p>Like the container image, the chart is only pushed when check passes and
+the ref is a tag:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># from _helm.yml</span>
+<span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inputs.publish &amp;&amp; github.ref_type == &#39;tag&#39;</span>
+</pre></div>
+</div>
+<p>The chart is pushed to <code class="docutils literal notranslate"><span class="pre">oci://ghcr.io/&lt;owner&gt;/charts</span></code> where it can be
+installed with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>helm<span class="w"> </span>install<span class="w"> </span>argocd-monitor<span class="w"> </span>oci://ghcr.io/epics-containers/charts/argocd-monitor<span class="w"> </span>--version<span class="w"> </span><span class="m">1</span>.2.3
+</pre></div>
+</div>
+</section>
+</section>
+<section id="documentation-publishing">
+<h2>Documentation publishing<a class="headerlink" href="#documentation-publishing" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">_docs.yml</span></code> workflow builds Sphinx documentation and publishes it to
+GitHub Pages.</p>
+<p>Key details:</p>
+<ul class="simple">
+<li><p><strong>Tag conflict avoidance</strong> – when a tag is pushed, the docs job
+sleeps 60 seconds before checkout to avoid git conflicts with a
+simultaneous branch push.</p></li>
+<li><p><strong>Versioned directories</strong> – each build is placed under a sanitized
+ref name (e.g. <code class="docutils literal notranslate"><span class="pre">main</span></code>, <code class="docutils literal notranslate"><span class="pre">1.2.3</span></code>), so multiple versions coexist on
+the Pages site.</p></li>
+<li><p><strong>Version switcher</strong> – a <code class="docutils literal notranslate"><span class="pre">make_switcher.py</span></code> script updates
+<code class="docutils literal notranslate"><span class="pre">switcher.json</span></code> so the docs site can offer a version dropdown.</p></li>
+<li><p><strong>Publish condition</strong> – docs are only published for tags and the
+<code class="docutils literal notranslate"><span class="pre">main</span></code> branch, not for pull requests.</p></li>
+</ul>
+</section>
+<section id="pre-commit-hooks">
+<h2>Pre-commit hooks<a class="headerlink" href="#pre-commit-hooks" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code> file defines hooks that run automatically
+on every <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Hook</p></th>
+<th class="head"><p>Source</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">check-added-large-files</span></code></p></td>
+<td><p>pre-commit-hooks</p></td>
+<td><p>Prevent accidental large file commits</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">check-yaml</span></code></p></td>
+<td><p>pre-commit-hooks</p></td>
+<td><p>Validate YAML syntax (Helm templates excluded)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">check-merge-conflict</span></code></p></td>
+<td><p>pre-commit-hooks</p></td>
+<td><p>Catch unresolved merge markers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">end-of-file-fixer</span></code></p></td>
+<td><p>pre-commit-hooks</p></td>
+<td><p>Ensure files end with a newline</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">eslint</span></code></p></td>
+<td><p>local</p></td>
+<td><p>Lint and auto-fix JS/TS files</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tsc</span></code></p></td>
+<td><p>local</p></td>
+<td><p>TypeScript type checking</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">conventional-pre-commit</span></code></p></td>
+<td><p>compilerla</p></td>
+<td><p>Validate conventional commit message format</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">gitleaks</span></code></p></td>
+<td><p>gitleaks</p></td>
+<td><p>Scan for accidentally committed secrets</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>These hooks catch common issues before code reaches CI, reducing
+round-trip time.</p>
+</section>
+<section id="the-release-process">
+<h2>The release process<a class="headerlink" href="#the-release-process" title="Link to this heading">#</a></h2>
+<p>Releases follow this workflow:</p>
+<ol class="arabic simple">
+<li><p>A maintainer pushes a git tag (e.g. <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span> <span class="pre">v1.2.3</span> <span class="pre">&amp;&amp;</span> <span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">v1.2.3</span></code>).</p></li>
+<li><p>The tag push triggers the CI pipeline.</p></li>
+<li><p>Because the ref is a tag:</p>
+<ul class="simple">
+<li><p>The container image is built with <code class="docutils literal notranslate"><span class="pre">VITE_APP_VERSION=v1.2.3</span></code> and
+pushed to GHCR with both the version tag and <code class="docutils literal notranslate"><span class="pre">latest</span></code>.</p></li>
+<li><p>The Helm chart is packaged as version <code class="docutils literal notranslate"><span class="pre">1.2.3</span></code> and pushed to the
+OCI chart registry.</p></li>
+<li><p>Documentation is built and published under the version directory.</p></li>
+</ul>
+</li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">_release.yml</span></code> workflow creates a <strong>GitHub Release</strong> with
+auto-generated release notes from merged PRs. Tags containing <code class="docutils literal notranslate"><span class="pre">a</span></code>,
+<code class="docutils literal notranslate"><span class="pre">b</span></code>, or <code class="docutils literal notranslate"><span class="pre">rc</span></code> are marked as pre-releases.</p></li>
+</ol>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="project-conventions.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Project Conventions</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../reference.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Reference</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline-overview">Pipeline overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-lint-type-check-and-test">Check: lint, type check, and test</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#container-image-build-and-publish">Container image build and publish</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-and-test">Build and test</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conditional-publishing">Conditional publishing</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#helm-chart-packaging-and-publish">Helm chart packaging and publish</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dynamic-versioning-from-git-tags">Dynamic versioning from git tags</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Conditional publishing</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-publishing">Documentation publishing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pre-commit-hooks">Pre-commit hooks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-release-process">The release process</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/argocd-monitor/edit/0.5.2/docs/explanations/ci-cd-pipeline.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/explanations/ci-cd-pipeline.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
