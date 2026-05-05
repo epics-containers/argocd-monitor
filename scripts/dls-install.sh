@@ -4,7 +4,6 @@ set -euo pipefail
 helm upgrade --install argocd-monitor oci://ghcr.io/epics-containers/charts/argocd-monitor \
     --version 0.5.2 \
     --namespace argocd-monitor \
-    --set image.tag=0.5.2 \
     --set oauth2Proxy.enabled=true \
     --set oauth2Proxy.clientId=argocd-monitor \
     --set oauth2Proxy.issuerUrl=https://argocd.diamond.ac.uk/api/dex \

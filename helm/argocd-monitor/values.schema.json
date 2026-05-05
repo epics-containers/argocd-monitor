@@ -7,6 +7,16 @@
         "argocd": {
             "type": "object",
             "properties": {
+                "anonymous": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "description": "Use ArgoCD anonymous read-only access. Requires users.anonymous.enabled in argocd-cm. Mutating actions will fail with 403",
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                },
                 "url": {
                     "description": "The ArgoCD instance URL to proxy API requests to",
                     "type": "string"
