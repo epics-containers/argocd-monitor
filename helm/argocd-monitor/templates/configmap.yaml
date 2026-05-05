@@ -11,10 +11,12 @@ data:
         root /usr/share/nginx/html;
         index index.html;
 
-        # Auth mode endpoint — lets the frontend know whether oauth2-proxy is active
+        # Auth mode endpoint — lets the frontend know which auth mode is active
         location = /api/auth-mode {
             default_type application/json;
-            {{- if .Values.oauth2Proxy.enabled }}
+            {{- if .Values.argocd.anonymous.enabled }}
+            return 200 '{"mode":"anonymous"}';
+            {{- else if .Values.oauth2Proxy.enabled }}
             return 200 '{"mode":"oauth2-proxy"}';
             {{- else }}
             return 200 '{"mode":"manual"}';

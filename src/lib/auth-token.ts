@@ -2,10 +2,10 @@ const TOKEN_KEY = "argocd-token";
 const REFRESH_KEY = "argocd-refresh-token";
 
 // Auth mode detection — cached after first fetch
-let authModeCache: "oauth2-proxy" | "manual" | null = null;
+let authModeCache: AuthMode | null = null;
 const authModeListeners = new Set<() => void>();
 
-export type AuthMode = "oauth2-proxy" | "manual";
+export type AuthMode = "oauth2-proxy" | "manual" | "anonymous";
 
 export function subscribeAuthMode(cb: () => void) {
   authModeListeners.add(cb);

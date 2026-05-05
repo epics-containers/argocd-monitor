@@ -16,6 +16,9 @@ replicaCount: 1
 argocd:
   # @schema description: The ArgoCD instance URL to proxy API requests to
   url: https://argocd.diamond.ac.uk
+  anonymous:
+    # @schema description: Use ArgoCD anonymous read-only access. Requires users.anonymous.enabled in argocd-cm. Mutating actions will fail with 403
+    enabled: false
 
 service:
   # @schema description: Kubernetes Service type

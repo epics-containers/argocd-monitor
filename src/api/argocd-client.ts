@@ -74,14 +74,15 @@ export async function argocdFetch<T>(
   };
 
   let response = await fetch(`${baseUrl}${path}`, fetchOpts);
+  const authMode = getAuthModeSnapshot();
 
   // Detect oauth2-proxy redirect (session expired, proxy redirected to login)
-  if (response.redirected && getAuthModeSnapshot() === "oauth2-proxy") {
+  if (response.redirected && authMode === "oauth2-proxy") {
     if (redirectToLogin()) return new Promise<T>(() => {}); // hang while redirecting
   }
 
-  if (response.status === 401) {
-    if (getAuthModeSnapshot() === "oauth2-proxy") {
+  if (response.status === 401 && authMode !== "anonymous") {
+    if (authMode === "oauth2-proxy") {
       // Session expired — redirect browser to re-authenticate via oauth2-proxy
       if (redirectToLogin()) return new Promise<T>(() => {});
       throw new ApiError(401, "Unauthenticated");
@@ -114,13 +115,14 @@ export async function argocdFetchStream(
   const fetchOpts: RequestInit = { ...init, credentials: "include" };
 
   let response = await fetch(`${baseUrl}${path}`, fetchOpts);
+  const authMode = getAuthModeSnapshot();
 
-  if (response.redirected && getAuthModeSnapshot() === "oauth2-proxy") {
+  if (response.redirected && authMode === "oauth2-proxy") {
     if (redirectToLogin()) return new Promise<ReadableStream<Uint8Array>>(() => {});
   }
 
-  if (response.status === 401) {
-    if (getAuthModeSnapshot() === "oauth2-proxy") {
+  if (response.status === 401 && authMode !== "anonymous") {
+    if (authMode === "oauth2-proxy") {
       if (redirectToLogin()) return new Promise<ReadableStream<Uint8Array>>(() => {});
       throw new ApiError(401, "Unauthenticated");
     }
