@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router";
 import { RefreshCw } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -7,16 +7,32 @@ import { DataTable } from "@/components/app-table/data-table";
 import { columns } from "@/components/app-table/columns";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { useApplications } from "@/hooks/use-applications";
+import { useBeamlineNamespace } from "@/hooks/use-beamline-namespace";
 
 export function ApplicationsPage() {
   const project = (import.meta.env.VITE_ARGOCD_PROJECT as string) || undefined;
   const { data: applications, isLoading, error, dataUpdatedAt } = useApplications(project);
   const queryClient = useQueryClient();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { data: beamlineNamespace } = useBeamlineNamespace();
 
   useEffect(() => {
     sessionStorage.setItem("tableFilters", searchParams.toString());
   }, [searchParams]);
+
+  // Auto-set ?ns= once per mount when the user lands without one. Re-mounts
+  // (new tab/window) re-fire; clearing the filter in the same mount sticks
+  // because the guard latches on first run.
+  const autoNsApplied = useRef(false);
+  useEffect(() => {
+    if (autoNsApplied.current) return;
+    if (!beamlineNamespace) return;
+    if (searchParams.get("ns")) return;
+    autoNsApplied.current = true;
+    const next = new URLSearchParams(searchParams);
+    next.set("ns", beamlineNamespace);
+    setSearchParams(next, { replace: true });
+  }, [beamlineNamespace, searchParams, setSearchParams]);
 
   if (isLoading) {
     return <LoadingSpinner message="Loading applications..." />;

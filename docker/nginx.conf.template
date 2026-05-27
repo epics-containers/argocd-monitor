@@ -7,6 +7,20 @@ server {
     resolver 127.0.0.11 8.8.8.8 valid=30s;
     set $argocd_url "${ARGOCD_URL}";
 
+    # Client IP — exposes $remote_addr and X-Forwarded-For so the frontend can
+    # pick the original client IP behind any forwarding layer.
+    location = /api/client-ip {
+        default_type application/json;
+        return 200 '{"ip":"$remote_addr","forwardedFor":"$http_x_forwarded_for"}';
+    }
+
+    # Beamline namespace stub — the helm chart's nginx supplies a real geo-based
+    # mapping; this docker image returns empty so the frontend skips auto-filter.
+    location = /api/beamline {
+        default_type application/json;
+        return 200 '{"namespace":""}';
+    }
+
     # Dedicated location for log streaming — must be above /api/ catch-all
     location ~ ^/api/v1/applications/[^/]+/logs {
         proxy_pass $argocd_url;

@@ -84,6 +84,27 @@
             },
             "additionalProperties": false
         },
+        "namespaceMap": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "description": "Enable IP→namespace resolution at /api/beamline",
+                    "type": "boolean"
+                },
+                "ranges": {
+                    "description": "Ordered IP-range → namespace map. First match wins. Each entry is {cidr, namespace}.",
+                    "type": "array"
+                },
+                "trustedProxies": {
+                    "description": "CIDRs of trusted forwarding layers (ingress/oauth2-proxy). Required for real-IP recovery from X-Forwarded-For.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
         "nodeSelector": {
             "description": "Node selector for pod scheduling",
             "type": "object",

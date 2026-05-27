@@ -56,6 +56,41 @@ Add this as the first line of `values.yaml` for IDE validation:
 # yaml-language-server: $schema=values.schema.json
 ```
 
+### Array-of-objects gotcha
+
+`noAdditionalProperties: true` in `.schema.config.yaml` propagates into
+array item schemas. If you declare `# @schema item: object` for an array
+whose entries have specific keys (`[{cidr, namespace}, …]`), the
+generated item schema becomes `{"type":"object","additionalProperties":false}`
+with no `properties` — so **every** real entry fails validation. The
+plugin also won't accept a JSON-blob `# @schema item: {"type":"object",…}`
+annotation; it parses the first token as the type.
+
+Workaround: leave such arrays as `# @schema type: array` only, without
+`item`. You lose item-shape validation but Helm template rendering
+surfaces missing keys clearly enough.
+
+## Nginx behind a localhost sidecar
+
+When the chart ships nginx with an in-pod sidecar (oauth2-proxy, a
+service-mesh proxy, etc.) that forwards traffic over loopback, the
+immediate peer nginx sees is `127.0.0.1`. nginx's `real_ip` module only
+consults `X-Forwarded-For` when the immediate peer is listed in
+`set_real_ip_from`. Trusting only the cluster pod CIDR (e.g.
+`10.0.0.0/8`) is not enough.
+
+Always include `127.0.0.1` (or `127.0.0.0/8`) in `set_real_ip_from`
+when any server-side logic depends on `$remote_addr` — `geo` lookups,
+`geoip`, IP-based allowlists, rate-limit keys. Without it `real_ip`
+silently no-ops and `$remote_addr` stays as `127.0.0.1`.
+
+Symptom that masks this bug: a `/api/client-ip` endpoint that returns
+both `$remote_addr` and `$http_x_forwarded_for` will display the right
+IP in the UI when the frontend prefers XFF over `$remote_addr`. The
+server-side `geo`/allowlist still misses. Verify `real_ip` directly by
+checking which value `$remote_addr` returns, not which value the UI
+renders.
+
 ## Chart.yaml versioning
 
 - `version` in Chart.yaml is updated by CI when tagging releases —

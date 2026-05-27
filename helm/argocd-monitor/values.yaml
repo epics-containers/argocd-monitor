@@ -91,3 +91,17 @@ oauth2Proxy:
       cpu: 25m
       # @schema description: oauth2-proxy memory request
       memory: 32Mi
+
+# Auto-select the namespace filter to match the user's beamline based on source IP.
+# When enabled the chart renders an nginx `geo` block that maps client IP → namespace
+# and exposes it at GET /api/beamline.
+namespaceMap:
+  # @schema description: Enable IP→namespace resolution at /api/beamline
+  enabled: false
+  # @schema description: CIDRs of trusted forwarding layers (ingress/oauth2-proxy). Required for real-IP recovery from X-Forwarded-For.
+  # @schema type: array
+  # @schema item: string
+  trustedProxies: []
+  # @schema description: Ordered IP-range → namespace map. First match wins. Each entry is {cidr, namespace}.
+  # @schema type: array
+  ranges: []

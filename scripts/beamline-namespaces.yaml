@@ -1,0 +1,46 @@
+namespaceMap:
+  enabled: true
+  trustedProxies:
+    - 10.0.0.0/8
+  ranges:
+    - { cidr: 172.23.240.0/20, namespace: p47-beamline }
+    - { cidr: 172.23.71.0/24, namespace: b01-beamline }
+    - { cidr: 172.23.103.0/24, namespace: i03-beamline }
+    - { cidr: 172.23.104.0/24, namespace: i04-beamline }
+    - { cidr: 172.23.73.0/24, namespace: j04-beamline }
+    - { cidr: 172.23.105.0/24, namespace: i05-beamline }
+    - { cidr: 172.23.106.0/24, namespace: i06-beamline }
+    - { cidr: 172.23.172.0/24, namespace: k06-beamline }
+    - { cidr: 172.23.77.0/24, namespace: b07-beamline }
+    - { cidr: 172.23.76.0/24, namespace: c07-beamline }
+    - { cidr: 172.23.107.0/24, namespace: i07-beamline }
+    - { cidr: 172.23.108.0/24, namespace: i08-beamline }
+    - { cidr: 172.23.109.0/24, namespace: i09-beamline }
+    - { cidr: 172.23.80.0/24, namespace: b10-beamline }
+    - { cidr: 172.23.110.0/24, namespace: i10-beamline }
+    - { cidr: 172.23.111.0/24, namespace: i11-beamline }
+    - { cidr: 172.23.81.0/24, namespace: k11-beamline }
+    - { cidr: 172.23.112.0/24, namespace: i12-beamline }
+    - { cidr: 172.23.113.0/24, namespace: i13-beamline }
+    - { cidr: 172.23.82.0/24, namespace: j13-beamline }
+    - { cidr: 172.23.114.0/24, namespace: i14-beamline }
+    - { cidr: 172.23.115.0/24, namespace: i15-beamline }
+    - { cidr: 172.23.86.0/24, namespace: b16-beamline }
+    - { cidr: 172.23.116.0/24, namespace: i16-beamline }
+    - { cidr: 172.23.88.0/24, namespace: b18-beamline }
+    - { cidr: 172.23.118.0/24, namespace: i18-beamline }
+    - { cidr: 172.23.119.0/24, namespace: i19-beamline }
+    - { cidr: 172.23.120.0/24, namespace: i20-beamline }
+    - { cidr: 172.23.90.0/24, namespace: j20-beamline }
+    - { cidr: 172.23.91.0/24, namespace: b21-beamline }
+    - { cidr: 172.23.121.0/24, namespace: i21-beamline }
+    - { cidr: 172.23.92.0/24, namespace: b22-beamline }
+    - { cidr: 172.23.122.0/24, namespace: i22-beamline }
+    - { cidr: 172.23.93.0/24, namespace: b23-beamline }
+    - { cidr: 172.23.123.0/24, namespace: i23-beamline }
+    - { cidr: 172.23.94.0/24, namespace: b24-beamline }
+    - { cidr: 172.23.124.0/24, namespace: i24-beamline }
+    - { cidr: 172.23.164.0/24, namespace: p32-beamline }
+    - { cidr: 172.23.170.0/24, namespace: p33-beamline }
+    - { cidr: 172.23.161.0/24, namespace: p60-beamline }
+    - { cidr: 172.23.177.0/24, namespace: p99-beamline }

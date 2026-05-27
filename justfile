@@ -27,9 +27,12 @@ test:
 test-watch:
     npm run test:watch
 
-# Start Vite dev server
-dev:
-    npm run dev
+# Start Vite dev server. Optional IP spoofs X-Forwarded-For on local /api/*
+# endpoints (e.g. /api/client-ip, /api/beamline) so IP-dependent features
+# like the namespace auto-filter can be exercised off the real subnet.
+# Example: `just dev 172.23.116.5` → /api/beamline resolves to i16-beamline.
+dev ip="":
+    DEV_CLIENT_IP="{{ip}}" npm run dev
 
 # Production build
 build:

@@ -4,11 +4,13 @@ import { Moon, Sun, Activity, LogOut } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useClientIp } from "@/hooks/use-client-ip";
 import { useTheme } from "@/hooks/use-theme";
 import { clearStoredToken, subscribeAuthMode, getAuthModeSnapshot } from "@/lib/auth-token";
 
 export function Header() {
   const { user } = useAuth();
+  const { ip } = useClientIp();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -46,6 +48,11 @@ export function Header() {
           {(user?.email || user?.username) && (
             <span className="text-sm text-muted-foreground">
               {user.email ? (user.username ? `${user.email} (${user.username})` : user.email) : user.username}
+            </span>
+          )}
+          {ip && (
+            <span className="text-sm text-muted-foreground" title="Client IP">
+              {ip}
             </span>
           )}
           {(user?.email || user?.username) && (
