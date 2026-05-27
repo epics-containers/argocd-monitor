@@ -2,7 +2,7 @@
 set -euo pipefail
 
 helm upgrade --install test-argocd-monitor oci://ghcr.io/epics-containers/charts/argocd-monitor \
-    --version 0.5.4-beta.2 \
+    --version 0.6.0 \
     --namespace argocd-monitor \
     --set oauth2Proxy.enabled=true \
     --set oauth2Proxy.clientId=argocd-monitor-test \
