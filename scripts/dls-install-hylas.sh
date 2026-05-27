@@ -6,5 +6,5 @@ helm upgrade --install hylas-argocd-monitor oci://ghcr.io/epics-containers/chart
     --namespace argocd-monitor \
     --set ingress.enabled=true \
     --set ingress.host=hylas-argocd-monitor.diamond.ac.uk \
-    --set argocd.url=https://argocd-controls.diamond.ac.uk \
+    --set argocd.url=https://hylas-argocd.diamond.ac.uk \
     --set argocd.anonymous.enabled=true
