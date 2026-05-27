@@ -16,6 +16,10 @@
     "url": "https://epics-containers.github.io/argocd-monitor/1.0.0-beta.1/"
   },
   {
+    "version": "1.0.0",
+    "url": "https://epics-containers.github.io/argocd-monitor/1.0.0/"
+  },
+  {
     "version": "0.6.1-beta.1",
     "url": "https://epics-containers.github.io/argocd-monitor/0.6.1-beta.1/"
   },
