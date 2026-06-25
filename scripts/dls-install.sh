@@ -1,9 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 helm upgrade --install argocd-monitor oci://ghcr.io/epics-containers/charts/argocd-monitor \
     --version 1.0.0 \
     --namespace argocd-monitor \
+    -f "$SCRIPT_DIR/beamline-namespaces.yaml" \
     --set oauth2Proxy.enabled=true \
     --set oauth2Proxy.clientId=argocd-monitor \
     --set oauth2Proxy.issuerUrl=https://argocd.diamond.ac.uk/api/dex \
