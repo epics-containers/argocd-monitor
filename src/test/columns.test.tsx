@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { columns } from "@/components/app-table/columns";
+import { columns, DESCRIPTION_ANNOTATION } from "@/components/app-table/columns";
 import type { Application } from "@/types/application";
 
 function makeApp(overrides: {
@@ -14,12 +14,14 @@ function makeApp(overrides: {
   sync?: { status: string } | undefined;
   name?: string;
   labels?: Record<string, string>;
+  annotations?: Record<string, string>;
 } = {}): Application {
   return {
     metadata: {
       name: overrides.name ?? "test-app",
       namespace: "default",
       labels: overrides.labels ?? {},
+      annotations: overrides.annotations,
     },
     spec: {
       project: "default",
@@ -116,5 +118,56 @@ describe("columns", () => {
     render(<TestTable data={[app]} />);
 
     expect(screen.queryByText("Stopped")).not.toBeInTheDocument();
+  });
+});
+
+describe("description column", () => {
+  it("shows an empty cell when the description annotation is absent", () => {
+    const app = makeApp({});
+
+    render(<TestTable data={[app]} />);
+
+    // The description cell falls back to "-", matching the other empty
+    // text columns (namespace, revision, properties).
+    expect(screen.getAllByText("-").length).toBeGreaterThan(0);
+  });
+
+  it("renders a short description in full", () => {
+    const app = makeApp({
+      annotations: { [DESCRIPTION_ANNOTATION]: "Short description" },
+    });
+
+    render(<TestTable data={[app]} />);
+
+    expect(screen.getByText("Short description")).toBeInTheDocument();
+  });
+
+  it("renders a long description with CSS clipping classes, full text intact in the DOM and tooltip", async () => {
+    const longDescription =
+      "This is a very long free-text description that should be clipped in the table cell so it does not skew the column width, well past sixty characters.";
+    const app = makeApp({
+      annotations: { [DESCRIPTION_ANNOTATION]: longDescription },
+    });
+
+    render(<TestTable data={[app]} />);
+
+    // jsdom does no layout, so we can't assert visual clipping - assert the
+    // classes that produce it are applied instead: a block element with a
+    // fixed max width plus Tailwind's truncate (overflow-hidden,
+    // text-ellipsis, whitespace-nowrap).
+    const trigger = screen.getByText(longDescription);
+    expect(trigger).toBeInTheDocument();
+    expect(trigger.className).toContain("truncate");
+    expect(trigger.className).toContain("max-w-48");
+    expect(trigger.className).toContain("block");
+
+    // The full text is reachable through the tooltip on hover/focus.
+    trigger.focus();
+    const tooltip = await screen.findByText(
+      (_, element) =>
+        element?.getAttribute("data-slot") === "tooltip-content" &&
+        element.textContent === longDescription,
+    );
+    expect(tooltip).toBeInTheDocument();
   });
 });
