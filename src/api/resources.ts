@@ -42,6 +42,11 @@ export interface StoppableWorkload {
   namespace: string;
   group: string;
   version: string;
+  /**
+   * The workload's `domain` label. The ioc-instance chart sets it to the
+   * parent ArgoCD Application's name, which Start/Stop needs.
+   */
+  domain?: string;
 }
 
 /**
@@ -84,6 +89,7 @@ export async function getStoppableWorkload(
     namespace: workload.namespace,
     group: workload.group ?? "apps",
     version: workload.version,
+    ...(manifest.metadata.labels.domain ? { domain: manifest.metadata.labels.domain } : {}),
   };
 }
 

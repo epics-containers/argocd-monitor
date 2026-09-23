@@ -74,6 +74,12 @@ Scope the project/object glob to whatever subset of applications you want operat
 able to stop. If your ArgoCD version still requires the broader `applications, update`
 action for parameter-only updates, swap `override` for `update`.
 
+The parent application is found from the `domain` label on the service's StatefulSet/Deployment,
+which the ec `ioc-instance` chart sets from the IOC's `domain` value or `global.domain`.
+**That label must equal the parent (root) ArgoCD Application's name.** Workloads without the
+label fall back to the older convention: a child app in namespace `<name>-beamline` has a
+parent Application called `<name>`.
+
 <!-- README only content. Anything below this line won't be included in index.md -->
 
 See <https://epics-containers.github.io/argocd-monitor> for full documentation.

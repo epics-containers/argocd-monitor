@@ -105,10 +105,14 @@ export function ApplicationDetailPage() {
 
   const namespace = app.spec.destination.namespace ?? "";
   const parentNamespace = app.metadata.namespace;
-  // Convention: child app's namespace `<beamline>-beamline` is deployed by a
-  // parent Application named `<beamline>` in the same namespace. Replace with
-  // an explicit annotation/label on the child once one exists (see #44).
-  const parentName = parentNamespace.replace(/-beamline$/, "");
+  // The ioc-instance chart labels the workload with `domain`, which equals the
+  // parent Application's name. Fall back to the older convention - child app
+  // namespace `<beamline>-beamline` is deployed by a parent Application named
+  // `<beamline>` - for workloads without the label (see #44).
+  const parentName = stoppable?.domain ?? parentNamespace.replace(/-beamline$/, "");
+  const parentSource = stoppable?.domain
+    ? "from the workload's domain label"
+    : "from the <name>-beamline namespace convention";
 
   const applyEnabled = (enabled: boolean) => {
     setSetEnabledError(null);
@@ -124,7 +128,9 @@ export function ApplicationDetailPage() {
         onSuccess: () => setStopConfirmOpen(false),
         onError: (err) => {
           setStopConfirmOpen(false);
-          setSetEnabledError(err.message);
+          setSetEnabledError(
+            `${err.message} (parent application "${parentName}", ${parentSource})`,
+          );
           setPendingAction(null);
         },
       },
