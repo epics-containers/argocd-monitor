@@ -14,6 +14,7 @@ vi.mock("@/hooks/use-application", () => ({
 
 vi.mock("@/hooks/use-restart-pod", () => ({
   useRestartPod: () => ({ isPending: false, mutate: vi.fn() }),
+  useRestartAllPods: () => ({ isPending: false, mutate: vi.fn() }),
 }));
 
 vi.mock("@/hooks/use-set-enabled", () => ({
@@ -219,5 +220,66 @@ describe("ApplicationDetailPage", () => {
 
     expect(screen.getByRole("button", { name: /Start/i })).toBeInTheDocument();
     expect(screen.getByText("Stopped")).toBeInTheDocument();
+  });
+
+  function makePods(count: number): ResourceTree {
+    return {
+      nodes: Array.from({ length: count }, (_, i) => ({
+        kind: "Pod",
+        name: `test-app-${i}`,
+        namespace: "test-ns",
+        version: "v1",
+        uid: `uid-${i}`,
+      })),
+    } as ResourceTree;
+  }
+
+  it("shows Restart all when the service has several pods", () => {
+    vi.mocked(useApplication).mockReturnValue({
+      data: makeApp({ health: { status: "Healthy" }, sync: { status: "Synced" } }),
+      isLoading: false,
+    } as ReturnType<typeof useApplication>);
+    vi.mocked(useResourceTree).mockReturnValue({
+      data: makePods(2),
+      isLoading: false,
+    } as ReturnType<typeof useResourceTree>);
+
+    renderPage();
+
+    expect(screen.getByRole("button", { name: /Restart all/i })).toBeInTheDocument();
+  });
+
+  it("hides Restart all for a single pod", () => {
+    vi.mocked(useApplication).mockReturnValue({
+      data: makeApp({ health: { status: "Healthy" }, sync: { status: "Synced" } }),
+      isLoading: false,
+    } as ReturnType<typeof useApplication>);
+    vi.mocked(useResourceTree).mockReturnValue({
+      data: makePods(1),
+      isLoading: false,
+    } as ReturnType<typeof useResourceTree>);
+
+    renderPage();
+
+    expect(screen.queryByRole("button", { name: /Restart all/i })).not.toBeInTheDocument();
+  });
+
+  it("hides Restart all when the service is stopped", () => {
+    vi.mocked(useApplication).mockReturnValue({
+      data: makeApp({
+        health: { status: "Healthy" },
+        sync: { status: "Synced" },
+        labels: { STOPPED: "1" },
+      }),
+      isLoading: false,
+    } as ReturnType<typeof useApplication>);
+    vi.mocked(useResourceTree).mockReturnValue({
+      data: makePods(2),
+      isLoading: false,
+    } as ReturnType<typeof useResourceTree>);
+
+    renderPage();
+
+    expect(screen.queryByRole("button", { name: /Restart all/i })).not.toBeInTheDocument();
   });
 });

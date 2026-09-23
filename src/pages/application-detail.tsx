@@ -15,7 +15,7 @@ import { HealthBadge, SyncBadge } from "@/components/app-table/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { useApplication, useResourceTree } from "@/hooks/use-application";
-import { useRestartPod } from "@/hooks/use-restart-pod";
+import { useRestartAllPods, useRestartPod } from "@/hooks/use-restart-pod";
 import { useSetEnabled } from "@/hooks/use-set-enabled";
 import { useStoppableWorkload } from "@/hooks/use-stoppable-workload";
 import { formatAge } from "@/lib/format";
@@ -36,10 +36,12 @@ export function ApplicationDetailPage() {
   const { data: tree, isLoading: treeLoading } = useResourceTree(name!, appNamespace, pollInterval);
   const { data: stoppable, error: stoppableError } = useStoppableWorkload(name!, appNamespace);
   const restartMutation = useRestartPod();
+  const restartAllMutation = useRestartAllPods();
   const setEnabledMutation = useSetEnabled();
 
   const [restartTarget, setRestartTarget] = useState<ResourceNode | null>(null);
   const [restartError, setRestartError] = useState<string | null>(null);
+  const [restartAllConfirmOpen, setRestartAllConfirmOpen] = useState(false);
   const [stopConfirmOpen, setStopConfirmOpen] = useState(false);
   const [setEnabledError, setSetEnabledError] = useState<string | null>(null);
   const [podSort, setPodSort] = useState<{ key: string; asc: boolean }>({ key: "name", asc: true });
@@ -164,32 +166,44 @@ export function ApplicationDetailPage() {
               )}
             </div>
           </div>
-          {stoppable && (
-            pendingAction ? (
-              <Button variant="outline" size="sm" disabled>
-                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                {pendingAction === "starting" ? "Starting..." : "Stopping..."}
-              </Button>
-            ) : isStopped ? (
+          <div className="flex items-center gap-2">
+            {pods.length > 1 && !isStopped && !pendingAction && (
               <Button
-                variant="default"
+                variant="outline"
                 size="sm"
-                onClick={() => applyEnabled(true)}
+                onClick={() => setRestartAllConfirmOpen(true)}
               >
-                <Play className="mr-1 h-4 w-4" />
-                Start
+                <RotateCcw className="mr-1 h-4 w-4" />
+                Restart all
               </Button>
-            ) : (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setStopConfirmOpen(true)}
-              >
-                <Square className="mr-1 h-4 w-4" />
-                Stop
-              </Button>
-            )
-          )}
+            )}
+            {stoppable && (
+              pendingAction ? (
+                <Button variant="outline" size="sm" disabled>
+                  <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                  {pendingAction === "starting" ? "Starting..." : "Stopping..."}
+                </Button>
+              ) : isStopped ? (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => applyEnabled(true)}
+                >
+                  <Play className="mr-1 h-4 w-4" />
+                  Start
+                </Button>
+              ) : (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setStopConfirmOpen(true)}
+                >
+                  <Square className="mr-1 h-4 w-4" />
+                  Stop
+                </Button>
+              )
+            )}
+          </div>
         </div>
 
         <div className="rounded-md border p-4">
@@ -366,6 +380,33 @@ export function ApplicationDetailPage() {
         variant="destructive"
         loading={setEnabledMutation.isPending}
         onConfirm={() => applyEnabled(false)}
+      />
+
+      <ConfirmDialog
+        open={restartAllConfirmOpen}
+        onOpenChange={setRestartAllConfirmOpen}
+        title="Restart All Pods"
+        description={`Restart all ${pods.length} pods of "${app.metadata.name}"? This will delete every pod and Kubernetes will recreate them.`}
+        confirmLabel="Restart all"
+        variant="destructive"
+        loading={restartAllMutation.isPending}
+        onConfirm={() => {
+          setRestartError(null);
+          restartAllMutation.mutate(
+            {
+              appName: name!,
+              pods: pods.map((p) => ({ name: p.name, namespace: p.namespace })),
+              appNamespace,
+            },
+            {
+              onSuccess: () => setRestartAllConfirmOpen(false),
+              onError: (err) => {
+                setRestartAllConfirmOpen(false);
+                setRestartError(err.message);
+              },
+            },
+          );
+        }}
       />
 
       <ConfirmDialog
