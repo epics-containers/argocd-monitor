@@ -110,6 +110,9 @@ export function ApplicationDetailPage() {
   // namespace `<beamline>-beamline` is deployed by a parent Application named
   // `<beamline>` - for workloads without the label (see #44).
   const parentName = stoppable?.domain ?? parentNamespace.replace(/-beamline$/, "");
+  const parentSource = stoppable?.domain
+    ? "from the workload's domain label"
+    : "from the <name>-beamline namespace convention";
 
   const applyEnabled = (enabled: boolean) => {
     setSetEnabledError(null);
@@ -125,7 +128,9 @@ export function ApplicationDetailPage() {
         onSuccess: () => setStopConfirmOpen(false),
         onError: (err) => {
           setStopConfirmOpen(false);
-          setSetEnabledError(err.message);
+          setSetEnabledError(
+            `${err.message} (parent application "${parentName}", ${parentSource})`,
+          );
           setPendingAction(null);
         },
       },

@@ -16,8 +16,10 @@ vi.mock("@/hooks/use-restart-pod", () => ({
   useRestartPod: () => ({ isPending: false, mutate: vi.fn() }),
 }));
 
+const { setEnabledMutate } = vi.hoisted(() => ({ setEnabledMutate: vi.fn() }));
+
 vi.mock("@/hooks/use-set-enabled", () => ({
-  useSetEnabled: () => ({ isPending: false, mutate: vi.fn() }),
+  useSetEnabled: () => ({ isPending: false, mutate: setEnabledMutate }),
 }));
 
 vi.mock("@/hooks/use-stoppable-workload", () => ({
@@ -50,9 +52,14 @@ function makeApp(overrides: {
   health?: { status: string } | undefined;
   sync?: { status: string } | undefined;
   labels?: Record<string, string>;
+  namespace?: string;
 } = {}): Application {
   return {
-    metadata: { name: "test-app", namespace: "default", labels: overrides.labels },
+    metadata: {
+      name: "test-app",
+      namespace: overrides.namespace ?? "default",
+      labels: overrides.labels,
+    },
     spec: {
       project: "default",
       destination: { namespace: "test-ns" },
@@ -197,30 +204,6 @@ describe("ApplicationDetailPage", () => {
     expect(screen.queryByText(/Stopped/)).not.toBeInTheDocument();
   });
 
-  it("renders Start button and Stopped badge when STOPPED=1", () => {
-    vi.mocked(useApplication).mockReturnValue({
-      data: makeApp({
-        health: { status: "Healthy" },
-        sync: { status: "Synced" },
-        labels: { STOPPED: "1" },
-      }),
-      isLoading: false,
-    } as ReturnType<typeof useApplication>);
-    vi.mocked(useResourceTree).mockReturnValue({
-      data: { nodes: [] } as ResourceTree,
-      isLoading: false,
-    } as ReturnType<typeof useResourceTree>);
-    vi.mocked(useStoppableWorkload).mockReturnValue({
-      data: { kind: "StatefulSet", name: "test-app", namespace: "ns", group: "apps", version: "v1" },
-      isLoading: false,
-    } as ReturnType<typeof useStoppableWorkload>);
-
-    renderPage();
-
-    expect(screen.getByRole("button", { name: /Start/i })).toBeInTheDocument();
-    expect(screen.getByText("Stopped")).toBeInTheDocument();
-  });
-
   it("uses the workload's domain label as the Stop target's parent app", () => {
     vi.mocked(useApplication).mockReturnValue({
       data: makeApp({ health: { status: "Healthy" }, sync: { status: "Synced" } }),
@@ -246,5 +229,96 @@ describe("ApplicationDetailPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /Stop/i }));
 
     expect(screen.getByText(/on the parent application "p47"/)).toBeInTheDocument();
+  });
+
+  it("falls back to <name>-beamline for the parent app without a domain label", () => {
+    vi.mocked(useApplication).mockReturnValue({
+      data: makeApp({
+        health: { status: "Healthy" },
+        sync: { status: "Synced" },
+        namespace: "p47-beamline",
+      }),
+      isLoading: false,
+    } as ReturnType<typeof useApplication>);
+    vi.mocked(useResourceTree).mockReturnValue({
+      data: { nodes: [] } as ResourceTree,
+      isLoading: false,
+    } as ReturnType<typeof useResourceTree>);
+    vi.mocked(useStoppableWorkload).mockReturnValue({
+      data: {
+        kind: "StatefulSet",
+        name: "test-app",
+        namespace: "ns",
+        group: "apps",
+        version: "v1",
+      },
+      isLoading: false,
+    } as ReturnType<typeof useStoppableWorkload>);
+
+    renderPage("test-app", "p47-beamline");
+    fireEvent.click(screen.getByRole("button", { name: /Stop/i }));
+
+    expect(screen.getByText(/on the parent application "p47"/)).toBeInTheDocument();
+  });
+
+  it("names the parent app it tried when Start fails", () => {
+    setEnabledMutate.mockImplementationOnce(
+      (_vars: unknown, opts: { onError: (err: Error) => void }) =>
+        opts.onError(new Error("ArgoCD API error 403: permission denied")),
+    );
+    vi.mocked(useApplication).mockReturnValue({
+      data: makeApp({
+        health: { status: "Healthy" },
+        sync: { status: "Synced" },
+        labels: { STOPPED: "1" },
+      }),
+      isLoading: false,
+    } as ReturnType<typeof useApplication>);
+    vi.mocked(useResourceTree).mockReturnValue({
+      data: { nodes: [] } as ResourceTree,
+      isLoading: false,
+    } as ReturnType<typeof useResourceTree>);
+    vi.mocked(useStoppableWorkload).mockReturnValue({
+      data: {
+        kind: "StatefulSet",
+        name: "test-app",
+        namespace: "ns",
+        group: "apps",
+        version: "v1",
+        domain: "p47",
+      },
+      isLoading: false,
+    } as ReturnType<typeof useStoppableWorkload>);
+
+    renderPage();
+    fireEvent.click(screen.getByRole("button", { name: /Start/i }));
+
+    expect(
+      screen.getByText(/403: permission denied \(parent application "p47", from the workload's domain label\)/),
+    ).toBeInTheDocument();
+  });
+
+  it("renders Start button and Stopped badge when STOPPED=1", () => {
+    vi.mocked(useApplication).mockReturnValue({
+      data: makeApp({
+        health: { status: "Healthy" },
+        sync: { status: "Synced" },
+        labels: { STOPPED: "1" },
+      }),
+      isLoading: false,
+    } as ReturnType<typeof useApplication>);
+    vi.mocked(useResourceTree).mockReturnValue({
+      data: { nodes: [] } as ResourceTree,
+      isLoading: false,
+    } as ReturnType<typeof useResourceTree>);
+    vi.mocked(useStoppableWorkload).mockReturnValue({
+      data: { kind: "StatefulSet", name: "test-app", namespace: "ns", group: "apps", version: "v1" },
+      isLoading: false,
+    } as ReturnType<typeof useStoppableWorkload>);
+
+    renderPage();
+
+    expect(screen.getByRole("button", { name: /Start/i })).toBeInTheDocument();
+    expect(screen.getByText("Stopped")).toBeInTheDocument();
   });
 });
