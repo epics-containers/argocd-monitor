@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ApplicationDetailPage } from "@/pages/application-detail";
@@ -219,5 +219,32 @@ describe("ApplicationDetailPage", () => {
 
     expect(screen.getByRole("button", { name: /Start/i })).toBeInTheDocument();
     expect(screen.getByText("Stopped")).toBeInTheDocument();
+  });
+
+  it("uses the workload's domain label as the Stop target's parent app", () => {
+    vi.mocked(useApplication).mockReturnValue({
+      data: makeApp({ health: { status: "Healthy" }, sync: { status: "Synced" } }),
+      isLoading: false,
+    } as ReturnType<typeof useApplication>);
+    vi.mocked(useResourceTree).mockReturnValue({
+      data: { nodes: [] } as ResourceTree,
+      isLoading: false,
+    } as ReturnType<typeof useResourceTree>);
+    vi.mocked(useStoppableWorkload).mockReturnValue({
+      data: {
+        kind: "StatefulSet",
+        name: "test-app",
+        namespace: "ns",
+        group: "apps",
+        version: "v1",
+        domain: "p47",
+      },
+      isLoading: false,
+    } as ReturnType<typeof useStoppableWorkload>);
+
+    renderPage();
+    fireEvent.click(screen.getByRole("button", { name: /Stop/i }));
+
+    expect(screen.getByText(/on the parent application "p47"/)).toBeInTheDocument();
   });
 });
