@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ApplicationDetailPage } from "@/pages/application-detail";
@@ -12,9 +12,11 @@ vi.mock("@/hooks/use-application", () => ({
   useResourceTree: vi.fn(),
 }));
 
+const { restartAllMutate } = vi.hoisted(() => ({ restartAllMutate: vi.fn() }));
+
 vi.mock("@/hooks/use-restart-pod", () => ({
   useRestartPod: () => ({ isPending: false, mutate: vi.fn() }),
-  useRestartAllPods: () => ({ isPending: false, mutate: vi.fn() }),
+  useRestartAllPods: () => ({ isPending: false, mutate: restartAllMutate }),
 }));
 
 vi.mock("@/hooks/use-set-enabled", () => ({
@@ -222,14 +224,15 @@ describe("ApplicationDetailPage", () => {
     expect(screen.getByText("Stopped")).toBeInTheDocument();
   });
 
-  function makePods(count: number): ResourceTree {
+  function makePods(count: number, ownerKind = "StatefulSet", prefix = "test-app"): ResourceTree {
     return {
       nodes: Array.from({ length: count }, (_, i) => ({
         kind: "Pod",
-        name: `test-app-${i}`,
+        name: `${prefix}-${i}`,
         namespace: "test-ns",
         version: "v1",
-        uid: `uid-${i}`,
+        uid: `${prefix}-uid-${i}`,
+        parentRefs: [{ kind: ownerKind, name: prefix, namespace: "test-ns" }],
       })),
     } as ResourceTree;
   }
@@ -281,5 +284,51 @@ describe("ApplicationDetailPage", () => {
     renderPage();
 
     expect(screen.queryByRole("button", { name: /Restart all/i })).not.toBeInTheDocument();
+  });
+
+  it("ignores Job-owned pods when deciding whether to show Restart all", () => {
+    vi.mocked(useApplication).mockReturnValue({
+      data: makeApp({ health: { status: "Healthy" }, sync: { status: "Synced" } }),
+      isLoading: false,
+    } as ReturnType<typeof useApplication>);
+    vi.mocked(useResourceTree).mockReturnValue({
+      data: {
+        nodes: [...makePods(1).nodes, ...makePods(2, "Job", "backup").nodes],
+      },
+      isLoading: false,
+    } as ReturnType<typeof useResourceTree>);
+
+    renderPage();
+
+    expect(screen.queryByRole("button", { name: /Restart all/i })).not.toBeInTheDocument();
+  });
+
+  it("passes only controller-owned pods to Restart all", () => {
+    restartAllMutate.mockClear();
+    vi.mocked(useApplication).mockReturnValue({
+      data: makeApp({ health: { status: "Healthy" }, sync: { status: "Synced" } }),
+      isLoading: false,
+    } as ReturnType<typeof useApplication>);
+    vi.mocked(useResourceTree).mockReturnValue({
+      data: {
+        nodes: [
+          ...makePods(2, "ReplicaSet").nodes,
+          ...makePods(2, "Job", "backup").nodes,
+        ],
+      },
+      isLoading: false,
+    } as ReturnType<typeof useResourceTree>);
+
+    renderPage();
+
+    fireEvent.click(screen.getByRole("button", { name: /Restart all/i }));
+    expect(screen.getByText(/Restart all 2 pods/)).toBeInTheDocument();
+    const buttons = screen.getAllByRole("button", { name: /Restart all/i });
+    fireEvent.click(buttons[buttons.length - 1]);
+
+    expect(restartAllMutate).toHaveBeenCalledTimes(1);
+    const [args] = restartAllMutate.mock.calls[0] as [{ pods: { name: string }[] }];
+    const pods = args.pods;
+    expect(pods.map((p) => p.name).sort()).toEqual(["test-app-0", "test-app-1"]);
   });
 });

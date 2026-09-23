@@ -21,6 +21,9 @@ import { useStoppableWorkload } from "@/hooks/use-stoppable-workload";
 import { formatAge } from "@/lib/format";
 import type { ResourceNode } from "@/types/resource";
 
+/** Pod owners whose controllers recreate a deleted pod. */
+const RESTARTABLE_OWNERS = new Set(["ReplicaSet", "StatefulSet", "DaemonSet"]);
+
 export function ApplicationDetailPage() {
   const { name } = useParams<{ name: string }>();
   const [searchParams] = useSearchParams();
@@ -92,6 +95,14 @@ export function ApplicationDetailPage() {
       return podSort.asc ? cmp : -cmp;
     });
   }, [tree?.nodes, podSort]);
+
+  // Only pods owned by a controller that recreates them can be "restarted" by
+  // deleting them. Job-owned (e.g. CronJob history) and bare pods would simply
+  // be destroyed, so Restart all leaves them out.
+  const restartablePods = useMemo(
+    () => pods.filter((p) => p.parentRefs?.some((r) => RESTARTABLE_OWNERS.has(r.kind))),
+    [pods],
+  );
 
   if (appLoading || treeLoading) {
     return <LoadingSpinner message="Loading application..." />;
@@ -167,7 +178,7 @@ export function ApplicationDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {pods.length > 1 && !isStopped && !pendingAction && (
+            {restartablePods.length > 1 && !isStopped && !pendingAction && (
               <Button
                 variant="outline"
                 size="sm"
@@ -386,7 +397,7 @@ export function ApplicationDetailPage() {
         open={restartAllConfirmOpen}
         onOpenChange={setRestartAllConfirmOpen}
         title="Restart All Pods"
-        description={`Restart all ${pods.length} pods of "${app.metadata.name}"? This will delete every pod and Kubernetes will recreate them.`}
+        description={`Restart all ${restartablePods.length} pods of "${app.metadata.name}"? This will delete every pod and Kubernetes will recreate them.`}
         confirmLabel="Restart all"
         variant="destructive"
         loading={restartAllMutation.isPending}
@@ -395,11 +406,14 @@ export function ApplicationDetailPage() {
           restartAllMutation.mutate(
             {
               appName: name!,
-              pods: pods.map((p) => ({ name: p.name, namespace: p.namespace })),
+              pods: restartablePods.map((p) => ({ name: p.name, namespace: p.namespace })),
               appNamespace,
             },
             {
-              onSuccess: () => setRestartAllConfirmOpen(false),
+              onSuccess: () => {
+                setRestartAllConfirmOpen(false);
+                setIsSettling(true);
+              },
               onError: (err) => {
                 setRestartAllConfirmOpen(false);
                 setRestartError(err.message);
