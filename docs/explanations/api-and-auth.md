@@ -190,18 +190,31 @@ parsed `LogEntry`. This approach:
 
 ### The React hook
 
-`useLogs` (`src/hooks/use-logs.ts:15-90`) manages the stream lifecycle
+`useLogs` (`src/hooks/use-logs.ts`) manages the stream lifecycle
 inside a React component:
 
 - **Start/stop** -- the `start` callback creates a new
   `AbortController`, clears accumulated lines, and kicks off the stream.
   The `stop` callback aborts the controller, resetting state.
-- **Appending lines** -- each yielded entry is appended to state via
-  `setLines(prev => [...prev, entry.content])`.
+- **Appending lines** -- yielded entries are collected in a ref and
+  flushed into state once per animation frame, so a burst of lines
+  costs one render rather than one per line.
+- **Bounded buffer** -- the viewer keeps the most recent `MAX_LINES`
+  (10,000) lines and discards the oldest beyond that, so a long-running
+  follow of a chatty pod cannot grow without limit. This applies even
+  when "All lines" is selected in the tail control.
 - **Auto-reconnect** -- when `follow` mode is enabled and the stream
   errors, the hook retries up to `MAX_RETRIES` (3) times with a
   2-second delay between attempts. A successful read resets the retry
   counter, so only *consecutive* failures count towards the limit.
+- **Resume, not replay** -- the hook remembers the timestamp of the
+  last entry it received. A reconnect asks for logs since that second
+  (as a relative `sinceSeconds`, with slack for clock skew) and no
+  `tailLines`, so nothing logged during the outage is missed. Kubernetes
+  only resumes to the second, so the hook also remembers the entries it
+  already holds from that second and drops the replayed copies on
+  arrival; anything older than the resume point is dropped too, so a
+  server that replays more than asked for still does not duplicate.
 
 ## Cancellation with AbortController
 
