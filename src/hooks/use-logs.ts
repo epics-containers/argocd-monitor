@@ -8,6 +8,10 @@ const RETRY_DELAY_MS = 2000;
 // Ring size: once this many lines are held the oldest are dropped, so a long
 // running follow on a chatty pod cannot grow without limit.
 const MAX_LINES = 10000;
+// A resumed stream asks for this much more than the gap, so a client clock
+// running behind the cluster's cannot make the server start after the resume
+// point. Anything replayed ahead of the position is dropped on arrival anyway.
+const RESUME_SLACK_S = 60;
 
 // Lines are collected in a ref and flushed once per animation frame, so a burst
 // costs one render and one array copy instead of one of each per line.
@@ -27,12 +31,16 @@ function cancelFlush(handle: number) {
 }
 
 // Where the last stream got to: the whole second of the newest entry seen, plus
-// the entries within that second, in order. ArgoCD's sinceTime is only accurate
-// to the second, so a resumed stream replays that second and the contents let
-// us drop the replayed entries again.
+// the entries within that second, in order. Kubernetes only resumes a log to
+// the second, so a resumed stream replays that second and the contents let us
+// drop the replayed entries again.
 interface StreamPosition {
   seconds: number;
   contents: string[];
+  // False when the stream cut in part-way through this second (tailLines or
+  // sinceSeconds on the first connection), so a replay of the second may carry
+  // entries ahead of contents[0] that were never shown.
+  complete: boolean;
 }
 
 function entrySeconds(timeStamp: string | undefined): number | null {
@@ -124,19 +132,24 @@ export function useLogs({ appName, params, enabled = true, appNamespace }: UseLo
       // tailLines/sinceSeconds would replay a fixed tail — duplicating what is
       // already on screen, and dropping anything logged beyond that count while
       // the connection was down.
+      // ArgoCD advertises sinceTime.seconds for this, but its grpc-gateway
+      // drops the parameter without error (metav1.Time has no seconds field to
+      // populate), so the position is sent as a relative sinceSeconds instead.
       const resumeFrom = positionRef.current;
       const streamParams: LogParams = resumeFrom
         ? {
             ...params,
-            sinceTimeSeconds: resumeFrom.seconds,
-            sinceSeconds: undefined,
+            sinceSeconds: Math.max(
+              RESUME_SLACK_S,
+              Math.ceil(Date.now() / 1000) - resumeFrom.seconds + RESUME_SLACK_S,
+            ),
             tailLines: undefined,
           }
         : params;
 
       // Entries are chronological, so drop everything the server re-delivers up
       // to and including the last entry we already hold. This stays correct even
-      // if the server ignores sinceTime and replays more than it was asked for.
+      // if the server ignores sinceSeconds and replays more than it was asked for.
       let replay = resumeFrom;
       let replayIndex = 0;
       const isReplayed = (entry: LogEntry): boolean => {
@@ -154,6 +167,9 @@ export function useLogs({ appName, params, enabled = true, appNamespace }: UseLo
           replayIndex++;
           return true;
         }
+        // We never saw the start of this second, so entries ahead of the ones
+        // we hold were never shown: keep dropping until our sequence begins
+        if (replayIndex === 0 && !replay.complete) return true;
         // Diverged from what we hold (log rotated, say): keep the rest
         replay = null;
         return false;
@@ -164,12 +180,19 @@ export function useLogs({ appName, params, enabled = true, appNamespace }: UseLo
         if (seconds === null) return;
         const current = positionRef.current;
         if (!current || current.seconds !== seconds) {
-          positionRef.current = { seconds, contents: [entry.content] };
+          // Only a change of second seen on the stream proves this entry is
+          // the first of its second
+          positionRef.current = {
+            seconds,
+            contents: [entry.content],
+            complete: current !== null,
+          };
           return;
         }
         current.contents.push(entry.content);
         if (current.contents.length > MAX_LINES) {
           current.contents.splice(0, current.contents.length - MAX_LINES);
+          current.complete = false;
         }
       };
 

@@ -6,8 +6,6 @@ export interface LogParams {
   container?: string;
   namespace: string;
   sinceSeconds?: number;
-  /** Resume point, in whole unix seconds; sent as ArgoCD's sinceTime.seconds. */
-  sinceTimeSeconds?: number;
   tailLines?: number;
   follow?: boolean;
   previous?: boolean;
@@ -33,9 +31,6 @@ export async function* streamLogs(
   }
   if (params.sinceSeconds) {
     searchParams.set("sinceSeconds", String(params.sinceSeconds));
-  }
-  if (params.sinceTimeSeconds !== undefined) {
-    searchParams.set("sinceTime.seconds", String(params.sinceTimeSeconds));
   }
   if (params.tailLines) {
     searchParams.set("tailLines", String(params.tailLines));
