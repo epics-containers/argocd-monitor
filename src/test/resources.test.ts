@@ -124,4 +124,29 @@ describe("getStoppableWorkload", () => {
 
     expect(result?.kind).toBe("Deployment");
   });
+
+  it("returns the `domain` label as the parent app name when present", async () => {
+    mockFetch.mockResolvedValueOnce(
+      jsonResponse({
+        nodes: [
+          {
+            kind: "StatefulSet",
+            group: "apps",
+            version: "v1",
+            name: "svc-a",
+            namespace: "ns",
+          },
+        ],
+      }),
+    );
+    mockFetch.mockResolvedValueOnce(
+      manifestResponse({
+        metadata: { name: "svc-a", labels: { enabled: "true", domain: "p47" } },
+      }),
+    );
+
+    const result = await getStoppableWorkload("svc-a", "argocd");
+
+    expect(result?.domain).toBe("p47");
+  });
 });
