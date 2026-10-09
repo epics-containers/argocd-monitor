@@ -1,0 +1,20 @@
+# Observability links (Grafana dashboards and Graylog logs) for the Application detail page.
+# Grafana: each Application's cluster key is spec.destination.name (e.g. "b01-1"), which
+# at DLS is already the cluster id, so no clusterPattern is needed.
+grafana:
+  enabled: true
+  urlTemplate: https://k8s-{cluster}-grafana.diamond.ac.uk
+  # Special cases, keyed by cluster name (or raw destination name/server).
+  # An empty string hides the Grafana links for that cluster.
+  # The shared argus and pollux clusters don't follow the k8s-<name> pattern.
+  overrides:
+    argus: https://argus-grafana.diamond.ac.uk
+    pollux: https://pollux-grafana.diamond.ac.uk
+
+# Graylog historical-log links: one "Graylog" button per workload. A single global
+# Graylog serves every cluster. The search id is the DLS saved search/stream
+# view; {query} is replaced with the URL-encoded Lucene pod-name query.
+graylog:
+  enabled: true
+  urlTemplate: https://graylog.diamond.ac.uk/search/68b837590236942c70cfdf96?q={query}&rangetype=relative&from=7200
+  podField: pod_name

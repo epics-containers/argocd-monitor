@@ -105,3 +105,32 @@ namespaceMap:
   # @schema description: Ordered IP-range → namespace map. First match wins. Each entry is {cidr, namespace}.
   # @schema type: array
   ranges: []
+
+# Grafana links on the Application detail page. Served with `graylog` at
+# GET /api/observability-config. The cluster key is spec.destination.name
+# (falling back to spec.destination.server).
+grafana:
+  # @schema description: Show Grafana dashboard / Explore links on the Application detail page
+  enabled: false
+  # @schema description: Optional regex with one capture group applied to the cluster key. Group 1 becomes {cluster}. Empty uses the cluster key verbatim
+  clusterPattern: ""
+  # @schema description: Grafana base URL template. {cluster} is replaced with the cluster name (e.g. https://k8s-{cluster}-grafana.example.com)
+  urlTemplate: ""
+  # @schema description: Cluster name (or raw cluster key) → Grafana base URL. An empty string disables links for that cluster
+  # @schema additionalProperties: {"type": "string"}
+  overrides: {}
+  # @schema description: UID of the Prometheus datasource used by Explore links
+  datasourceUid: prometheus
+  # @schema description: Show app-wide Grafana Explore links (CPU, memory, restarts). Off by default because Grafana's Viewer role cannot open Explore
+  exploreLinks: false
+
+# Graylog historical-log links ("Logs" per workload) on the Application detail
+# page. One global Graylog server serves every cluster. Served with `grafana`
+# at GET /api/observability-config.
+graylog:
+  # @schema description: Show a Graylog historical-logs link for each workload on the Application detail page
+  enabled: false
+  # @schema description: Graylog search URL. {query} is replaced with the URL-encoded Lucene query (e.g. https://graylog.example.com/search?q={query})
+  urlTemplate: ""
+  # @schema description: Graylog message field holding the pod name. Must be a keyword (non-analyzed) field for regex queries
+  podField: pod_name

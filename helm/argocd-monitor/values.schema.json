@@ -32,6 +32,57 @@
                 "null"
             ]
         },
+        "grafana": {
+            "type": "object",
+            "properties": {
+                "clusterPattern": {
+                    "description": "Optional regex with one capture group applied to the cluster key. Group 1 becomes {cluster}. Empty uses the cluster key verbatim",
+                    "type": "string"
+                },
+                "datasourceUid": {
+                    "description": "UID of the Prometheus datasource used by Explore links",
+                    "type": "string"
+                },
+                "enabled": {
+                    "description": "Show Grafana dashboard / Explore links on the Application detail page",
+                    "type": "boolean"
+                },
+                "exploreLinks": {
+                    "description": "Show app-wide Grafana Explore links (CPU, memory, restarts). Off by default because Grafana's Viewer role cannot open Explore",
+                    "type": "boolean"
+                },
+                "overrides": {
+                    "description": "Cluster name (or raw cluster key) → Grafana base URL. An empty string disables links for that cluster",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "urlTemplate": {
+                    "description": "Grafana base URL template. {cluster} is replaced with the cluster name (e.g. https://k8s-{cluster}-grafana.example.com)",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
+        "graylog": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "description": "Show a Graylog historical-logs link for each workload on the Application detail page",
+                    "type": "boolean"
+                },
+                "podField": {
+                    "description": "Graylog message field holding the pod name. Must be a keyword (non-analyzed) field for regex queries",
+                    "type": "string"
+                },
+                "urlTemplate": {
+                    "description": "Graylog search URL. {query} is replaced with the URL-encoded Lucene query (e.g. https://graylog.example.com/search?q={query})",
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
         "image": {
             "type": "object",
             "properties": {

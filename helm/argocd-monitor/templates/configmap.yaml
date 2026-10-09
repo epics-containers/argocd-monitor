@@ -5,6 +5,21 @@ metadata:
   labels:
     {{- include "argocd-monitor.labels" . | nindent 4 }}
 data:
+  # Served verbatim at /api/observability-config. Rendered as a standalone JSON
+  # file (rather than inlined in `return 200 '...'`) so regex backslashes and
+  # quotes in clusterPattern need no nginx escaping.
+  observability-config.json: |
+    {{- $g := .Values.grafana }}
+    {{- $grafana := dict "enabled" false }}
+    {{- if $g.enabled }}
+    {{- $grafana = dict "enabled" true "clusterPattern" ($g.clusterPattern | default "") "urlTemplate" ($g.urlTemplate | default "") "overrides" ($g.overrides | default dict) "datasourceUid" ($g.datasourceUid | default "prometheus") "exploreLinks" ($g.exploreLinks | default false) }}
+    {{- end }}
+    {{- $l := .Values.graylog }}
+    {{- $graylog := dict "enabled" false }}
+    {{- if $l.enabled }}
+    {{- $graylog = dict "enabled" true "urlTemplate" ($l.urlTemplate | default "") "podField" ($l.podField | default "pod_name") }}
+    {{- end }}
+    {{- dict "grafana" $grafana "graylog" $graylog | toJson | nindent 4 }}
   {{- if .Values.namespaceMap.enabled }}
   # Loaded by nginx's `include /etc/nginx/conf.d/*.conf;` so the geo block sits
   # at http context (sibling of server{}). $beamline_namespace is then visible
@@ -74,6 +89,14 @@ data:
             {{- else }}
             return 200 '{"namespace":""}';
             {{- end }}
+        }
+
+        # Grafana / Graylog link config for the Application detail page.
+        # An exact-match location, so it wins over the /api/ proxy prefix.
+        location = /api/observability-config {
+            default_type application/json;
+            add_header Cache-Control "no-cache";
+            alias /etc/nginx/argocd-monitor/observability-config.json;
         }
 
         # Dedicated location for log streaming — must be above /api/ catch-all
