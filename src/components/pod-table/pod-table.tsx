@@ -238,8 +238,8 @@ function PodRow({
       </span>,
     );
   }
-  for (const img of pod.images ?? []) {
-    details.push(<ImageName key={img} image={img} />);
+  for (const [i, img] of (pod.images ?? []).entries()) {
+    details.push(<ImageName key={`img-${i}`} image={img} />);
   }
   if (nodeName) {
     details.push(

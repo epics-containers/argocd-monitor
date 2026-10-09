@@ -1,4 +1,5 @@
 import type { GraylogConfig } from "@/api/observability-config";
+import { isHttpUrl } from "@/lib/grafana";
 import type { ObservabilityLink, LinkGroup } from "@/lib/observability";
 import type { ResourceNode } from "@/types/resource";
 
@@ -86,7 +87,9 @@ export function graylogRangeLabel(urlTemplate: string): string | null {
 export function resolveGraylogTemplate(config: GraylogConfig | undefined): string | null {
   if (!config?.enabled) return null;
   const template = config.urlTemplate?.trim();
-  return template && template.includes(QUERY_PLACEHOLDER) ? template : null;
+  return template && template.includes(QUERY_PLACEHOLDER) && isHttpUrl(template)
+    ? template
+    : null;
 }
 
 export interface GraylogLinkSet {

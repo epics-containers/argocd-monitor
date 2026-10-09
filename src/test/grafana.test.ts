@@ -53,6 +53,15 @@ describe("clusterKey", () => {
 });
 
 describe("resolveGrafanaBaseUrl", () => {
+  it("only accepts http(s) URLs", () => {
+    const cfg = (urlTemplate: string, overrides = {}) => ({ ...DLS_CONFIG, urlTemplate, overrides });
+    const dest = { name: "b01-1", namespace: "b01-1-beamline" };
+    expect(resolveGrafanaBaseUrl(dest, cfg("k8s-{cluster}-grafana"))).toBeNull();
+    expect(resolveGrafanaBaseUrl(dest, cfg("https://g", { "b01-1": "data:text/html,x" }))).toBeNull();
+    expect(resolveGrafanaBaseUrl(dest, cfg("HTTP://g/"))).toBe("HTTP://g");
+  });
+
+
   it("uses destination.name verbatim when no pattern is set", () => {
     expect(resolveGrafanaBaseUrl({ name: "i15", namespace: I15_NS }, DLS_CONFIG)).toBe(
       I15_GRAFANA,

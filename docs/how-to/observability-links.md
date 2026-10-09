@@ -12,8 +12,9 @@ link, which you enable separately, sit alongside them:
   next to **Open Grafana**.
 - **Graylog**: a **Graylog** button (first on each workload row) that searches
   one global Graylog server for the logs of that workload's pods, including
-  pods that no longer exist. A pod with no owning workload gets its Graylog
-  link in its **Dashboards** menu instead.
+  pods that no longer exist. A bare pod with no owner reference gets its
+  Graylog link in its **Dashboards** menu instead. Pods owned by a Job get no
+  Graylog link.
 
 Both are off by default. With neither enabled the pod table shows no links.
 Graylog links still show for clusters that have no Grafana. A workload scaled
@@ -25,7 +26,9 @@ pods.
 Each destination cluster needs a Grafana deployed with
 [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack).
 The links target the dashboards that chart bundles (from kubernetes-mixin and
-node-exporter-mixin), whose UIDs are stable across releases:
+node-exporter-mixin), whose UIDs are stable across releases. The workload CPU
+and Memory buttons open single panels with `viewPanel=panel-N`, the form used
+by Grafana 11 and later; they were checked against Grafana 13.
 
 | Link | Dashboard |
 |---|---|

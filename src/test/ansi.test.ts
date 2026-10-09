@@ -35,6 +35,10 @@ describe("parseAnsi", () => {
     expect(parseAnsi("a\x1b[2Kb\x1b[?25lc").text).toBe("abc");
   });
 
+  it("drops private CSI, two-byte escapes and unterminated OSC", () => {
+    expect(parseAnsi("a\x1b[>1cb\x1b(Bc\x1b7d\x1b]0;title").text).toBe("abcd");
+  });
+
   it("ignores a malformed 24-bit colour", () => {
     expect(parseAnsi("\x1b[38;2;999;0;0mx").segments).toEqual([]);
   });

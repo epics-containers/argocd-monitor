@@ -73,9 +73,15 @@ function extractClusterName(key: string, pattern?: string): string | null {
   }
 }
 
+/** Only http(s) URLs become links: anything else (a relative `k8s-x`, a
+ *  `data:` URL) is a misconfiguration and hides the links. */
+export function isHttpUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url);
+}
+
 function normaliseBaseUrl(url: string | undefined): string | null {
   const trimmed = (url ?? "").trim().replace(/\/+$/, "");
-  return trimmed || null;
+  return trimmed && isHttpUrl(trimmed) ? trimmed : null;
 }
 
 /** What a link points at; lets the UI pick an icon and describe the target. */

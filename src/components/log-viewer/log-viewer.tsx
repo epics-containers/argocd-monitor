@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type CSSProperties, type ReactNode } from "react";
+import { memo, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { parseAnsi, type AnsiStyle, type ParsedAnsi } from "@/lib/ansi";
 import { matchRanges } from "@/lib/log-search";
 import { cn } from "@/lib/utils";
@@ -51,9 +51,53 @@ function renderLine({ text, segments }: ParsedAnsi, pattern?: RegExp): ReactNode
   return parts;
 }
 
+// One row. Memoised on its text, pattern and current flag, so a streamed line
+// renders only itself rather than re-highlighting the whole log.
+const LogRow = memo(function LogRow({
+  index,
+  line,
+  highlight,
+  current,
+}: {
+  index: number;
+  line: ParsedAnsi;
+  highlight?: RegExp;
+  current: boolean;
+}) {
+  return (
+    <div
+      data-line={index}
+      aria-current={current || undefined}
+      className={cn(
+        "hover:bg-muted-foreground/10",
+        current && "bg-yellow-200/50 ring-1 ring-yellow-500/60 dark:bg-yellow-500/15",
+      )}
+    >
+      <span className="mr-3 inline-block w-12 select-none text-right text-muted-foreground">
+        {index + 1}
+      </span>
+      {renderLine(line, highlight)}
+    </div>
+  );
+});
+
+// Parsed lines by text, so each streamed line is parsed once and keeps the
+// same object (and so the same memoised row). Bounded so a long-running
+// stream cannot grow it without limit.
+const MAX_CACHED = 50_000;
+
 export function LogViewer({ lines, follow, highlight, currentLine }: LogViewerProps) {
   const containerRef = useRef<HTMLPreElement>(null);
-  const parsed = useMemo(() => lines.map(parseAnsi), [lines]);
+  const [cache] = useState(() => new Map<string, ParsedAnsi>());
+  const parse = (line: string): ParsedAnsi => {
+    let parsed = cache.get(line);
+    if (!parsed) {
+      if (cache.size >= MAX_CACHED) cache.clear();
+      parsed = parseAnsi(line);
+      cache.set(line, parsed);
+    }
+    return parsed;
+  };
 
   // Following tails the log, except while searching: new lines must not pull
   // the view away from the hit being looked at.
@@ -77,24 +121,17 @@ export function LogViewer({ lines, follow, highlight, currentLine }: LogViewerPr
       ref={containerRef}
       className="relative h-[calc(100vh-320px)] min-h-[400px] overflow-auto rounded-lg bg-muted p-4 font-mono text-xs leading-5 text-foreground"
     >
-      {parsed.length === 0 ? (
+      {lines.length === 0 ? (
         <span className="text-muted-foreground">Waiting for logs...</span>
       ) : (
-        parsed.map((line, i) => (
-          <div
+        lines.map((line, i) => (
+          <LogRow
             key={i}
-            data-line={i}
-            aria-current={i === currentLine || undefined}
-            className={cn(
-              "hover:bg-muted-foreground/10",
-              i === currentLine && "bg-yellow-200/50 ring-1 ring-yellow-500/60 dark:bg-yellow-500/15",
-            )}
-          >
-            <span className="mr-3 inline-block w-12 select-none text-right text-muted-foreground">
-              {i + 1}
-            </span>
-            {renderLine(line, highlight)}
-          </div>
+            index={i}
+            line={parse(line)}
+            highlight={highlight}
+            current={i === currentLine}
+          />
         ))
       )}
     </pre>

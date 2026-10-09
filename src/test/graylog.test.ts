@@ -130,6 +130,12 @@ describe("graylogRangeLabel", () => {
 });
 
 describe("resolveGraylogTemplate", () => {
+  it("rejects a template that is not an http(s) URL", () => {
+    expect(resolveGraylogTemplate({ enabled: true, urlTemplate: "graylog/search?q={query}" })).toBeNull();
+    expect(resolveGraylogTemplate({ enabled: true, urlTemplate: "javascript:{query}" })).toBeNull();
+  });
+
+
   it("requires enabled and a non-blank template", () => {
     expect(resolveGraylogTemplate(undefined)).toBeNull();
     expect(resolveGraylogTemplate({ enabled: false, urlTemplate: "https://g" })).toBeNull();

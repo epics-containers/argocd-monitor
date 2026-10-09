@@ -1,4 +1,5 @@
-import { useQueries } from "@tanstack/react-query";
+import { useCallback } from "react";
+import { useQueries, type UseQueryResult } from "@tanstack/react-query";
 import { getPodResource } from "@/api/resources";
 import { podKey } from "@/lib/grafana";
 import type { PodResource, ResourceNode } from "@/types/resource";
@@ -13,6 +14,20 @@ export function usePodManifests(
   appNamespace?: string,
   enabled = true,
 ) {
+  // Stable, so react-query memoises the combined result and the links built
+  // from it are not rebuilt on every render.
+  const combine = useCallback(
+    (results: UseQueryResult<PodResource>[]) => {
+      const manifests: Record<string, PodResource | undefined> = {};
+      const pending = new Set<string>();
+      results.forEach((r, i) => {
+        if (r.data) manifests[podKey(pods[i])] = r.data;
+        else if (r.isLoading) pending.add(podKey(pods[i]));
+      });
+      return { manifests, pending, isLoading: pending.size > 0 };
+    },
+    [pods],
+  );
   return useQueries({
     queries: pods.map((pod) => ({
       queryKey: ["pod-manifest", appName, appNamespace, pod.namespace, pod.name, pod.uid],
@@ -22,14 +37,6 @@ export function usePodManifests(
       refetchOnWindowFocus: false,
       retry: false,
     })),
-    combine: (results) => {
-      const manifests: Record<string, PodResource | undefined> = {};
-      const pending = new Set<string>();
-      results.forEach((r, i) => {
-        if (r.data) manifests[podKey(pods[i])] = r.data;
-        else if (r.isLoading) pending.add(podKey(pods[i]));
-      });
-      return { manifests, pending, isLoading: pending.size > 0 };
-    },
+    combine,
   });
 }

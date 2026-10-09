@@ -24,9 +24,11 @@ export interface ParsedAnsi {
   segments: AnsiSegment[];
 }
 
-// Any CSI sequence (colours, cursor moves, erase-line), plus bare OSC titles.
-// eslint-disable-next-line no-control-regex
-const ESCAPE = /\x1b\[([0-9;?]*)([@-~])|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)/g;
+// Any CSI sequence (colours, cursor moves, erase-line, private modes), OSC
+// titles (terminated or not), and two-byte escapes such as ESC ( B or ESC 7.
+const ESCAPE =
+  // eslint-disable-next-line no-control-regex
+  /\x1b\[([0-9;?<=>]*)[ -/]*([@-~])|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\|$)|\x1b[ -/]*[0-~]/g;
 
 // The 16 standard colours, mid-tone so they read on both the light and the
 // dark log background.
