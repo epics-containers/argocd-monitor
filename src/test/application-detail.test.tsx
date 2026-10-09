@@ -124,7 +124,8 @@ describe("ApplicationDetailPage", () => {
     renderPage();
 
     expect(screen.getAllByText("test-app").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/Pods \(0\)/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole("heading", { name: "Pods" })).toBeInTheDocument();
+    expect(screen.getByText("No pods found.")).toBeInTheDocument();
   });
 
   it("renders when tree.nodes is undefined", () => {
@@ -143,7 +144,8 @@ describe("ApplicationDetailPage", () => {
     renderPage();
 
     expect(screen.getAllByText("test-app").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/Pods \(0\)/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole("heading", { name: "Pods" })).toBeInTheDocument();
+    expect(screen.getByText("No pods found.")).toBeInTheDocument();
   });
 
   it("shows loading spinner while loading", () => {

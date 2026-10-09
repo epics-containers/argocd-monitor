@@ -119,10 +119,10 @@ export function buildGraylogLinks({
   for (const n of sorted) {
     if (n.kind in POD_SUFFIX) {
       const link = linkFor(n);
-      if (link) workloads.push({ name: n.name, detail: n.kind, links: [link] });
+      if (link) workloads.push({ name: n.name, detail: n.kind, namespace: n.namespace, links: [link] });
     } else if (n.kind === "Pod" && !n.parentRefs?.length) {
       const link = linkFor(n);
-      if (link) pods.push({ name: n.name, links: [link] });
+      if (link) pods.push({ name: n.name, namespace: n.namespace, links: [link] });
     }
   }
   return { workloads, pods };

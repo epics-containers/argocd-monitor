@@ -1,25 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router";
-import { ArrowLeft, ArrowUpDown, Loader2, Play, RotateCcw, ScrollText, Square } from "lucide-react";
+import { ArrowLeft, Loader2, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { HealthBadge, SyncBadge } from "@/components/app-table/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
-import { ObservabilityLinksSection } from "@/components/observability/observability-links";
+import { PodTable } from "@/components/pod-table/pod-table";
 import { useApplication, useResourceTree } from "@/hooks/use-application";
 import { useRestartPod } from "@/hooks/use-restart-pod";
 import { useSetEnabled } from "@/hooks/use-set-enabled";
 import { useStoppableWorkload } from "@/hooks/use-stoppable-workload";
-import { formatAge } from "@/lib/format";
 import type { ResourceNode } from "@/types/resource";
 
 const EMPTY_NODES: ResourceNode[] = [];
@@ -45,7 +36,6 @@ export function ApplicationDetailPage() {
   const [restartError, setRestartError] = useState<string | null>(null);
   const [stopConfirmOpen, setStopConfirmOpen] = useState(false);
   const [setEnabledError, setSetEnabledError] = useState<string | null>(null);
-  const [podSort, setPodSort] = useState<{ key: string; asc: boolean }>({ key: "name", asc: true });
 
   const isStopped = app?.metadata.labels?.STOPPED === "1";
 
@@ -73,27 +63,6 @@ export function ApplicationDetailPage() {
   }, [isSettling]);
   const tableFilters = sessionStorage.getItem("tableFilters");
   const backTo = tableFilters ? `/?${tableFilters}` : "/";
-  const pods = useMemo(() => {
-    const filtered = tree?.nodes?.filter((n) => n.kind === "Pod") ?? [];
-    return [...filtered].sort((a, b) => {
-      let cmp = 0;
-      switch (podSort.key) {
-        case "name":
-          cmp = a.name.localeCompare(b.name);
-          break;
-        case "status":
-          cmp = (a.health?.status ?? "").localeCompare(b.health?.status ?? "");
-          break;
-        case "age":
-          cmp = (a.createdAt ?? "").localeCompare(b.createdAt ?? "");
-          break;
-        default:
-          cmp = 0;
-      }
-      return podSort.asc ? cmp : -cmp;
-    });
-  }, [tree?.nodes, podSort]);
-
   if (appLoading || treeLoading) {
     return <LoadingSpinner message="Loading application..." />;
   }
@@ -265,106 +234,12 @@ export function ApplicationDetailPage() {
         </p>
       )}
 
-      <div>
-        <h3 className="mb-3 text-lg font-medium">Pods ({pods.length})</h3>
-        {pods.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No pods found.</p>
-        ) : (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>
-                    <Button variant="ghost" className="-ml-4" onClick={() => setPodSort((s) => ({ key: "name", asc: s.key === "name" ? !s.asc : true }))}>
-                      Pod Name <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>
-                    <Button variant="ghost" className="-ml-4" onClick={() => setPodSort((s) => ({ key: "status", asc: s.key === "status" ? !s.asc : true }))}>
-                      Status <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>Image</TableHead>
-                  <TableHead>
-                    <Button variant="ghost" className="-ml-4" onClick={() => setPodSort((s) => ({ key: "age", asc: s.key === "age" ? !s.asc : true }))}>
-                      Age <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </TableHead>
-                  <TableHead>Info</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pods.map((pod) => (
-                  <TableRow key={pod.name}>
-                    <TableCell className="font-medium">{pod.name}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={
-                          pod.health?.status === "Healthy"
-                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
-                            : pod.health?.status === "Degraded"
-                              ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                              : "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
-                        }
-                      >
-                        {pod.health?.status ?? "Unknown"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm whitespace-normal">
-                      {pod.images?.length ? (
-                        <div className="flex flex-col gap-0.5">
-                          {pod.images.map((img) => (
-                            <span key={img} className="font-mono text-xs text-muted-foreground break-all" title={img}>
-                              {img}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground" title={pod.createdAt ?? ""}>
-                      {formatAge(pod.createdAt)}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground whitespace-normal break-words">
-                      {pod.info
-                        ?.map((i) => `${i.name}: ${i.value}`)
-                        .join(", ") ?? ""}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Link
-                          to={`/apps/${encodeURIComponent(name!)}/logs/${encodeURIComponent(pod.name)}?namespace=${encodeURIComponent(pod.namespace)}${appNamespace ? `&appNamespace=${encodeURIComponent(appNamespace)}` : ""}`}
-                          className="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-sm font-medium hover:bg-muted"
-                        >
-                          <ScrollText className="h-4 w-4" />
-                          Logs
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setRestartTarget(pod)}
-                        >
-                          <RotateCcw className="mr-1 h-4 w-4" />
-                          Restart
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </div>
-
-      <ObservabilityLinksSection
+      <PodTable
         appName={name!}
         appNamespace={appNamespace}
         destination={app.spec.destination}
         nodes={tree?.nodes ?? EMPTY_NODES}
+        onRestart={setRestartTarget}
       />
 
       <ConfirmDialog

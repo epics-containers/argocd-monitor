@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ObservabilityLinksSection } from "@/components/observability/observability-links";
+import { PodTable } from "@/components/pod-table/pod-table";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   getObservabilityConfig,
   type GrafanaConfig,
@@ -9,6 +11,7 @@ import {
   type ObservabilityConfig,
 } from "@/api/observability-config";
 import { getPodResource } from "@/api/resources";
+import type { ResourceNode } from "@/types/resource";
 import {
   DLS_CONFIG,
   GRAYLOG_CONFIG,
@@ -18,6 +21,7 @@ import {
   I15_NODE,
   I15_NODES,
   I15_NS,
+  I15_OAUTH_POD,
 } from "./grafana-fixtures";
 
 vi.mock("@/api/resources", () => ({
@@ -40,207 +44,231 @@ function configResponse(
   return jsonResponse({ grafana, graylog });
 }
 
-function renderSection(destination = { name: "i15", namespace: I15_NS }, nodes = I15_NODES) {
+const onRestart = vi.fn();
+
+function renderTable(destination = { name: "i15", namespace: I15_NS }, nodes = I15_NODES) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const result = render(
     <QueryClientProvider client={queryClient}>
-      <ObservabilityLinksSection appName="i15-1-blueapi" destination={destination} nodes={nodes} />
+      <TooltipProvider>
+        <MemoryRouter>
+          <PodTable
+            appName="i15-1-blueapi"
+            destination={destination}
+            nodes={nodes}
+            onRestart={onRestart}
+          />
+        </MemoryRouter>
+      </TooltipProvider>
     </QueryClientProvider>,
   );
   return { ...result, queryClient };
 }
 
-/** Wait until the config query has settled, so "renders nothing" assertions
- *  aren't satisfied by the pre-fetch empty render. */
+/** Wait until the config query has settled, so "no links" assertions aren't
+ *  satisfied by the pre-fetch render. */
 async function configSettled(queryClient: QueryClient) {
   await waitFor(() =>
     expect(queryClient.getQueryState(["observability-config"])?.status).toMatch(/success|error/),
   );
 }
 
-describe("ObservabilityLinksSection", () => {
+/** Open a pod's Dashboards menu and return it. */
+async function openPodMenu(pod: string) {
+  const trigger = await screen.findByRole("button", { name: `Dashboards for pod ${pod}` });
+  act(() => {
+    fireEvent.click(trigger);
+  });
+  return screen.findByRole("menu");
+}
+
+function closeMenu() {
+  act(() => {
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+  });
+}
+
+/** The row group (workload header plus its pods) whose header names `name`. */
+function workloadGroup(name: string): HTMLElement {
+  const header = screen.getAllByRole("rowheader").find((h) => within(h).queryByText(name));
+  return header!.closest("tbody")!;
+}
+
+describe("PodTable", () => {
   beforeEach(() => {
     mockFetch.mockReset();
+    onRestart.mockReset();
     vi.mocked(getPodResource).mockClear();
     vi.mocked(getPodResource).mockImplementation((_app, pod, ns) =>
       Promise.resolve(I15_MANIFESTS[`${ns}/${pod}`]),
     );
   });
 
-  it("renders dashboard links for the i15 app", async () => {
-    mockFetch.mockResolvedValue(configResponse());
-    renderSection();
+  it("groups pods under their workload, through ReplicaSets", () => {
+    mockFetch.mockResolvedValue(configResponse(OFF, OFF));
+    const idle = { ...I15_NODES[0], name: "i15-1-idle", uid: "idle" };
+    renderTable(undefined, [...I15_NODES, idle]);
 
-    expect(await screen.findByText("Observability")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Open Grafana/ })).toHaveAttribute(
+    expect(within(workloadGroup("i15-1-blueapi")).getByText("i15-1-blueapi-0")).toBeInTheDocument();
+    expect(within(workloadGroup("i15-1-blueapi-oauth2")).getByText(I15_OAUTH_POD)).toBeInTheDocument();
+    // A workload scaled to zero still gets its row (and so its links).
+    expect(within(workloadGroup("i15-1-idle")).getByText("No pods running.")).toBeInTheDocument();
+    expect(screen.queryByText("Other pods")).not.toBeInTheDocument();
+  });
+
+  it("restarts the pod whose Restart button is pressed", () => {
+    mockFetch.mockResolvedValue(configResponse(OFF, OFF));
+    renderTable();
+    fireEvent.click(screen.getByRole("button", { name: `Restart pod ${I15_OAUTH_POD}` }));
+    expect(onRestart).toHaveBeenCalledWith(I15_NODES[5]);
+  });
+
+  it("puts workload dashboards on the workload row and the rest in each pod's menu", async () => {
+    mockFetch.mockResolvedValue(configResponse());
+    renderTable();
+
+    expect(await screen.findByRole("link", { name: /Open Grafana/ })).toHaveAttribute(
       "href",
       I15_GRAFANA,
     );
-    // Node group appears once pod manifests have loaded, under the node's
-    // short hostname with the FQDN in its tooltip.
-    expect(await screen.findByText(I15_NODE.split(".")[0])).toHaveAttribute("title", I15_NODE);
-    expect(screen.getAllByRole("link", { name: /Pod network/ })).toHaveLength(1);
-    expect(screen.getByRole("link", { name: /Volume i15-1-blueapi-scratch/ })).toBeInTheDocument();
-    for (const link of screen.getAllByRole("link")) {
+    const sts = workloadGroup("i15-1-blueapi");
+    expect(within(sts).getByRole("link", { name: /^CPU: CPU usage panel/ })).toBeInTheDocument();
+    expect(within(sts).getByRole("link", { name: /^Workload resources/ })).toBeInTheDocument();
+    for (const link of screen.getAllByRole("link", { name: /Grafana in a new tab/ })) {
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", "noopener noreferrer");
       expect(link.getAttribute("href")).toMatch(/^https:\/\/k8s-i15-grafana\.diamond\.ac\.uk/);
     }
+
+    // The node row shows once manifests load: short name, FQDN in the tooltip.
+    expect(await within(sts).findByText(I15_NODE.split(".")[0])).toHaveAttribute("title", I15_NODE);
+    // hostNetwork pod: volume but no network link; its node's dashboards.
+    let menu = await openPodMenu("i15-1-blueapi-0");
+    expect(within(menu).getByRole("menuitem", { name: /^Pod resources: Kubernetes \/ Compute Resources \/ Pod/ })).toBeInTheDocument();
+    expect(within(menu).getByRole("menuitem", { name: /Volume i15-1-blueapi-scratch/ })).toBeInTheDocument();
+    expect(within(menu).queryByRole("menuitem", { name: /Pod network/ })).not.toBeInTheDocument();
+    expect(within(menu).getByText(`Node ${I15_NODE.split(".")[0]}`)).toHaveAttribute("title", I15_NODE);
+    expect(
+      within(menu).getByRole("menuitem", { name: /^Node hardware: Node Exporter \/ Nodes, last hour/ }),
+    ).toHaveAttribute("target", "_blank");
+    closeMenu();
+
+    menu = await openPodMenu(I15_OAUTH_POD);
+    expect(within(menu).getByRole("menuitem", { name: /Pod network/ })).toBeInTheDocument();
   });
 
-  it("names the target dashboard in each link's accessible name", async () => {
-    mockFetch.mockResolvedValue(configResponse());
-    renderSection();
-
-    expect(await screen.findByText(I15_NODE.split(".")[0])).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: /^Node hardware: Node Exporter \/ Nodes/ }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getAllByRole("link", { name: /^Workload resources: Kubernetes \/ Compute Resources \/ Workload/ }),
-    ).toHaveLength(2);
-  });
-
-  it("holds a skeleton node row while pod manifests load", async () => {
+  it("shows pending links while pod manifests load", async () => {
     vi.mocked(getPodResource).mockReturnValue(new Promise(() => {}));
     mockFetch.mockResolvedValue(configResponse());
-    renderSection();
+    renderTable();
 
-    const section = await screen.findByRole("region", { name: "Observability" });
-    expect(section).toHaveAttribute("aria-busy", "true");
-    expect(screen.getByRole("heading", { name: "Node" })).toBeInTheDocument();
-    expect(section.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
-    expect(screen.queryByText(I15_NODE.split(".")[0])).not.toBeInTheDocument();
-    // Network chips wait for the manifest rather than flickering in and out.
-    expect(screen.queryByRole("link", { name: /Pod network/ })).not.toBeInTheDocument();
+    const menu = await openPodMenu(I15_OAUTH_POD);
+    expect(screen.getByRole("region", { name: "Pods" })).toHaveAttribute("aria-busy", "true");
+    expect(within(menu).getByText("Loading network and volume links…")).toBeInTheDocument();
+    // Network links wait for the manifest rather than flickering in and out.
+    expect(within(menu).queryByRole("menuitem", { name: /Pod network/ })).not.toBeInTheDocument();
   });
 
-  it("still renders tree-derived links when pod manifests fail to load", async () => {
+  it("still links to pod dashboards when pod manifests fail to load", async () => {
     vi.mocked(getPodResource).mockRejectedValue(new Error("403"));
     mockFetch.mockResolvedValue(configResponse());
-    renderSection();
+    renderTable();
 
-    const section = await screen.findByRole("region", { name: "Observability" });
+    const section = await screen.findByRole("region", { name: "Pods" });
     await waitFor(() => expect(section).toHaveAttribute("aria-busy", "false"));
-    expect(screen.getAllByRole("link", { name: /^Pod resources/ })).toHaveLength(2);
-    expect(screen.getAllByRole("link", { name: /^Workload resources/ })).toHaveLength(2);
     // Workload CPU / Memory panels come from the tree alone.
     expect(screen.getAllByRole("link", { name: /^CPU: CPU usage panel/ })).toHaveLength(2);
-    // Unknown hostNetwork: no network link, and no lingering skeletons.
-    expect(screen.queryByRole("link", { name: /Pod network/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Node" })).not.toBeInTheDocument();
-    expect(section.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(0);
+    const menu = await openPodMenu("i15-1-blueapi-0");
+    expect(within(menu).getByRole("menuitem", { name: /^Pod resources/ })).toBeInTheDocument();
+    // Unknown hostNetwork and node: no network link, no node group.
+    expect(within(menu).queryByRole("menuitem", { name: /Pod network/ })).not.toBeInTheDocument();
+    expect(within(menu).queryByText(/^Node /)).not.toBeInTheDocument();
+    expect(within(menu).queryByText(/Loading/)).not.toBeInTheDocument();
   });
 
-  it("hides the app-wide Explore row unless exploreLinks is set", async () => {
+  it("shows the app-wide Explore links only when exploreLinks is set", async () => {
     mockFetch.mockResolvedValue(configResponse());
-    renderSection();
-    await screen.findByRole("region", { name: "Observability" });
-    expect(screen.queryByRole("heading", { name: "Application" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Explore/ })).not.toBeInTheDocument();
-  });
+    const { unmount } = renderTable();
+    await screen.findByRole("link", { name: /Open Grafana/ });
+    expect(screen.queryByText("All pods in Explore")).not.toBeInTheDocument();
+    unmount();
 
-  it("shows the app-wide Explore row when exploreLinks is set", async () => {
     mockFetch.mockResolvedValue(configResponse({ ...DLS_CONFIG, exploreLinks: true }));
-    renderSection();
-    expect(await screen.findByRole("heading", { name: "Application" })).toBeInTheDocument();
+    renderTable();
+    expect(await screen.findByText("All pods in Explore")).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: /Explore/ })).toHaveLength(3);
   });
 
-  it("shows an empty state when the app has no workloads or pods", async () => {
+  it("shows an empty state when the app has no workloads or pods", () => {
     mockFetch.mockResolvedValue(configResponse());
-    renderSection(undefined, []);
-    expect(await screen.findByText("No workloads or pods to link to.")).toBeInTheDocument();
+    renderTable(undefined, []);
+    expect(screen.getByText("No pods found.")).toBeInTheDocument();
   });
 
-  it("renders nothing when Grafana and Graylog are disabled", async () => {
-    mockFetch.mockResolvedValue(configResponse(OFF, OFF));
-    const { container, queryClient } = renderSection();
+  it.each([
+    ["Grafana and Graylog are disabled", () => configResponse(OFF, OFF)],
+    ["the endpoint is missing", () => new Response("not found", { status: 404 })],
+    ["Graylog has no URL template", () => configResponse(OFF, { enabled: true, urlTemplate: " " })],
+    ["the cluster override is empty", () => configResponse({ ...DLS_CONFIG, overrides: { i15: "" } })],
+  ])("lists pods without links when %s", async (_why, response) => {
+    mockFetch.mockResolvedValue(response());
+    const { queryClient } = renderTable();
     await configSettled(queryClient);
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.getByText("i15-1-blueapi-0")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /new tab/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Dashboards for pod/ })).not.toBeInTheDocument();
+    expect(getPodResource).not.toHaveBeenCalled();
   });
 
-  it("renders nothing when the endpoint is missing", async () => {
-    mockFetch.mockResolvedValue(new Response("not found", { status: 404 }));
-    const { container, queryClient } = renderSection();
-    await configSettled(queryClient);
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it("adds a Graylog chip to each workload alongside Grafana", async () => {
+  it("puts a Graylog chip first on each workload, alongside Grafana", async () => {
     mockFetch.mockResolvedValue(configResponse(DLS_CONFIG, GRAYLOG_CONFIG));
-    renderSection();
+    renderTable();
 
-    expect(await screen.findByText(/Grafana dashboards · k8s-i15-grafana/)).toBeInTheDocument();
-    expect(screen.getByText(/Graylog logs · graylog\.example\.com/)).toBeInTheDocument();
-    const logs = screen.getAllByRole("link", {
+    const logs = await screen.findAllByRole("link", {
       name: "Graylog: historical logs, last 2 hours (opens Graylog in a new tab)",
     });
-    expect(logs).toHaveLength(2);
     expect(logs.map((l) => l.getAttribute("href"))).toEqual([
       `${GRAYLOG_SEARCH}?q=pod_name%3A%2Fi15-1-blueapi-%5B0-9%5D%2B%2F&rangetype=relative&from=7200`,
       `${GRAYLOG_SEARCH}?q=pod_name%3A%2Fi15-1-blueapi-oauth2-%5Ba-z0-9%5D%7B1%2C10%7D-%5Ba-z0-9%5D%7B5%7D%2F&rangetype=relative&from=7200`,
     ]);
     for (const l of logs) {
+      expect(l).toHaveTextContent("Graylog");
       expect(l).toHaveAttribute("target", "_blank");
       expect(l).toHaveAttribute("rel", "noopener noreferrer");
     }
-    // Grafana chips are unaffected.
-    expect(screen.getAllByRole("link", { name: /^Workload resources/ })).toHaveLength(2);
-  });
-
-  it("shows Graylog links when Grafana is disabled", async () => {
-    mockFetch.mockResolvedValue(configResponse(OFF, GRAYLOG_CONFIG));
-    renderSection();
-
-    const section = await screen.findByRole("region", { name: "Observability" });
-    expect(screen.getAllByRole("link", { name: /^Graylog: historical logs/ })).toHaveLength(2);
-    expect(screen.queryByRole("link", { name: /Open Grafana/ })).not.toBeInTheDocument();
-    expect(screen.queryByText(/Grafana dashboards/)).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /^Workload resources/ })).not.toBeInTheDocument();
-    // No Grafana means no pod manifest fetches and no Pods/Node rows for owned pods.
-    expect(getPodResource).not.toHaveBeenCalled();
-    expect(screen.queryByRole("heading", { name: "Pods" })).not.toBeInTheDocument();
-    expect(section).toHaveAttribute("aria-busy", "false");
+    const chips = within(workloadGroup("i15-1-blueapi")).getAllByRole("link");
+    expect(chips[0]).toBe(logs[0]);
+    expect(chips.length).toBeGreaterThan(1);
   });
 
   it("shows Graylog links when the cluster has no Grafana", async () => {
     mockFetch.mockResolvedValue(
       configResponse({ ...DLS_CONFIG, overrides: { i15: "" } }, GRAYLOG_CONFIG),
     );
-    renderSection();
+    renderTable();
     expect(await screen.findAllByRole("link", { name: /^Graylog: historical logs/ })).toHaveLength(2);
     expect(screen.queryByRole("link", { name: /Open Grafana/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /^Workload resources/ })).not.toBeInTheDocument();
+    // No Grafana means no manifest fetches, and owned pods have nothing to menu.
+    expect(getPodResource).not.toHaveBeenCalled();
+    expect(screen.queryByRole("button", { name: /^Dashboards for pod/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Pods" })).toHaveAttribute("aria-busy", "false");
   });
 
-  it("links a bare pod with no owner by its exact name", async () => {
+  it("links a bare pod to Graylog by its exact name, under Other pods", async () => {
     mockFetch.mockResolvedValue(configResponse(OFF, GRAYLOG_CONFIG));
-    const bare = { ...I15_NODES[4], name: "debug-shell", uid: "bare", parentRefs: undefined };
-    const owned = I15_NODES[4];
-    renderSection(undefined, [I15_NODES[0], owned, bare]);
+    const bare: ResourceNode = { ...I15_NODES[4], name: "debug-shell", uid: "bare", parentRefs: undefined };
+    renderTable(undefined, [I15_NODES[0], I15_NODES[4], bare]);
 
-    expect(await screen.findByRole("heading", { name: "Pods" })).toBeInTheDocument();
-    const logs = screen.getAllByRole("link", { name: /^Graylog: historical logs/ });
-    expect(logs).toHaveLength(2);
-    expect(logs.map((l) => new URL(l.getAttribute("href")!).searchParams.get("q"))).toEqual([
-      "pod_name:/i15-1-blueapi-[0-9]+/",
-      'pod_name:"debug-shell"',
-    ]);
-    expect(screen.queryByText("i15-1-blueapi-0")).not.toBeInTheDocument();
-  });
-
-  it("renders nothing when Graylog is enabled without a URL template", async () => {
-    mockFetch.mockResolvedValue(configResponse(OFF, { enabled: true, urlTemplate: " " }));
-    const { container, queryClient } = renderSection();
-    await configSettled(queryClient);
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it("renders nothing when the cluster override is empty", async () => {
-    mockFetch.mockResolvedValue(configResponse({ ...DLS_CONFIG, overrides: { i15: "" } }));
-    const { container, queryClient } = renderSection();
-    await configSettled(queryClient);
-    expect(container).toBeEmptyDOMElement();
+    expect(await screen.findByText("Other pods")).toBeInTheDocument();
+    expect(
+      within(workloadGroup("Other pods")).getByText("debug-shell"),
+    ).toBeInTheDocument();
+    const workloadLogs = await screen.findAllByRole("link", { name: /^Graylog: historical logs/ });
+    expect(workloadLogs).toHaveLength(1);
+    const menu = await openPodMenu("debug-shell");
+    const podLog = within(menu).getByRole("menuitem", { name: /^Graylog: historical logs/ });
+    expect(new URL(podLog.getAttribute("href")!).searchParams.get("q")).toBe('pod_name:"debug-shell"');
   });
 });
 

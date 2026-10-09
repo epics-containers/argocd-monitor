@@ -105,6 +105,8 @@ export interface GrafanaLinkGroup {
   name: string;
   /** Secondary detail, e.g. workload kind or node host IP. */
   detail?: string;
+  /** Namespace of a workload or pod group; unset for nodes. */
+  namespace?: string;
   links: GrafanaLink[];
   /** True while the pod's manifest is still loading, so links that depend on
    *  it (network, volumes) are not known yet. */
@@ -208,6 +210,7 @@ export function buildGrafanaLinks({
       return {
         name: n.name,
         detail: n.kind,
+        namespace: n.namespace,
         links: [
           { kind: "workloadCpu", label: "CPU", url: panel(WORKLOAD_CPU_PANEL) },
           { kind: "workloadMemory", label: "Memory", url: panel(WORKLOAD_MEMORY_PANEL) },
@@ -287,7 +290,12 @@ export function buildGrafanaLinks({
       nodeGroups.set(nodeName, { name: nodeName, detail: hostIP, links: nodeLinks });
     }
 
-    return { name: p.name, links, pending: !manifest && !!pendingPods?.has(podKey(p)) };
+    return {
+      name: p.name,
+      namespace: p.namespace,
+      links,
+      pending: !manifest && !!pendingPods?.has(podKey(p)),
+    };
   });
 
   const app: GrafanaLink[] = [];

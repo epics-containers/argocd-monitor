@@ -7,7 +7,6 @@ import {
   graylogUrl,
   resolveGraylogTemplate,
 } from "@/lib/graylog";
-import { mergeLinkGroups } from "@/lib/observability";
 import { GRAYLOG_CONFIG, GRAYLOG_SEARCH, I15_NODES, I15_OAUTH_POD } from "./grafana-fixtures";
 
 /** Convert `field:/regex/` to a JS RegExp anchored like Lucene (whole term). */
@@ -193,21 +192,5 @@ describe("buildGraylogLinks (i15-1-blueapi)", () => {
     }).workloads;
     expect(g.links[0].query).toBe("pod_name:/i15-1-blueapi-[0-9]+/");
     expect(g.links[0].range).toBeUndefined();
-  });
-});
-
-describe("mergeLinkGroups", () => {
-  it("merges groups for the same resource and keeps the rest", () => {
-    const merged = mergeLinkGroups(
-      [{ name: "b", detail: "Deployment", links: [{ kind: "workload", label: "W", url: "g" }] }],
-      [
-        { name: "b", detail: "Deployment", links: [{ kind: "logs", label: "Graylog", url: "l" }] },
-        { name: "a", detail: "StatefulSet", links: [{ kind: "logs", label: "Graylog", url: "l2" }] },
-      ],
-    );
-    expect(merged.map((g) => [g.name, g.links.map((l) => l.kind)])).toEqual([
-      ["a", ["logs"]],
-      ["b", ["workload", "logs"]],
-    ]);
   });
 });

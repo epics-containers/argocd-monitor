@@ -1,19 +1,24 @@
 # Observability Links
 
-The Application detail page has an Observability panel with two kinds of
-link, which you enable separately:
+The Application detail page lists the Application's pods grouped under the
+workload (StatefulSet, Deployment or DaemonSet) that owns them. Two kinds of
+link, which you enable separately, sit alongside them:
 
 - **Grafana**: links into the Grafana instance that monitors each
-  Application's destination cluster. These are per-workload, per-pod and
-  per-node dashboards, and optionally Grafana Explore queries covering all of
-  the Application's pods.
-- **Graylog**: a **Graylog** button (first in each workload row) that searches one global
-  Graylog server for the logs of that workload's pods, including pods that no
-  longer exist.
+  Application's destination cluster. Workload dashboards are buttons on the
+  workload's row. Pod and node dashboards are in each pod's **Dashboards** menu
+  (the chart icon next to **Logs**), so pod rows stay compact. Optional Grafana
+  Explore queries covering all of the Application's pods sit above the table,
+  next to **Open Grafana**.
+- **Graylog**: a **Graylog** button (first on each workload row) that searches
+  one global Graylog server for the logs of that workload's pods, including
+  pods that no longer exist. A pod with no owning workload gets its Graylog
+  link in its **Dashboards** menu instead.
 
-Both are off by default. The panel appears when at least one of them applies
-to the Application, so Graylog links still show for clusters that have no
-Grafana.
+Both are off by default. With neither enabled the pod table shows no links.
+Graylog links still show for clusters that have no Grafana. A workload scaled
+to zero keeps its row and links, so you can still open the logs of its earlier
+pods.
 
 ## Grafana prerequisites
 
@@ -32,7 +37,7 @@ node-exporter-mixin), whose UIDs are stable across releases:
 | Node pods | Kubernetes / Compute Resources / Node (Pods) |
 | Node hardware | Node Exporter / Nodes (assumes node-exporter on port 9100; opens with a 1 hour range because the dashboard is heavy) |
 
-With `exploreLinks: true`, an Application row adds CPU, memory and restart
+With `exploreLinks: true`, the pod table gains CPU, memory and restart
 links that open Grafana Explore against a Prometheus datasource, with one
 series per pod. They are off by default because Grafana's Viewer role cannot
 open Explore: Grafana redirects it to the home page. Turn them on only where
