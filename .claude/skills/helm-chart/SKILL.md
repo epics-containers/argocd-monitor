@@ -40,6 +40,10 @@ type: LoadBalancer
 replicaCount: 1
 ```
 
+**No `;` inside an annotation value.** The generator splits annotations on
+`;`, so `# @schema description: Empty means off; set it to enable` is cut
+in two and the second half is parsed as a bogus keyword. Use `.` or `,`.
+
 ### Regenerating the schema
 
 The schema regenerates automatically via pre-commit. To run manually:
@@ -109,6 +113,16 @@ renders.
   ```yaml
   checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum }}
   ```
+
+### Serving structured config to the frontend
+
+When an nginx-fronted app needs values as JSON at runtime, render a file
+into the ConfigMap with `toJson`, mount it with `subPath`, and serve it from
+an exact-match `location = /api/<name>` using `alias`. Inlining JSON in
+`return 200 '...'` breaks on quotes and regex backslashes in user values.
+`toJson` output (including `\u0026`-style escapes) is valid JSON as-is.
+Render an explicit `{"enabled":false}` when the feature is off, and give the
+non-Helm image a stub location that returns the same.
 
 ## Pre-commit configuration
 
