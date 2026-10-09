@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LogsPage } from "@/pages/logs";
@@ -114,5 +114,56 @@ describe("LogsPage", () => {
     renderLogsPage();
 
     expect(screen.getAllByText("Waiting for logs...").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("searches without hiding lines, stepping between hits", async () => {
+    vi.mocked(useResourceTree).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as ReturnType<typeof useResourceTree>);
+    vi.mocked(useLogs).mockReturnValue({
+      lines: ["INFO started", "ERROR disk full", "error: retry (1)"],
+      isStreaming: true,
+      error: null,
+      stop: vi.fn(),
+      restart: vi.fn(),
+    });
+
+    const { container } = renderLogsPage();
+    const input = screen.getByRole("searchbox", { name: "Search logs" });
+    const current = () => container.querySelector('[aria-current="true"]')?.getAttribute("data-line");
+
+    fireEvent.change(input, { target: { value: "error" } });
+    expect(await screen.findByText("1 of 2")).toBeInTheDocument();
+    // Nothing is filtered out.
+    expect(screen.getByText("INFO started")).toBeInTheDocument();
+    expect(current()).toBe("1");
+
+    fireEvent.keyDown(input, { key: "Enter" });
+    expect(await screen.findByText("2 of 2")).toBeInTheDocument();
+    expect(current()).toBe("2");
+    // Wraps around, both ways.
+    fireEvent.click(screen.getByRole("button", { name: "Next match" }));
+    expect(await screen.findByText("1 of 2")).toBeInTheDocument();
+    fireEvent.keyDown(input, { key: "Enter", shiftKey: true });
+    expect(await screen.findByText("2 of 2")).toBeInTheDocument();
+
+    // Plain text is literal: "(1)" is not a regex group.
+    fireEvent.change(input, { target: { value: "(1)" } });
+    expect(await screen.findByText("1 of 1")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Use regular expression" }));
+    fireEvent.change(input, { target: { value: "^ERROR" } });
+    expect(await screen.findByText("1 of 2")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Match case" }));
+    expect(await screen.findByText("1 of 1")).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: "nothing-here" } });
+    expect(await screen.findByText("No results")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Next match" })).toBeDisabled();
+
+    fireEvent.change(input, { target: { value: "(" } });
+    expect(await screen.findByRole("alert")).toHaveTextContent(/Invalid regex/);
   });
 });
