@@ -30,3 +30,6 @@ build/
 coverage/
 test-results/
 playwright-report/
+
+# Local cluster credentials
+*.kubeconfig
