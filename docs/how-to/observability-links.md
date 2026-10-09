@@ -7,7 +7,7 @@ link, which you enable separately:
   Application's destination cluster. These are per-workload, per-pod and
   per-node dashboards, plus Grafana Explore queries covering all of the
   Application's pods.
-- **Graylog**: a **Logs** button for each workload that searches one global
+- **Graylog**: a **History** button for each workload that searches one global
   Graylog server for the logs of that workload's pods, including pods that no
   longer exist.
 
@@ -110,7 +110,7 @@ shows the range, for example "Last 2 hours".
 
 Graylog stores logs by pod name, and pods get new names whenever they are
 recreated. So that one search finds the logs of the workload's current and
-past pods, each **Logs** button runs a regular expression over the pod-name
+past pods, each **History** button runs a regular expression over the pod-name
 field. Lucene regular expressions must match the whole value, so the pattern
 spells out the suffix each controller adds to the workload name. This stops a
 workload such as `i15-1-blueapi` from matching the pods of a sibling such as

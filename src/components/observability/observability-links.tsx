@@ -87,7 +87,7 @@ const LINK_STYLES: Record<LinkKind, LinkStyle> = {
     short: "Restarts",
     target: "Explore: container restarts per pod",
   },
-  logs: { tool: "Graylog", icon: ScrollText, short: "Logs", target: "Graylog" },
+  logs: { tool: "Graylog", icon: ScrollText, short: "History", target: "Graylog" },
 };
 
 interface ObservabilityLinksSectionProps {
@@ -208,7 +208,7 @@ export function ObservabilityLinksSection({
           )}
           {links.nodes.length > 0 ? (
             <LinkSection icon={Server} title={links.nodes.length > 1 ? "Nodes" : "Node"}>
-              <LinkGroups groups={links.nodes} />
+              <LinkGroups groups={links.nodes} shortNames />
             </LinkSection>
           ) : (
             nodesPending && (
@@ -257,7 +257,9 @@ function LinkSection({
   );
 }
 
-function LinkGroups({ groups }: { groups: LinkGroup[] }) {
+// Node names are FQDNs; the first label is what people call the machine, and
+// the full name stays in the tooltip.
+function LinkGroups({ groups, shortNames }: { groups: LinkGroup[]; shortNames?: boolean }) {
   return (
     <ul className="space-y-3 sm:space-y-2">
       {groups.map((g) => (
@@ -267,7 +269,7 @@ function LinkGroups({ groups }: { groups: LinkGroup[] }) {
         >
           <div className="flex min-w-0 items-baseline gap-2 sm:h-7 sm:w-72 sm:shrink-0 sm:items-center">
             <span className="truncate text-sm font-medium" title={g.name}>
-              {g.name}
+              {shortNames ? g.name.split(".")[0] : g.name}
             </span>
             {g.detail && (
               <span className="shrink-0 font-mono text-[11px] text-muted-foreground">

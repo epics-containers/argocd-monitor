@@ -76,8 +76,9 @@ describe("ObservabilityLinksSection", () => {
       "href",
       I15_GRAFANA,
     );
-    // Node group appears once pod manifests have loaded.
-    expect(await screen.findByText(I15_NODE)).toBeInTheDocument();
+    // Node group appears once pod manifests have loaded, under the node's
+    // short hostname with the FQDN in its tooltip.
+    expect(await screen.findByText(I15_NODE.split(".")[0])).toHaveAttribute("title", I15_NODE);
     expect(screen.getAllByRole("link", { name: /Pod network/ })).toHaveLength(1);
     expect(screen.getByRole("link", { name: /Volume i15-1-blueapi-scratch/ })).toBeInTheDocument();
     for (const link of screen.getAllByRole("link")) {
@@ -91,7 +92,7 @@ describe("ObservabilityLinksSection", () => {
     mockFetch.mockResolvedValue(configResponse());
     renderSection();
 
-    expect(await screen.findByText(I15_NODE)).toBeInTheDocument();
+    expect(await screen.findByText(I15_NODE.split(".")[0])).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: /^Node hardware: Node Exporter \/ Nodes/ }),
     ).toBeInTheDocument();
@@ -109,7 +110,7 @@ describe("ObservabilityLinksSection", () => {
     expect(section).toHaveAttribute("aria-busy", "true");
     expect(screen.getByRole("heading", { name: "Node" })).toBeInTheDocument();
     expect(section.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0);
-    expect(screen.queryByText(I15_NODE)).not.toBeInTheDocument();
+    expect(screen.queryByText(I15_NODE.split(".")[0])).not.toBeInTheDocument();
     // Network chips wait for the manifest rather than flickering in and out.
     expect(screen.queryByRole("link", { name: /Pod network/ })).not.toBeInTheDocument();
   });
@@ -150,14 +151,14 @@ describe("ObservabilityLinksSection", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("adds a Graylog Logs chip to each workload alongside Grafana", async () => {
+  it("adds a Graylog History chip to each workload alongside Grafana", async () => {
     mockFetch.mockResolvedValue(configResponse(DLS_CONFIG, GRAYLOG_CONFIG));
     renderSection();
 
     expect(await screen.findByText(/Grafana dashboards · k8s-i15-grafana/)).toBeInTheDocument();
     expect(screen.getByText(/Graylog logs · graylog\.example\.com/)).toBeInTheDocument();
     const logs = screen.getAllByRole("link", {
-      name: "Logs: Graylog, last 2 hours (opens Graylog in a new tab)",
+      name: "History: Graylog, last 2 hours (opens Graylog in a new tab)",
     });
     expect(logs).toHaveLength(2);
     expect(logs.map((l) => l.getAttribute("href"))).toEqual([
@@ -177,7 +178,7 @@ describe("ObservabilityLinksSection", () => {
     renderSection();
 
     const section = await screen.findByRole("region", { name: "Observability" });
-    expect(screen.getAllByRole("link", { name: /^Logs: Graylog/ })).toHaveLength(2);
+    expect(screen.getAllByRole("link", { name: /^History: Graylog/ })).toHaveLength(2);
     expect(screen.queryByRole("link", { name: /Open Grafana/ })).not.toBeInTheDocument();
     expect(screen.queryByText(/Grafana dashboards/)).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /^Workload resources/ })).not.toBeInTheDocument();
@@ -192,7 +193,7 @@ describe("ObservabilityLinksSection", () => {
       configResponse({ ...DLS_CONFIG, overrides: { i15: "" } }, GRAYLOG_CONFIG),
     );
     renderSection();
-    expect(await screen.findAllByRole("link", { name: /^Logs: Graylog/ })).toHaveLength(2);
+    expect(await screen.findAllByRole("link", { name: /^History: Graylog/ })).toHaveLength(2);
     expect(screen.queryByRole("link", { name: /Open Grafana/ })).not.toBeInTheDocument();
   });
 
@@ -203,7 +204,7 @@ describe("ObservabilityLinksSection", () => {
     renderSection(undefined, [I15_NODES[0], owned, bare]);
 
     expect(await screen.findByRole("heading", { name: "Pods" })).toBeInTheDocument();
-    const logs = screen.getAllByRole("link", { name: /^Logs: Graylog/ });
+    const logs = screen.getAllByRole("link", { name: /^History: Graylog/ });
     expect(logs).toHaveLength(2);
     expect(logs.map((l) => new URL(l.getAttribute("href")!).searchParams.get("q"))).toEqual([
       "pod_name:/i15-1-blueapi-[0-9]+/",
