@@ -113,6 +113,7 @@ describe("resolveGrafanaBaseUrl", () => {
 describe("buildGrafanaLinks (i15-1-blueapi)", () => {
   const links = buildGrafanaLinks({
     baseUrl: I15_GRAFANA,
+    exploreLinks: true,
     nodes: I15_NODES,
     podManifests: I15_MANIFESTS,
   });
@@ -180,6 +181,7 @@ describe("buildGrafanaLinks (i15-1-blueapi)", () => {
   it("uses a custom datasource UID", () => {
     const custom = buildGrafanaLinks({
       baseUrl: I15_GRAFANA,
+      exploreLinks: true,
       datasourceUid: "prom-uid",
       nodes: I15_NODES,
       podManifests: I15_MANIFESTS,
@@ -201,6 +203,24 @@ describe("buildGrafanaLinks (i15-1-blueapi)", () => {
     // hostNetwork is unknown without the manifest, so no pod network link.
     for (const p of partial.pods) expect(p.links.map((l) => l.kind)).toEqual(["pod"]);
     expect(partial.pods.map((p) => p.pending)).toEqual([true, false]);
+  });
+
+  it("links CPU and Memory panels of the Workload dashboard per workload", () => {
+    const links = buildGrafanaLinks({ baseUrl: I15_GRAFANA, nodes: I15_NODES, podManifests: {} });
+    const sts = links.workloads.find((g) => g.name === "i15-1-blueapi")!;
+    expect(sts.links.map((l) => l.kind)).toEqual(["workloadCpu", "workloadMemory", "workload"]);
+    const cpu = new URL(sts.links[0].url);
+    expect(cpu.pathname).toBe("/d/a164a7f0339f99e89cea5cb47e9be617/k8s-resources-workload");
+    expect(cpu.searchParams.get("viewPanel")).toBe("panel-1");
+    expect(cpu.searchParams.get("var-workload")).toBe("i15-1-blueapi");
+    expect(cpu.searchParams.get("var-type")).toBe("statefulset");
+    expect(new URL(sts.links[1].url).searchParams.get("viewPanel")).toBe("panel-3");
+    expect(new URL(sts.links[2].url).searchParams.has("viewPanel")).toBe(false);
+  });
+
+  it("leaves out Explore links unless asked: Viewers cannot open Explore", () => {
+    const links = buildGrafanaLinks({ baseUrl: I15_GRAFANA, nodes: I15_NODES, podManifests: {} });
+    expect(links.app).toEqual([]);
   });
 
   it("keeps same-named pods in different namespaces apart", () => {

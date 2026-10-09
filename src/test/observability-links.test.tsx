@@ -124,11 +124,27 @@ describe("ObservabilityLinksSection", () => {
     await waitFor(() => expect(section).toHaveAttribute("aria-busy", "false"));
     expect(screen.getAllByRole("link", { name: /^Pod resources/ })).toHaveLength(2);
     expect(screen.getAllByRole("link", { name: /^Workload resources/ })).toHaveLength(2);
-    expect(screen.getByRole("link", { name: /^CPU/ })).toBeInTheDocument();
+    // Workload CPU / Memory panels come from the tree alone.
+    expect(screen.getAllByRole("link", { name: /^CPU: CPU usage panel/ })).toHaveLength(2);
     // Unknown hostNetwork: no network link, and no lingering skeletons.
     expect(screen.queryByRole("link", { name: /Pod network/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Node" })).not.toBeInTheDocument();
     expect(section.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(0);
+  });
+
+  it("hides the app-wide Explore row unless exploreLinks is set", async () => {
+    mockFetch.mockResolvedValue(configResponse());
+    renderSection();
+    await screen.findByRole("region", { name: "Observability" });
+    expect(screen.queryByRole("heading", { name: "Application" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Explore/ })).not.toBeInTheDocument();
+  });
+
+  it("shows the app-wide Explore row when exploreLinks is set", async () => {
+    mockFetch.mockResolvedValue(configResponse({ ...DLS_CONFIG, exploreLinks: true }));
+    renderSection();
+    expect(await screen.findByRole("heading", { name: "Application" })).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /Explore/ })).toHaveLength(3);
   });
 
   it("shows an empty state when the app has no workloads or pods", async () => {
@@ -151,14 +167,14 @@ describe("ObservabilityLinksSection", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("adds a Graylog History chip to each workload alongside Grafana", async () => {
+  it("adds a Graylog chip to each workload alongside Grafana", async () => {
     mockFetch.mockResolvedValue(configResponse(DLS_CONFIG, GRAYLOG_CONFIG));
     renderSection();
 
     expect(await screen.findByText(/Grafana dashboards · k8s-i15-grafana/)).toBeInTheDocument();
     expect(screen.getByText(/Graylog logs · graylog\.example\.com/)).toBeInTheDocument();
     const logs = screen.getAllByRole("link", {
-      name: "History: Graylog, last 2 hours (opens Graylog in a new tab)",
+      name: "Graylog: historical logs, last 2 hours (opens Graylog in a new tab)",
     });
     expect(logs).toHaveLength(2);
     expect(logs.map((l) => l.getAttribute("href"))).toEqual([
@@ -178,7 +194,7 @@ describe("ObservabilityLinksSection", () => {
     renderSection();
 
     const section = await screen.findByRole("region", { name: "Observability" });
-    expect(screen.getAllByRole("link", { name: /^History: Graylog/ })).toHaveLength(2);
+    expect(screen.getAllByRole("link", { name: /^Graylog: historical logs/ })).toHaveLength(2);
     expect(screen.queryByRole("link", { name: /Open Grafana/ })).not.toBeInTheDocument();
     expect(screen.queryByText(/Grafana dashboards/)).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /^Workload resources/ })).not.toBeInTheDocument();
@@ -193,7 +209,7 @@ describe("ObservabilityLinksSection", () => {
       configResponse({ ...DLS_CONFIG, overrides: { i15: "" } }, GRAYLOG_CONFIG),
     );
     renderSection();
-    expect(await screen.findAllByRole("link", { name: /^History: Graylog/ })).toHaveLength(2);
+    expect(await screen.findAllByRole("link", { name: /^Graylog: historical logs/ })).toHaveLength(2);
     expect(screen.queryByRole("link", { name: /Open Grafana/ })).not.toBeInTheDocument();
   });
 
@@ -204,7 +220,7 @@ describe("ObservabilityLinksSection", () => {
     renderSection(undefined, [I15_NODES[0], owned, bare]);
 
     expect(await screen.findByRole("heading", { name: "Pods" })).toBeInTheDocument();
-    const logs = screen.getAllByRole("link", { name: /^History: Graylog/ });
+    const logs = screen.getAllByRole("link", { name: /^Graylog: historical logs/ });
     expect(logs).toHaveLength(2);
     expect(logs.map((l) => new URL(l.getAttribute("href")!).searchParams.get("q"))).toEqual([
       "pod_name:/i15-1-blueapi-[0-9]+/",
@@ -251,6 +267,7 @@ describe("getObservabilityConfig", () => {
         urlTemplate: undefined,
         overrides: { a: "https://a" },
         datasourceUid: "prom",
+        exploreLinks: false,
       },
       graylog: { enabled: true, urlTemplate: "https://g/?q={query}", podField: undefined },
     } satisfies ObservabilityConfig);

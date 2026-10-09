@@ -53,6 +53,18 @@ const LINK_STYLES: Record<LinkKind, LinkStyle> = {
     short: "Resources",
     target: "Kubernetes / Compute Resources / Workload",
   },
+  workloadCpu: {
+    ...GRAFANA,
+    icon: Cpu,
+    short: "CPU",
+    target: "CPU usage panel of Kubernetes / Compute Resources / Workload",
+  },
+  workloadMemory: {
+    ...GRAFANA,
+    icon: MemoryStick,
+    short: "Memory",
+    target: "Memory usage panel of Kubernetes / Compute Resources / Workload",
+  },
   pod: { ...GRAFANA, icon: Gauge, short: "Resources", target: "Kubernetes / Compute Resources / Pod" },
   podNetwork: {
     ...GRAFANA,
@@ -87,7 +99,7 @@ const LINK_STYLES: Record<LinkKind, LinkStyle> = {
     short: "Restarts",
     target: "Explore: container restarts per pod",
   },
-  logs: { tool: "Graylog", icon: ScrollText, short: "History", target: "Graylog" },
+  logs: { tool: "Graylog", icon: ScrollText, short: "Graylog", target: "historical logs" },
 };
 
 interface ObservabilityLinksSectionProps {
@@ -118,6 +130,7 @@ export function ObservabilityLinksSection({
   const graylogTemplate = resolveGraylogTemplate(config?.graylog);
   const graylogPodField = config?.graylog.podField;
   const datasourceUid = config?.grafana.datasourceUid;
+  const exploreLinks = config?.grafana.exploreLinks;
   const pods = useMemo(() => nodes.filter((n) => n.kind === "Pod"), [nodes]);
   // Pod manifests only feed Grafana links (network, volumes, nodes).
   const {
@@ -133,6 +146,7 @@ export function ObservabilityLinksSection({
       ? buildGrafanaLinks({
           baseUrl,
           datasourceUid,
+          exploreLinks,
           nodes,
           podManifests: manifests,
           pendingPods,
@@ -143,11 +157,21 @@ export function ObservabilityLinksSection({
       : { workloads: [], pods: [] };
     return {
       app: grafana.app,
-      workloads: mergeLinkGroups(grafana.workloads, graylog.workloads),
-      pods: mergeLinkGroups(grafana.pods, graylog.pods),
+      // Graylog first: it is the link people reach for most.
+      workloads: mergeLinkGroups(graylog.workloads, grafana.workloads),
+      pods: mergeLinkGroups(graylog.pods, grafana.pods),
       nodes: grafana.nodes,
     };
-  }, [baseUrl, graylogTemplate, graylogPodField, datasourceUid, nodes, manifests, pendingPods]);
+  }, [
+    baseUrl,
+    graylogTemplate,
+    graylogPodField,
+    datasourceUid,
+    exploreLinks,
+    nodes,
+    manifests,
+    pendingPods,
+  ]);
 
   if (!links) return null;
   const empty =
@@ -193,7 +217,7 @@ export function ObservabilityLinksSection({
         <div className="divide-y rounded-md border">
           {links.app.length > 0 && (
             <LinkSection icon={Activity} title="Application">
-              <LinkRow links={links.app} />
+              <LinkGroups groups={[{ name: appName, links: links.app }]} />
             </LinkSection>
           )}
           {links.workloads.length > 0 && (
@@ -316,7 +340,7 @@ function LinkChip({ link }: { link: ObservabilityLink }) {
         }
       >
         <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-foreground" />
-        <span className={link.subject ? "truncate font-mono text-[11px]" : undefined}>
+        <span className={link.subject ? "truncate" : undefined}>
           {text}
         </span>
         <ArrowUpRight className="h-3 w-3 shrink-0 text-muted-foreground/60 group-hover:text-foreground" />

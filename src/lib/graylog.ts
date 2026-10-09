@@ -111,7 +111,7 @@ export function buildGraylogLinks({
   const linkFor = (n: ResourceNode): ObservabilityLink | null => {
     const query = graylogPodQuery(n.kind, n.name, field);
     if (!query) return null;
-    return { kind: "logs", label: "History", url: graylogUrl(urlTemplate, query), query, range };
+    return { kind: "logs", label: "Graylog", url: graylogUrl(urlTemplate, query), query, range };
   };
 
   const workloads: LinkGroup[] = [];

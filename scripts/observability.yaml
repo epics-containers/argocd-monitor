@@ -6,13 +6,12 @@ grafana:
   urlTemplate: https://k8s-{cluster}-grafana.diamond.ac.uk
   # Special cases, keyed by cluster name (or raw destination name/server).
   # An empty string hides the Grafana links for that cluster.
-  # To add overrides, replace {} with indented entries, e.g.:
-  #   overrides:
-  #     example-cluster: https://grafana.example.diamond.ac.uk
-  #     no-grafana-cluster: ""
-  overrides: {}
+  # The shared argus and pollux clusters don't follow the k8s-<name> pattern.
+  overrides:
+    argus: https://argus-grafana.diamond.ac.uk
+    pollux: https://pollux-grafana.diamond.ac.uk
 
-# Graylog historical-log links: one "Logs" button per workload. A single global
+# Graylog historical-log links: one "Graylog" button per workload. A single global
 # Graylog serves every cluster. The search id is the DLS saved search/stream
 # view; {query} is replaced with the URL-encoded Lucene pod-name query.
 graylog:

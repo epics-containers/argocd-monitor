@@ -12,7 +12,7 @@ data:
     {{- $g := .Values.grafana }}
     {{- $grafana := dict "enabled" false }}
     {{- if $g.enabled }}
-    {{- $grafana = dict "enabled" true "clusterPattern" ($g.clusterPattern | default "") "urlTemplate" ($g.urlTemplate | default "") "overrides" ($g.overrides | default dict) "datasourceUid" ($g.datasourceUid | default "prometheus") }}
+    {{- $grafana = dict "enabled" true "clusterPattern" ($g.clusterPattern | default "") "urlTemplate" ($g.urlTemplate | default "") "overrides" ($g.overrides | default dict) "datasourceUid" ($g.datasourceUid | default "prometheus") "exploreLinks" ($g.exploreLinks | default false) }}
     {{- end }}
     {{- $l := .Values.graylog }}
     {{- $graylog := dict "enabled" false }}

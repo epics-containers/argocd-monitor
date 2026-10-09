@@ -19,6 +19,9 @@ export interface GrafanaConfig {
   overrides?: Record<string, string>;
   /** Prometheus datasource UID used by Explore links. */
   datasourceUid?: string;
+  /** Show the app-wide Explore links. Off by default: Grafana's Viewer role
+   *  cannot open Explore, and is redirected to the home page. */
+  exploreLinks?: boolean;
 }
 
 /** A single global Graylog server shared by every cluster. */
@@ -53,6 +56,7 @@ function parseGrafana(v: unknown): GrafanaConfig {
     urlTemplate: str(data.urlTemplate),
     overrides,
     datasourceUid: str(data.datasourceUid),
+    exploreLinks: data.exploreLinks === true,
   };
 }
 

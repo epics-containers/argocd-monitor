@@ -158,13 +158,13 @@ describe("buildGraylogLinks (i15-1-blueapi)", () => {
     nodes: I15_NODES,
   });
 
-  it("adds one History link per workload, sorted by name", () => {
+  it("adds one Graylog link per workload, sorted by name", () => {
     expect(links.workloads.map((g) => [g.name, g.detail])).toEqual([
       ["i15-1-blueapi", "StatefulSet"],
       ["i15-1-blueapi-oauth2", "Deployment"],
     ]);
     const [sts, deploy] = links.workloads.map((g) => g.links[0]);
-    expect(sts).toMatchObject({ kind: "logs", label: "History", range: "Last 2 hours" });
+    expect(sts).toMatchObject({ kind: "logs", label: "Graylog", range: "Last 2 hours" });
     expect(sts.url).toBe(
       `${GRAYLOG_SEARCH}?q=pod_name%3A%2Fi15-1-blueapi-%5B0-9%5D%2B%2F&rangetype=relative&from=7200`,
     );
@@ -201,8 +201,8 @@ describe("mergeLinkGroups", () => {
     const merged = mergeLinkGroups(
       [{ name: "b", detail: "Deployment", links: [{ kind: "workload", label: "W", url: "g" }] }],
       [
-        { name: "b", detail: "Deployment", links: [{ kind: "logs", label: "History", url: "l" }] },
-        { name: "a", detail: "StatefulSet", links: [{ kind: "logs", label: "History", url: "l2" }] },
+        { name: "b", detail: "Deployment", links: [{ kind: "logs", label: "Graylog", url: "l" }] },
+        { name: "a", detail: "StatefulSet", links: [{ kind: "logs", label: "Graylog", url: "l2" }] },
       ],
     );
     expect(merged.map((g) => [g.name, g.links.map((l) => l.kind)])).toEqual([

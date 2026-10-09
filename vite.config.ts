@@ -150,6 +150,7 @@ export default defineConfig(({ mode }) => {
                 urlTemplate: grafanaUrl,
                 overrides: {},
                 datasourceUid: 'prometheus',
+                exploreLinks: env.DEV_GRAFANA_EXPLORE === '1',
               }
             : { enabled: false },
           graylog: graylogUrl

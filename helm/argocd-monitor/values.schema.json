@@ -47,6 +47,10 @@
                     "description": "Show Grafana dashboard / Explore links on the Application detail page",
                     "type": "boolean"
                 },
+                "exploreLinks": {
+                    "description": "Show app-wide Grafana Explore links (CPU, memory, restarts). Off by default because Grafana's Viewer role cannot open Explore",
+                    "type": "boolean"
+                },
                 "overrides": {
                     "description": "Cluster name (or raw cluster key) → Grafana base URL. An empty string disables links for that cluster",
                     "type": "object",

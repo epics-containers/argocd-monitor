@@ -5,9 +5,9 @@ link, which you enable separately:
 
 - **Grafana**: links into the Grafana instance that monitors each
   Application's destination cluster. These are per-workload, per-pod and
-  per-node dashboards, plus Grafana Explore queries covering all of the
-  Application's pods.
-- **Graylog**: a **History** button for each workload that searches one global
+  per-node dashboards, and optionally Grafana Explore queries covering all of
+  the Application's pods.
+- **Graylog**: a **Graylog** button (first in each workload row) that searches one global
   Graylog server for the logs of that workload's pods, including pods that no
   longer exist.
 
@@ -24,6 +24,7 @@ node-exporter-mixin), whose UIDs are stable across releases:
 
 | Link | Dashboard |
 |---|---|
+| Workload CPU, Memory | The CPU Usage and Memory Usage panels of Kubernetes / Compute Resources / Workload, opened full-screen |
 | Workload resources | Kubernetes / Compute Resources / Workload |
 | Pod resources | Kubernetes / Compute Resources / Pod |
 | Pod network | Kubernetes / Networking / Pod (not shown for `hostNetwork` pods, where it would show the whole host) |
@@ -31,8 +32,12 @@ node-exporter-mixin), whose UIDs are stable across releases:
 | Node pods | Kubernetes / Compute Resources / Node (Pods) |
 | Node hardware | Node Exporter / Nodes (assumes node-exporter on port 9100; opens with a 1 hour range because the dashboard is heavy) |
 
-The CPU, memory and restart links open Grafana Explore against a Prometheus
-datasource, with one series per pod.
+With `exploreLinks: true`, an Application row adds CPU, memory and restart
+links that open Grafana Explore against a Prometheus datasource, with one
+series per pod. They are off by default because Grafana's Viewer role cannot
+open Explore: Grafana redirects it to the home page. Turn them on only where
+users have Explore access, for example where Viewers have been granted the
+Data source explorer role.
 
 ## How a cluster maps to a Grafana URL
 
@@ -67,6 +72,8 @@ grafana:
   overrides:
     special-cluster: https://grafana.special.example.com
     cluster-without-grafana: ""
+  # Explore links need Explore access in Grafana (not the Viewer role).
+  exploreLinks: false
   # UID of the Prometheus datasource that Explore links use.
   datasourceUid: prometheus
 ```
@@ -110,7 +117,7 @@ shows the range, for example "Last 2 hours".
 
 Graylog stores logs by pod name, and pods get new names whenever they are
 recreated. So that one search finds the logs of the workload's current and
-past pods, each **History** button runs a regular expression over the pod-name
+past pods, each **Graylog** button runs a regular expression over the pod-name
 field. Lucene regular expressions must match the whole value, so the pattern
 spells out the suffix each controller adds to the workload name. This stops a
 workload such as `i15-1-blueapi` from matching the pods of a sibling such as
@@ -160,7 +167,8 @@ nginx ConfigMap, and nginx serves the file at `GET /api/observability-config`:
     "clusterPattern": "",
     "urlTemplate": "https://k8s-{cluster}-grafana.example.com",
     "overrides": {},
-    "datasourceUid": "prometheus"
+    "datasourceUid": "prometheus",
+    "exploreLinks": false
   },
   "graylog": {
     "enabled": true,

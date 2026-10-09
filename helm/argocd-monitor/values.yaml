@@ -121,6 +121,8 @@ grafana:
   overrides: {}
   # @schema description: UID of the Prometheus datasource used by Explore links
   datasourceUid: prometheus
+  # @schema description: Show app-wide Grafana Explore links (CPU, memory, restarts). Off by default because Grafana's Viewer role cannot open Explore
+  exploreLinks: false
 
 # Graylog historical-log links ("Logs" per workload) on the Application detail
 # page. One global Graylog server serves every cluster. Served with `grafana`

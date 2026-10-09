@@ -19,6 +19,11 @@ const NODE_HARDWARE_FROM = "now-1h";
 const NODE_EXPORTER_PORT = 9100;
 const DEFAULT_DATASOURCE_UID = "prometheus";
 
+// Single panels of the Workload dashboard, opened full-screen with viewPanel.
+// Unlike Explore, a dashboard panel works for Grafana's Viewer role.
+const WORKLOAD_CPU_PANEL = "panel-1";
+const WORKLOAD_MEMORY_PANEL = "panel-3";
+
 const WORKLOAD_TYPES: Record<string, string> = {
   StatefulSet: "statefulset",
   Deployment: "deployment",
@@ -79,6 +84,8 @@ export type GrafanaLinkKind =
   | "pod"
   | "podNetwork"
   | "volume"
+  | "workloadCpu"
+  | "workloadMemory"
   | "node"
   | "nodeHardware"
   | "cpu"
@@ -114,6 +121,8 @@ export interface GrafanaLinkSet {
 export interface BuildGrafanaLinksInput {
   baseUrl: string;
   datasourceUid?: string;
+  /** Include the app-wide Explore links (needs Explore access in Grafana). */
+  exploreLinks?: boolean;
   /** Resource-tree nodes for the Application (workloads and pods are picked out). */
   nodes: ResourceNode[];
   /** Pod manifests keyed by podKey(); missing entries degrade gracefully. */
@@ -133,11 +142,13 @@ function dashboardUrl(
   dashboard: { uid: string; slug: string },
   vars: Record<string, string>,
   from = DEFAULT_FROM,
+  viewPanel?: string,
 ): string {
   const params = new URLSearchParams();
   for (const [k, v] of Object.entries(vars)) params.set(`var-${k}`, v);
   params.set("from", from);
   params.set("to", "now");
+  if (viewPanel) params.set("viewPanel", viewPanel);
   return `${baseUrl}/d/${dashboard.uid}/${dashboard.slug}?${params}`;
 }
 
@@ -178,6 +189,7 @@ export function exploreUrl(baseUrl: string, datasourceUid: string, expr: string)
 export function buildGrafanaLinks({
   baseUrl,
   datasourceUid,
+  exploreLinks,
   nodes,
   podManifests,
   pendingPods,
@@ -189,21 +201,24 @@ export function buildGrafanaLinks({
 
   const workloads: GrafanaLinkGroup[] = sorted
     .filter((n) => n.kind in WORKLOAD_TYPES)
-    .map((n) => ({
-      name: n.name,
-      detail: n.kind,
-      links: [
-        {
-          kind: "workload",
-          label: "Workload resources",
-          url: dashboardUrl(baseUrl, GRAFANA_DASHBOARDS.workload, {
-            namespace: n.namespace,
-            workload: n.name,
-            type: WORKLOAD_TYPES[n.kind],
-          }),
-        },
-      ],
-    }));
+    .map((n) => {
+      const vars = { namespace: n.namespace, workload: n.name, type: WORKLOAD_TYPES[n.kind] };
+      const panel = (id: string) =>
+        dashboardUrl(baseUrl, GRAFANA_DASHBOARDS.workload, vars, DEFAULT_FROM, id);
+      return {
+        name: n.name,
+        detail: n.kind,
+        links: [
+          { kind: "workloadCpu", label: "CPU", url: panel(WORKLOAD_CPU_PANEL) },
+          { kind: "workloadMemory", label: "Memory", url: panel(WORKLOAD_MEMORY_PANEL) },
+          {
+            kind: "workload",
+            label: "Workload resources",
+            url: dashboardUrl(baseUrl, GRAFANA_DASHBOARDS.workload, vars),
+          },
+        ],
+      };
+    });
 
   const podNodes = sorted.filter((n) => n.kind === "Pod");
   const nodeGroups = new Map<string, GrafanaLinkGroup>();
@@ -280,7 +295,7 @@ export function buildGrafanaLinks({
   // live in the Application's destination namespace in practice, so group by
   // the first pod's namespace and include only pods in it.
   const ns = podNodes[0]?.namespace;
-  if (ns) {
+  if (exploreLinks && ns) {
     const names = podNodes.filter((p) => p.namespace === ns).map((p) => p.name);
     const sel = podSelector(ns, names);
     app.push(
