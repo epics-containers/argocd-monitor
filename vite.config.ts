@@ -129,8 +129,45 @@ export default defineConfig(({ mode }) => {
     },
   }
 
+  // Dev-only middleware mirroring the chart's /api/observability-config
+  // endpoint. Each feature is disabled unless its env var is set, e.g.
+  //   DEV_GRAFANA_URL_TEMPLATE='https://k8s-{cluster}-grafana.diamond.ac.uk' \
+  //   DEV_GRAYLOG_URL_TEMPLATE='https://graylog.example.com/search?q={query}&rangetype=relative&from=7200' \
+  //   just dev
+  // DEV_GRAFANA_CLUSTER_PATTERN optionally sets clusterPattern and
+  // DEV_GRAYLOG_POD_FIELD the Graylog pod-name field (default pod_name).
+  const devObservabilityConfigPlugin = {
+    name: 'dev-observability-config',
+    configureServer(server: any) {
+      server.middlewares.use('/api/observability-config', (_req: any, res: any) => {
+        const grafanaUrl = env.DEV_GRAFANA_URL_TEMPLATE ?? ''
+        const graylogUrl = env.DEV_GRAYLOG_URL_TEMPLATE ?? ''
+        const config = {
+          grafana: grafanaUrl
+            ? {
+                enabled: true,
+                clusterPattern: env.DEV_GRAFANA_CLUSTER_PATTERN ?? '',
+                urlTemplate: grafanaUrl,
+                overrides: {},
+                datasourceUid: 'prometheus',
+              }
+            : { enabled: false },
+          graylog: graylogUrl
+            ? {
+                enabled: true,
+                urlTemplate: graylogUrl,
+                podField: env.DEV_GRAYLOG_POD_FIELD || 'pod_name',
+              }
+            : { enabled: false },
+        }
+        res.setHeader('Content-Type', 'application/json')
+        res.end(JSON.stringify(config))
+      })
+    },
+  }
+
   return {
-    plugins: [react(), tailwindcss(), devSpoofIpPlugin, devClientIpPlugin, devCidrBeamlinePlugin, devBeamlinePlugin],
+    plugins: [react(), tailwindcss(), devSpoofIpPlugin, devClientIpPlugin, devCidrBeamlinePlugin, devBeamlinePlugin, devObservabilityConfigPlugin],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

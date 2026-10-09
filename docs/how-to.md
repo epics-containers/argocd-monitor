@@ -7,4 +7,5 @@ how-to/configure-argocd
 how-to/nginx-configuration
 how-to/helm-deployment
 how-to/keycloak-authentication
+how-to/observability-links
 ```

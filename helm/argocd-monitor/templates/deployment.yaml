@@ -47,6 +47,10 @@ spec:
               mountPath: /etc/nginx/conf.d/default.conf
               subPath: default.conf
               readOnly: true
+            - name: nginx-config
+              mountPath: /etc/nginx/argocd-monitor/observability-config.json
+              subPath: observability-config.json
+              readOnly: true
             {{- if .Values.namespaceMap.enabled }}
             - name: nginx-config
               mountPath: /etc/nginx/conf.d/geo.conf

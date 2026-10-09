@@ -21,6 +21,13 @@ server {
         return 200 '{"namespace":""}';
     }
 
+    # Observability links stub — the helm chart serves the real Grafana and
+    # Graylog config; this docker image reports both disabled so links stay hidden.
+    location = /api/observability-config {
+        default_type application/json;
+        return 200 '{"grafana":{"enabled":false},"graylog":{"enabled":false}}';
+    }
+
     # Dedicated location for log streaming — must be above /api/ catch-all
     location ~ ^/api/v1/applications/[^/]+/logs {
         proxy_pass $argocd_url;

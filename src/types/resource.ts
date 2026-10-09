@@ -39,11 +39,22 @@ export interface PodResource {
     creationTimestamp?: string;
     labels?: Record<string, string>;
   };
+  spec?: {
+    nodeName?: string;
+    hostNetwork?: boolean;
+    volumes?: PodVolume[];
+  };
   status: {
     phase: string;
+    hostIP?: string;
     containerStatuses?: ContainerStatus[];
     initContainerStatuses?: ContainerStatus[];
   };
+}
+
+export interface PodVolume {
+  name: string;
+  persistentVolumeClaim?: { claimName: string };
 }
 
 export interface ContainerStatus {

@@ -14,12 +14,15 @@ import { Badge } from "@/components/ui/badge";
 import { HealthBadge, SyncBadge } from "@/components/app-table/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
+import { ObservabilityLinksSection } from "@/components/observability/observability-links";
 import { useApplication, useResourceTree } from "@/hooks/use-application";
 import { useRestartPod } from "@/hooks/use-restart-pod";
 import { useSetEnabled } from "@/hooks/use-set-enabled";
 import { useStoppableWorkload } from "@/hooks/use-stoppable-workload";
 import { formatAge } from "@/lib/format";
 import type { ResourceNode } from "@/types/resource";
+
+const EMPTY_NODES: ResourceNode[] = [];
 
 export function ApplicationDetailPage() {
   const { name } = useParams<{ name: string }>();
@@ -356,6 +359,13 @@ export function ApplicationDetailPage() {
           </div>
         )}
       </div>
+
+      <ObservabilityLinksSection
+        appName={name!}
+        appNamespace={appNamespace}
+        destination={app.spec.destination}
+        nodes={tree?.nodes ?? EMPTY_NODES}
+      />
 
       <ConfirmDialog
         open={stopConfirmOpen}
