@@ -194,7 +194,7 @@ describe("buildGrafanaLinks (i15-1-blueapi)", () => {
       baseUrl: I15_GRAFANA,
       nodes: I15_NODES,
       podManifests: {},
-      pendingPods: new Set(["i15-1-blueapi-0"]),
+      pendingPods: new Set([`${I15_NS}/i15-1-blueapi-0`]),
     });
     expect(partial.pods).toHaveLength(2);
     expect(partial.nodes).toEqual([]);
@@ -203,14 +203,34 @@ describe("buildGrafanaLinks (i15-1-blueapi)", () => {
     expect(partial.pods.map((p) => p.pending)).toEqual([true, false]);
   });
 
+  it("keeps same-named pods in different namespaces apart", () => {
+    const pod = I15_MANIFESTS[`${I15_NS}/i15-1-blueapi-0`];
+    const other = { ...I15_NODES.find((n) => n.name === "i15-1-blueapi-0")!, namespace: "other", uid: "other" };
+    const links = buildGrafanaLinks({
+      baseUrl: I15_GRAFANA,
+      nodes: [...I15_NODES, other],
+      podManifests: {
+        ...I15_MANIFESTS,
+        "other/i15-1-blueapi-0": { ...pod, spec: { nodeName: "elsewhere", volumes: [] } },
+      },
+    });
+    const pods = links.pods.filter((g) => g.name === "i15-1-blueapi-0");
+    expect(pods).toHaveLength(2);
+    // The i15 pod keeps its hostNetwork (no Network link) and its PVC; the other
+    // namespace's pod gets its own manifest's (Network link, no PVC).
+    const kinds = pods.map((g) => g.links.map((l) => l.kind).sort());
+    expect(kinds).toContainEqual(["pod", "volume"]);
+    expect(kinds).toContainEqual(["pod", "podNetwork"]);
+  });
+
   it("links a PVC once even when mounted by several volumes", () => {
-    const pod = I15_MANIFESTS["i15-1-blueapi-0"];
+    const pod = I15_MANIFESTS[`${I15_NS}/i15-1-blueapi-0`];
     const twice = buildGrafanaLinks({
       baseUrl: I15_GRAFANA,
       nodes: I15_NODES,
       podManifests: {
         ...I15_MANIFESTS,
-        "i15-1-blueapi-0": {
+        [`${I15_NS}/i15-1-blueapi-0`]: {
           ...pod,
           spec: {
             ...pod.spec,

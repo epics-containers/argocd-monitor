@@ -21,7 +21,7 @@ import {
 } from "./grafana-fixtures";
 
 vi.mock("@/api/resources", () => ({
-  getPodResource: vi.fn((_app: string, pod: string) => Promise.resolve(I15_MANIFESTS[pod])),
+  getPodResource: vi.fn((_app: string, pod: string, ns: string) => Promise.resolve(I15_MANIFESTS[`${ns}/${pod}`])),
 }));
 
 const mockFetch = vi.fn();
@@ -62,8 +62,8 @@ describe("ObservabilityLinksSection", () => {
   beforeEach(() => {
     mockFetch.mockReset();
     vi.mocked(getPodResource).mockClear();
-    vi.mocked(getPodResource).mockImplementation((_app, pod) =>
-      Promise.resolve(I15_MANIFESTS[pod]),
+    vi.mocked(getPodResource).mockImplementation((_app, pod, ns) =>
+      Promise.resolve(I15_MANIFESTS[`${ns}/${pod}`]),
     );
   });
 

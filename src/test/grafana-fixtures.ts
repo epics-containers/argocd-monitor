@@ -45,7 +45,7 @@ export const I15_NODES: ResourceNode[] = [
 ];
 
 export const I15_MANIFESTS: Record<string, PodResource> = {
-  "i15-1-blueapi-0": {
+  [`${I15_NS}/i15-1-blueapi-0`]: {
     apiVersion: "v1",
     kind: "Pod",
     metadata: { name: "i15-1-blueapi-0", namespace: I15_NS },
@@ -59,7 +59,7 @@ export const I15_MANIFESTS: Record<string, PodResource> = {
     },
     status: { phase: "Running", hostIP: I15_HOST_IP },
   },
-  [I15_OAUTH_POD]: {
+  [`${I15_NS}/${I15_OAUTH_POD}`]: {
     apiVersion: "v1",
     kind: "Pod",
     metadata: { name: I15_OAUTH_POD, namespace: I15_NS },

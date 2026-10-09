@@ -116,10 +116,16 @@ export interface BuildGrafanaLinksInput {
   datasourceUid?: string;
   /** Resource-tree nodes for the Application (workloads and pods are picked out). */
   nodes: ResourceNode[];
-  /** Pod manifests keyed by pod name; missing entries degrade gracefully. */
+  /** Pod manifests keyed by podKey(); missing entries degrade gracefully. */
   podManifests: Record<string, PodResource | undefined>;
-  /** Names of pods whose manifest fetch is still in flight. */
+  /** podKey()s of pods whose manifest fetch is still in flight. */
   pendingPods?: ReadonlySet<string>;
+}
+
+/** Key for per-pod maps: an Application can span namespaces, so pod names
+ *  alone can collide. */
+export function podKey(pod: { namespace: string; name: string }): string {
+  return `${pod.namespace}/${pod.name}`;
 }
 
 function dashboardUrl(
@@ -203,7 +209,7 @@ export function buildGrafanaLinks({
   const nodeGroups = new Map<string, GrafanaLinkGroup>();
 
   const pods: GrafanaLinkGroup[] = podNodes.map((p) => {
-    const manifest = podManifests[p.name];
+    const manifest = podManifests[podKey(p)];
     const links: GrafanaLink[] = [
       {
         kind: "pod",
@@ -266,7 +272,7 @@ export function buildGrafanaLinks({
       nodeGroups.set(nodeName, { name: nodeName, detail: hostIP, links: nodeLinks });
     }
 
-    return { name: p.name, links, pending: !manifest && !!pendingPods?.has(p.name) };
+    return { name: p.name, links, pending: !manifest && !!pendingPods?.has(podKey(p)) };
   });
 
   const app: GrafanaLink[] = [];

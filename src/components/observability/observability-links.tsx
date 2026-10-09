@@ -310,7 +310,7 @@ function LinkChip({ link }: { link: ObservabilityLink }) {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`${link.label}: ${style.target}${link.range ? `, ${link.range.toLowerCase()}` : ""} (opens ${style.tool} in a new tab)`}
+            aria-label={`${link.label}: ${style.target}${range ? `, ${range.toLowerCase()}` : ""} (opens ${style.tool} in a new tab)`}
             className="group inline-flex h-7 max-w-full items-center gap-1.5 rounded-md border bg-background px-2 text-xs font-medium shadow-xs outline-none transition-colors hover:border-foreground/20 hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30 dark:hover:bg-input/50"
           />
         }
