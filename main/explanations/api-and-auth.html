@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>API and Authentication &#8212; argocd-monitor 1.1.0-beta.1-1-g0531413 documentation</title>
+    <title>API and Authentication &#8212; argocd-monitor 1.1.0-3-gd2ebf30 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=d4930f4c"></script>
+    <script src="../_static/documentation_options.js?v=5b61cb93"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -649,18 +649,31 @@ how the loop exits.</p></li>
 </section>
 <section id="the-react-hook">
 <h3><a class="toc-backref" href="#id14" role="doc-backlink">The React hook</a><a class="headerlink" href="#the-react-hook" title="Link to this heading">#</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">useLogs</span></code> (<code class="docutils literal notranslate"><span class="pre">src/hooks/use-logs.ts:15-90</span></code>) manages the stream lifecycle
+<p><code class="docutils literal notranslate"><span class="pre">useLogs</span></code> (<code class="docutils literal notranslate"><span class="pre">src/hooks/use-logs.ts</span></code>) manages the stream lifecycle
 inside a React component:</p>
 <ul class="simple">
 <li><p><strong>Start/stop</strong> – the <code class="docutils literal notranslate"><span class="pre">start</span></code> callback creates a new
 <code class="docutils literal notranslate"><span class="pre">AbortController</span></code>, clears accumulated lines, and kicks off the stream.
 The <code class="docutils literal notranslate"><span class="pre">stop</span></code> callback aborts the controller, resetting state.</p></li>
-<li><p><strong>Appending lines</strong> – each yielded entry is appended to state via
-<code class="docutils literal notranslate"><span class="pre">setLines(prev</span> <span class="pre">=&gt;</span> <span class="pre">[...prev,</span> <span class="pre">entry.content])</span></code>.</p></li>
+<li><p><strong>Appending lines</strong> – yielded entries are collected in a ref and
+flushed into state once per animation frame, so a burst of lines
+costs one render rather than one per line.</p></li>
+<li><p><strong>Bounded buffer</strong> – the viewer keeps the most recent <code class="docutils literal notranslate"><span class="pre">MAX_LINES</span></code>
+(10,000) lines and discards the oldest beyond that, so a long-running
+follow of a chatty pod cannot grow without limit. This applies even
+when “All lines” is selected in the tail control.</p></li>
 <li><p><strong>Auto-reconnect</strong> – when <code class="docutils literal notranslate"><span class="pre">follow</span></code> mode is enabled and the stream
 errors, the hook retries up to <code class="docutils literal notranslate"><span class="pre">MAX_RETRIES</span></code> (3) times with a
 2-second delay between attempts. A successful read resets the retry
 counter, so only <em>consecutive</em> failures count towards the limit.</p></li>
+<li><p><strong>Resume, not replay</strong> – the hook remembers the timestamp of the
+last entry it received. A reconnect asks for logs since that second
+(as a relative <code class="docutils literal notranslate"><span class="pre">sinceSeconds</span></code>, with slack for clock skew) and no
+<code class="docutils literal notranslate"><span class="pre">tailLines</span></code>, so nothing logged during the outage is missed. Kubernetes
+only resumes to the second, so the hook also remembers the entries it
+already holds from that second and drops the replayed copies on
+arrival; anything older than the resume point is dropped too, so a
+server that replays more than asked for still does not duplicate.</p></li>
 </ul>
 </section>
 </section>
