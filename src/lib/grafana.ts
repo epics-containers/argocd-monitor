@@ -299,13 +299,16 @@ export function buildGrafanaLinks({
   });
 
   const app: GrafanaLink[] = [];
-  // Explore queries are scoped to a single namespace; pods from the tree all
-  // live in the Application's destination namespace in practice, so group by
-  // the first pod's namespace and include only pods in it.
-  const ns = podNodes[0]?.namespace;
-  if (exploreLinks && ns) {
-    const names = podNodes.filter((p) => p.namespace === ns).map((p) => p.name);
-    const sel = podSelector(ns, names);
+  // One selector per namespace, joined with `or`: a single namespace=~ plus
+  // pod=~ would match any listed pod name in any listed namespace.
+  const byNs = new Map<string, string[]>();
+  for (const p of podNodes) byNs.set(p.namespace, [...(byNs.get(p.namespace) ?? []), p.name]);
+  if (exploreLinks && byNs.size > 0) {
+    const by = byNs.size > 1 ? "namespace, pod" : "pod";
+    const query = (series: (sel: string) => string) =>
+      [...byNs]
+        .map(([ns, names]) => `sum by (${by}) (${series(podSelector(ns, names))})`)
+        .join(" or ");
     app.push(
       {
         kind: "cpu",
@@ -313,7 +316,7 @@ export function buildGrafanaLinks({
         url: exploreUrl(
           baseUrl,
           dsUid,
-          `sum by (pod) (rate(container_cpu_usage_seconds_total{${sel}, container!=""}[5m]))`,
+          query((sel) => `rate(container_cpu_usage_seconds_total{${sel}, container!=""}[5m])`),
         ),
       },
       {
@@ -322,7 +325,7 @@ export function buildGrafanaLinks({
         url: exploreUrl(
           baseUrl,
           dsUid,
-          `sum by (pod) (container_memory_working_set_bytes{${sel}, container!=""})`,
+          query((sel) => `container_memory_working_set_bytes{${sel}, container!=""}`),
         ),
       },
       {
@@ -331,7 +334,7 @@ export function buildGrafanaLinks({
         url: exploreUrl(
           baseUrl,
           dsUid,
-          `sum by (pod) (kube_pod_container_status_restarts_total{${sel}})`,
+          query((sel) => `kube_pod_container_status_restarts_total{${sel}}`),
         ),
       },
     );

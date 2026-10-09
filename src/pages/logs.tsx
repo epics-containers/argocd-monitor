@@ -7,6 +7,7 @@ import { LogSearchBar } from "@/components/log-viewer/log-search-bar";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { useResourceTree } from "@/hooks/use-application";
 import { useLogs } from "@/hooks/use-logs";
+import { stripAnsi } from "@/lib/ansi";
 import { compileLogSearch, lineMatches, type LogSearchOptions } from "@/lib/log-search";
 
 export function LogsPage() {
@@ -68,8 +69,9 @@ export function LogsPage() {
   const hitLines = useMemo(() => {
     if (matcher.kind !== "ok") return [];
     const hits: number[] = [];
-    lines.forEach((text, i) => {
-      if (lineMatches(text, matcher.pattern)) hits.push(i);
+    // Match what is shown: colour codes must neither match nor split a word.
+    lines.forEach((line, i) => {
+      if (lineMatches(stripAnsi(line), matcher.pattern)) hits.push(i);
     });
     return hits;
   }, [lines, matcher]);
@@ -124,6 +126,7 @@ export function LogsPage() {
         onSearchChange={setSearch}
         matcher={compileLogSearch(search)}
         hitCount={hitLines.length}
+        pending={search !== deferredSearch}
         current={Math.max(hitIndex, 0)}
         onNext={() => step(1)}
         onPrevious={() => step(-1)}

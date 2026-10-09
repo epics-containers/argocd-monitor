@@ -178,6 +178,20 @@ describe("buildGrafanaLinks (i15-1-blueapi)", () => {
     );
   });
 
+  it("covers pods in every namespace, without pairing names across namespaces", () => {
+    const pod = I15_NODES.find((n) => n.name === "i15-1-blueapi-0")!;
+    const multi = buildGrafanaLinks({
+      baseUrl: I15_GRAFANA,
+      exploreLinks: true,
+      nodes: [pod, { ...pod, name: "other-0", namespace: "other", uid: "o" }],
+      podManifests: {},
+    });
+    expect(panesOf(multi.app[2].url).a.queries[0].expr).toBe(
+      `sum by (namespace, pod) (kube_pod_container_status_restarts_total{namespace="${I15_NS}", pod=~"^(i15-1-blueapi-0)$"})` +
+        ` or sum by (namespace, pod) (kube_pod_container_status_restarts_total{namespace="other", pod=~"^(other-0)$"})`,
+    );
+  });
+
   it("uses a custom datasource UID", () => {
     const custom = buildGrafanaLinks({
       baseUrl: I15_GRAFANA,

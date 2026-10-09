@@ -10,6 +10,8 @@ interface LogSearchBarProps {
   /** Number of lines with a hit, and the 0-based position of the current one. */
   hitCount: number;
   current: number;
+  /** The hits still describe the previous query (the search is catching up). */
+  pending?: boolean;
   onNext: () => void;
   onPrevious: () => void;
 }
@@ -54,6 +56,7 @@ export function LogSearchBar({
   matcher,
   hitCount,
   current,
+  pending,
   onNext,
   onPrevious,
 }: LogSearchBarProps) {
@@ -72,6 +75,8 @@ export function LogSearchBar({
             value={search.query}
             onChange={(e) => set({ query: e.target.value })}
             onKeyDown={(e) => {
+              // Enter / Esc confirm or cancel an IME candidate mid-composition.
+              if (e.nativeEvent.isComposing) return;
               if (e.key === "Enter") {
                 e.preventDefault();
                 if (e.shiftKey) onPrevious();
@@ -120,7 +125,9 @@ export function LogSearchBar({
               className="min-w-20 text-right text-sm text-muted-foreground tabular-nums"
               aria-live="polite"
             >
-              {hitCount === 0
+              {pending
+                ? "…"
+                : hitCount === 0
                 ? "No results"
                 : `${(current + 1).toLocaleString()} of ${hitCount.toLocaleString()}`}
             </span>
@@ -129,7 +136,7 @@ export function LogSearchBar({
               aria-label="Previous match"
               title="Previous match (Shift+Enter)"
               onClick={onPrevious}
-              disabled={hitCount === 0}
+              disabled={pending || hitCount === 0}
               className={nav}
             >
               <ChevronUp className="h-4 w-4" />
@@ -139,7 +146,7 @@ export function LogSearchBar({
               aria-label="Next match"
               title="Next match (Enter)"
               onClick={onNext}
-              disabled={hitCount === 0}
+              disabled={pending || hitCount === 0}
               className={nav}
             >
               <ChevronDown className="h-4 w-4" />

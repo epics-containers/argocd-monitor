@@ -42,4 +42,23 @@ describe("LogViewer", () => {
 
     expect(container.querySelector('[aria-current="true"]')).toHaveAttribute("data-line", "1");
   });
+
+  it("renders ANSI colours instead of escape codes", () => {
+    const { container } = render(
+      <LogViewer lines={["\x1b[38;2;255;176;0mWARNING\x1b[0m done"]} follow={false} />,
+    );
+
+    expect(container.textContent).not.toContain("\x1b");
+    expect(screen.getByText("WARNING")).toHaveStyle({ color: "rgb(255, 176, 0)" });
+  });
+
+  it("highlights search hits across colour boundaries", () => {
+    const { container } = render(
+      <LogViewer lines={["\x1b[32mWAR\x1b[0mNING"]} follow={false} highlight={/warning/gi} />,
+    );
+
+    const marks = [...container.querySelectorAll("mark")].map((m) => m.textContent);
+    expect(marks.join("")).toBe("WARNING");
+  });
 });
+
