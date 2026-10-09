@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 helm upgrade --install test-argocd-monitor oci://ghcr.io/epics-containers/charts/argocd-monitor \
-    --version 1.0.0-beta.2 \
+    --version 1.1.0 \
     --namespace argocd-monitor \
     -f "$SCRIPT_DIR/beamline-namespaces.yaml" \
     --set oauth2Proxy.enabled=true \
