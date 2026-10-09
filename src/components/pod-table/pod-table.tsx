@@ -126,12 +126,12 @@ export function PodTable({ appName, appNamespace, destination, nodes, onRestart 
           <Table className="min-w-[52rem]">
             <TableHeader>
               <TableRow className="text-xs hover:bg-transparent [&_th]:text-muted-foreground">
-                {sortHeader("status", "Status", "w-32 pl-4")}
+                {sortHeader("status", "Status", "w-32 pl-5")}
                 {sortHeader("name", "Pod")}
                 <TableHead className="w-16">Ready</TableHead>
                 <TableHead className="w-20">Restarts</TableHead>
                 {sortHeader("age", "Age", "w-16")}
-                <TableHead className="w-44 pr-4 text-right">Actions</TableHead>
+                <TableHead className="w-44 pr-5 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             {groups.map((g) => {
@@ -143,7 +143,7 @@ export function PodTable({ appName, appNamespace, destination, nodes, onRestart 
                 >
                   {hasWorkloads && (
                     <TableRow className="bg-muted/40 hover:bg-muted/40">
-                      <th scope="rowgroup" colSpan={COLUMNS} className="px-4 py-2 text-left font-normal">
+                      <th scope="rowgroup" colSpan={COLUMNS} className="px-5 py-2.5 text-left font-normal">
                         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                           {g.workload ? (
                             <div className="flex min-w-0 items-baseline gap-2">
@@ -168,7 +168,7 @@ export function PodTable({ appName, appNamespace, destination, nodes, onRestart 
                   )}
                   {g.pods.length === 0 ? (
                     <TableRow className="hover:bg-transparent">
-                      <TableCell colSpan={COLUMNS} className="px-4 text-muted-foreground">
+                      <TableCell colSpan={COLUMNS} className="px-5 py-3 text-muted-foreground">
                         No pods running.
                       </TableCell>
                     </TableRow>
@@ -253,8 +253,8 @@ function PodRow({
   }
 
   return (
-    <TableRow>
-      <TableCell className="pl-4">
+    <TableRow className="[&>td]:py-3">
+      <TableCell className="pl-5">
         <span className="inline-flex items-center gap-2">
           <span
             aria-hidden
@@ -289,7 +289,7 @@ function PodRow({
       <TableCell className="text-muted-foreground" title={pod.createdAt ?? ""}>
         {formatAge(pod.createdAt)}
       </TableCell>
-      <TableCell className="pr-4">
+      <TableCell className="pr-5">
         <div className="flex items-center justify-end gap-1">
           <Link
             to={logsHref}

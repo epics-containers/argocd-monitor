@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import type { HealthStatusCode, SyncStatusCode } from "@/types/application";
 
 const healthColors: Record<HealthStatusCode, string> = {
@@ -30,4 +31,39 @@ export function SyncBadge({ status }: { status: SyncStatusCode }) {
       {status}
     </Badge>
   );
+}
+
+// Quieter dot-and-word form for page headers, where a row of tinted pills
+// competes with the content. Progressing is an open ring so it differs from
+// Healthy by shape as well as colour.
+const healthDots: Record<HealthStatusCode, string> = {
+  Healthy: "bg-emerald-500",
+  Degraded: "bg-red-500",
+  Progressing: "border-2 border-blue-500",
+  Suspended: "bg-gray-400",
+  Missing: "bg-amber-500",
+  Unknown: "border-2 border-gray-400",
+};
+
+const syncDots: Record<SyncStatusCode, string> = {
+  Synced: "bg-emerald-500",
+  OutOfSync: "bg-amber-500",
+  Unknown: "border-2 border-gray-400",
+};
+
+function StatusDot({ dot, label }: { dot: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <span aria-hidden className={cn("size-2 shrink-0 rounded-full", dot)} />
+      {label}
+    </span>
+  );
+}
+
+export function HealthDot({ status }: { status: HealthStatusCode }) {
+  return <StatusDot dot={healthDots[status] ?? healthDots.Unknown} label={status} />;
+}
+
+export function SyncDot({ status }: { status: SyncStatusCode }) {
+  return <StatusDot dot={syncDots[status] ?? syncDots.Unknown} label={status} />;
 }

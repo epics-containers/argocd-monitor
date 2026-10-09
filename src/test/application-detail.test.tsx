@@ -87,7 +87,7 @@ describe("ApplicationDetailPage", () => {
 
     renderPage();
 
-    expect(screen.getByText("test-app")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "test-app" })).toBeInTheDocument();
     expect(screen.getByText("Healthy")).toBeInTheDocument();
     expect(screen.getByText("Synced")).toBeInTheDocument();
   });

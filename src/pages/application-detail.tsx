@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useParams, useSearchParams, Link } from "react-router";
-import { ArrowLeft, Loader2, Play, Square } from "lucide-react";
+import { Loader2, Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { HealthBadge, SyncBadge } from "@/components/app-table/status-badge";
+import { HealthDot, SyncDot } from "@/components/app-table/status-badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { PodTable } from "@/components/pod-table/pod-table";
@@ -11,6 +11,8 @@ import { useApplication, useResourceTree } from "@/hooks/use-application";
 import { useRestartPod } from "@/hooks/use-restart-pod";
 import { useSetEnabled } from "@/hooks/use-set-enabled";
 import { useStoppableWorkload } from "@/hooks/use-stoppable-workload";
+import { formatAge } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import type { ResourceNode } from "@/types/resource";
 
 const EMPTY_NODES: ResourceNode[] = [];
@@ -105,115 +107,133 @@ export function ApplicationDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Link
-          to={backTo}
-          className="inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-sm font-medium hover:bg-muted"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Link>
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="space-y-2">
-            <h2 className="text-2xl font-semibold tracking-tight">
+      <div className="space-y-3">
+        <nav aria-label="Breadcrumb">
+          <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <li>
+              <Link
+                to={backTo}
+                className="rounded-sm outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+              >
+                Applications
+              </Link>
+            </li>
+            <li aria-hidden>/</li>
+            <li aria-current="page" className="truncate text-foreground">
               {app.metadata.name}
-            </h2>
-            <div className="flex items-center gap-3">
-              <HealthBadge status={app.status.health?.status ?? "Unknown"} />
-              <SyncBadge status={app.status.sync?.status ?? "Unknown"} />
-              <Badge variant="secondary">project: {app.spec.project}</Badge>
-              {namespace && <Badge variant="outline">ns: {namespace}</Badge>}
+            </li>
+          </ol>
+        </nav>
+
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0 space-y-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="font-mono text-2xl font-semibold tracking-tight break-all">
+                {app.metadata.name}
+              </h2>
               {pendingAction ? (
                 <Badge variant="outline" className="gap-1">
                   <Loader2 className="h-3 w-3 animate-spin" />
                   {pendingAction === "starting" ? "Starting..." : "Stopping..."}
                 </Badge>
               ) : (
-                isStopped && <Badge variant="destructive">Stopped</Badge>
+                isStopped && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Square className="fill-current" />
+                    Stopped
+                  </Badge>
+                )
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              <HealthDot status={app.status.health?.status ?? "Unknown"} />
+              <SyncDot status={app.status.sync?.status ?? "Unknown"} />
+              <span aria-hidden className="h-3.5 w-px bg-border" />
+              <span className="text-muted-foreground">
+                project <span className="text-foreground">{app.spec.project}</span>
+              </span>
+              {namespace && (
+                <span className="text-muted-foreground">
+                  namespace <span className="text-foreground">{namespace}</span>
+                </span>
               )}
             </div>
           </div>
           {stoppable && (
             pendingAction ? (
-              <Button variant="outline" size="sm" disabled>
-                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              <Button variant="outline" disabled>
+                <Loader2 className="animate-spin" />
                 {pendingAction === "starting" ? "Starting..." : "Stopping..."}
               </Button>
             ) : isStopped ? (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() => applyEnabled(true)}
-              >
-                <Play className="mr-1 h-4 w-4" />
+              <Button onClick={() => applyEnabled(true)}>
+                <Play />
                 Start
               </Button>
             ) : (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setStopConfirmOpen(true)}
-              >
-                <Square className="mr-1 h-4 w-4" />
+              // Calm until confirmed: the confirm dialog carries the danger.
+              <Button variant="outline" onClick={() => setStopConfirmOpen(true)}>
+                <Square className="text-destructive" />
                 Stop
               </Button>
             )
           )}
         </div>
+      </div>
 
-        <div className="rounded-md border p-4">
-          <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
-            {app.spec.source?.repoURL && (
-              <div>
-                <dt className="font-medium text-muted-foreground">Repository</dt>
-                <dd className="mt-0.5 truncate" title={app.spec.source.repoURL}>
-                  {app.spec.source.repoURL}
-                </dd>
-              </div>
-            )}
-            {app.spec.source?.targetRevision && (
-              <div>
-                <dt className="font-medium text-muted-foreground">Target Revision</dt>
-                <dd className="mt-0.5 font-mono text-xs">{app.spec.source.targetRevision}</dd>
-              </div>
-            )}
-            {app.spec.source?.path && (
-              <div>
-                <dt className="font-medium text-muted-foreground">Path</dt>
-                <dd className="mt-0.5 font-mono text-xs">{app.spec.source.path}</dd>
-              </div>
-            )}
-            <div>
-              <dt className="font-medium text-muted-foreground">Destination</dt>
-              <dd className="mt-0.5 truncate" title={app.spec.destination.server ?? app.spec.destination.name ?? ""}>
-                {app.spec.destination.name ?? app.spec.destination.server ?? "-"}
-                {namespace ? ` / ${namespace}` : ""}
-              </dd>
-            </div>
-            {app.metadata.creationTimestamp && (
-              <div>
-                <dt className="font-medium text-muted-foreground">Created</dt>
-                <dd className="mt-0.5">{new Date(app.metadata.creationTimestamp).toLocaleString()}</dd>
-              </div>
-            )}
-            {app.status.operationState && (
-              <div>
-                <dt className="font-medium text-muted-foreground">Last Sync</dt>
-                <dd className="mt-0.5">
-                  <span className="mr-1.5">{app.status.operationState.phase}</span>
-                  {app.status.operationState.finishedAt && (
-                    <span className="text-muted-foreground">
-                      {new Date(app.status.operationState.finishedAt).toLocaleString()}
-                    </span>
-                  )}
-                </dd>
-              </div>
-            )}
-          </dl>
-        </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <DetailCard title="Source">
+          {app.spec.source?.repoURL && (
+            <Detail label="Repository">
+              {/^https?:\/\//.test(app.spec.source.repoURL) ? (
+                <a
+                  href={app.spec.source.repoURL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={app.spec.source.repoURL}
+                  className="hover:underline"
+                >
+                  {app.spec.source.repoURL.replace(/^https?:\/\//, "")}
+                </a>
+              ) : (
+                <span title={app.spec.source.repoURL}>{app.spec.source.repoURL}</span>
+              )}
+            </Detail>
+          )}
+          {app.spec.source?.targetRevision && (
+            <Detail label="Revision" mono>
+              {app.spec.source.targetRevision}
+            </Detail>
+          )}
+          {app.spec.source?.path && (
+            <Detail label="Path" mono>
+              {app.spec.source.path}
+            </Detail>
+          )}
+        </DetailCard>
+        <DetailCard title="Deployment">
+          <Detail
+            label="Destination"
+            title={app.spec.destination.server ?? app.spec.destination.name ?? ""}
+          >
+            {app.spec.destination.name ?? app.spec.destination.server ?? "-"}
+            {namespace && <span className="text-muted-foreground"> / </span>}
+            {namespace}
+          </Detail>
+          {app.status.operationState && (
+            <Detail label="Last sync">
+              {app.status.operationState.phase}
+              {app.status.operationState.finishedAt && (
+                <When timestamp={app.status.operationState.finishedAt} />
+              )}
+            </Detail>
+          )}
+          {app.metadata.creationTimestamp && (
+            <Detail label="Created">
+              <When timestamp={app.metadata.creationTimestamp} first />
+            </Detail>
+          )}
+        </DetailCard>
       </div>
 
       {restartError && (
@@ -285,5 +305,57 @@ export function ApplicationDetailPage() {
         }}
       />
     </div>
+  );
+}
+
+function DetailCard({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section
+      aria-label={title}
+      className="space-y-3 rounded-xl border bg-muted/40 px-5 py-4"
+    >
+      <h3 className="text-sm text-muted-foreground">{title}</h3>
+      <dl className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">{children}</dl>
+    </section>
+  );
+}
+
+function Detail({
+  label,
+  mono,
+  title,
+  children,
+}: {
+  label: string;
+  mono?: boolean;
+  title?: string;
+  children: ReactNode;
+}) {
+  return (
+    <>
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className={cn("truncate", mono && "font-mono text-[0.8rem]")} title={title}>
+        {children}
+      </dd>
+    </>
+  );
+}
+
+/** Relative age, with the absolute time in the tooltip. `first` leads with the
+ *  age ("7 months ago · 12 Mar 2026"); otherwise it follows other text. */
+function When({ timestamp, first }: { timestamp: string; first?: boolean }) {
+  const date = new Date(timestamp);
+  const age = `${formatAge(timestamp)} ago`;
+  return (
+    <span title={date.toLocaleString()}>
+      {first ? (
+        <>
+          {age}
+          <span className="text-muted-foreground"> · {date.toLocaleDateString()}</span>
+        </>
+      ) : (
+        <span className="text-muted-foreground"> · {age}</span>
+      )}
+    </span>
   );
 }
