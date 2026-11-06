@@ -80,9 +80,9 @@ export function ApplicationDetailPage() {
   const namespace = app.spec.destination.namespace ?? "";
   const parentNamespace = app.metadata.namespace;
   // The ioc-instance chart labels the workload with `domain`, which equals the
-  // parent Application's name. Fall back to the older convention - child app
-  // namespace `<beamline>-beamline` is deployed by a parent Application named
-  // `<beamline>` - for workloads without the label (see #44).
+  // parent Application's name. Workloads without the label fall back to the
+  // namespace with `-beamline` stripped: child app namespace `<beamline>-beamline`
+  // is deployed by a parent Application named `<beamline>` (see #44).
   const parentName = stoppable?.domain ?? parentNamespace.replace(/-beamline$/, "");
   const parentSource = stoppable?.domain
     ? "from the workload's domain label"
