@@ -1,6 +1,6 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useParams, useSearchParams, Link } from "react-router";
-import { Loader2, Play, Square } from "lucide-react";
+import { Loader2, Play, RotateCcw, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { HealthDot, SyncDot } from "@/components/app-table/status-badge";
@@ -8,7 +8,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { PodTable } from "@/components/pod-table/pod-table";
 import { useApplication, useResourceTree } from "@/hooks/use-application";
-import { useRestartPod } from "@/hooks/use-restart-pod";
+import { useRestartAllPods, useRestartPod } from "@/hooks/use-restart-pod";
 import { useSetEnabled } from "@/hooks/use-set-enabled";
 import { useStoppableWorkload } from "@/hooks/use-stoppable-workload";
 import { formatAge } from "@/lib/format";
@@ -16,6 +16,9 @@ import { cn } from "@/lib/utils";
 import type { ResourceNode } from "@/types/resource";
 
 const EMPTY_NODES: ResourceNode[] = [];
+
+/** Pod owners whose controllers recreate a deleted pod. */
+const RESTARTABLE_OWNERS = new Set(["ReplicaSet", "StatefulSet", "DaemonSet"]);
 
 export function ApplicationDetailPage() {
   const { name } = useParams<{ name: string }>();
@@ -32,10 +35,12 @@ export function ApplicationDetailPage() {
   const { data: tree, isLoading: treeLoading } = useResourceTree(name!, appNamespace, pollInterval);
   const { data: stoppable, error: stoppableError } = useStoppableWorkload(name!, appNamespace);
   const restartMutation = useRestartPod();
+  const restartAllMutation = useRestartAllPods();
   const setEnabledMutation = useSetEnabled();
 
   const [restartTarget, setRestartTarget] = useState<ResourceNode | null>(null);
   const [restartError, setRestartError] = useState<string | null>(null);
+  const [restartAllConfirmOpen, setRestartAllConfirmOpen] = useState(false);
   const [stopConfirmOpen, setStopConfirmOpen] = useState(false);
   const [setEnabledError, setSetEnabledError] = useState<string | null>(null);
 
@@ -65,6 +70,16 @@ export function ApplicationDetailPage() {
   }, [isSettling]);
   const tableFilters = sessionStorage.getItem("tableFilters");
   const backTo = tableFilters ? `/?${tableFilters}` : "/";
+  const pods = useMemo(() => tree?.nodes?.filter((n) => n.kind === "Pod") ?? [], [tree?.nodes]);
+
+  // Only pods owned by a controller that recreates them can be "restarted" by
+  // deleting them. Job-owned (e.g. CronJob history) and bare pods would simply
+  // be destroyed, so Restart all leaves them out.
+  const restartablePods = useMemo(
+    () => pods.filter((p) => p.parentRefs?.some((r) => RESTARTABLE_OWNERS.has(r.kind))),
+    [pods],
+  );
+
   if (appLoading || treeLoading) {
     return <LoadingSpinner message="Loading application..." />;
   }
@@ -165,25 +180,33 @@ export function ApplicationDetailPage() {
               )}
             </div>
           </div>
-          {stoppable && (
-            pendingAction ? (
-              <Button variant="outline" disabled>
-                <Loader2 className="animate-spin" />
-                {pendingAction === "starting" ? "Starting..." : "Stopping..."}
+          <div className="flex items-center gap-2">
+            {restartablePods.length > 1 && !isStopped && !pendingAction && (
+              <Button variant="outline" onClick={() => setRestartAllConfirmOpen(true)}>
+                <RotateCcw />
+                Restart all
               </Button>
-            ) : isStopped ? (
-              <Button onClick={() => applyEnabled(true)}>
-                <Play />
-                Start
-              </Button>
-            ) : (
-              // Calm until confirmed: the confirm dialog carries the danger.
-              <Button variant="outline" onClick={() => setStopConfirmOpen(true)}>
-                <Square className="text-destructive" />
-                Stop
-              </Button>
-            )
-          )}
+            )}
+            {stoppable && (
+              pendingAction ? (
+                <Button variant="outline" disabled>
+                  <Loader2 className="animate-spin" />
+                  {pendingAction === "starting" ? "Starting..." : "Stopping..."}
+                </Button>
+              ) : isStopped ? (
+                <Button onClick={() => applyEnabled(true)}>
+                  <Play />
+                  Start
+                </Button>
+              ) : (
+                // Calm until confirmed: the confirm dialog carries the danger.
+                <Button variant="outline" onClick={() => setStopConfirmOpen(true)}>
+                  <Square className="text-destructive" />
+                  Stop
+                </Button>
+              )
+            )}
+          </div>
         </div>
       </div>
 
@@ -277,6 +300,36 @@ export function ApplicationDetailPage() {
         variant="destructive"
         loading={setEnabledMutation.isPending}
         onConfirm={() => applyEnabled(false)}
+      />
+
+      <ConfirmDialog
+        open={restartAllConfirmOpen}
+        onOpenChange={setRestartAllConfirmOpen}
+        title="Restart All Pods"
+        description={`Restart all ${restartablePods.length} pods of "${app.metadata.name}"? This will delete every pod and Kubernetes will recreate them.`}
+        confirmLabel="Restart all"
+        variant="destructive"
+        loading={restartAllMutation.isPending}
+        onConfirm={() => {
+          setRestartError(null);
+          restartAllMutation.mutate(
+            {
+              appName: name!,
+              pods: restartablePods.map((p) => ({ name: p.name, namespace: p.namespace })),
+              appNamespace,
+            },
+            {
+              onSuccess: () => {
+                setRestartAllConfirmOpen(false);
+                setIsSettling(true);
+              },
+              onError: (err) => {
+                setRestartAllConfirmOpen(false);
+                setRestartError(err.message);
+              },
+            },
+          );
+        }}
       />
 
       <ConfirmDialog

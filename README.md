@@ -18,6 +18,7 @@ Releases        | <https://github.com/epics-containers/argocd-monitor/releases>
 - Detailed application view with pod info, images, and age
 - Pod log streaming with container selection
 - Pod restart with confirmation dialog
+- Restart all pods of a multi-pod service in one action
 - Start/Stop services (writes `services.<svc>.enabled=<bool>` to the parent application)
 - Automatic token refresh for uninterrupted sessions
 - Light and dark theme support
