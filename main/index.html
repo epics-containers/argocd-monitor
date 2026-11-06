@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>ArgoCD Monitor &#8212; argocd-monitor 1.2.0-2-g4a9bf3c documentation</title>
+    <title>ArgoCD Monitor &#8212; argocd-monitor 1.2.0-6-g7c6dce7 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=65d50845"></script>
+    <script src="_static/documentation_options.js?v=b7186896"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -470,6 +470,11 @@ p, role:argocd-monitor, applications, override, */*, allow
 <p>Scope the project/object glob to whatever subset of applications you want operators to be
 able to stop. If your ArgoCD version still requires the broader <code class="docutils literal notranslate"><span class="pre">applications,</span> <span class="pre">update</span></code>
 action for parameter-only updates, swap <code class="docutils literal notranslate"><span class="pre">override</span></code> for <code class="docutils literal notranslate"><span class="pre">update</span></code>.</p>
+<p>The parent application is found from the <code class="docutils literal notranslate"><span class="pre">domain</span></code> label on the service’s StatefulSet/Deployment,
+which the ec <code class="docutils literal notranslate"><span class="pre">ioc-instance</span></code> chart sets from the IOC’s <code class="docutils literal notranslate"><span class="pre">domain</span></code> value or <code class="docutils literal notranslate"><span class="pre">global.domain</span></code>.
+<strong>That label must equal the parent (root) ArgoCD Application’s name.</strong> Workloads without the
+label fall back to the namespace with <code class="docutils literal notranslate"><span class="pre">-beamline</span></code> stripped: a child app in namespace
+<code class="docutils literal notranslate"><span class="pre">&lt;name&gt;-beamline</span></code> has a parent Application called <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code>.</p>
 </section>
 <section id="how-the-documentation-is-structured">
 <h2>How the documentation is structured<a class="headerlink" href="#how-the-documentation-is-structured" title="Link to this heading">#</a></h2>
