@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { deletePod } from "@/api/resources";
 
 interface RestartParams {
@@ -8,6 +8,12 @@ interface RestartParams {
   appNamespace?: string;
 }
 
+function invalidateAppQueries(queryClient: QueryClient, appName: string) {
+  void queryClient.invalidateQueries({ queryKey: ["resourceTree", appName] });
+  void queryClient.invalidateQueries({ queryKey: ["application", appName] });
+  void queryClient.invalidateQueries({ queryKey: ["applications"] });
+}
+
 export function useRestartPod() {
   const queryClient = useQueryClient();
 
@@ -15,15 +21,7 @@ export function useRestartPod() {
     mutationFn: ({ appName, podName, namespace, appNamespace }: RestartParams) =>
       deletePod(appName, podName, namespace, appNamespace),
     onSuccess: (_data, variables) => {
-      void queryClient.invalidateQueries({
-        queryKey: ["resourceTree", variables.appName],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: ["application", variables.appName],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: ["applications"],
-      });
+      invalidateAppQueries(queryClient, variables.appName);
     },
   });
 }
@@ -55,15 +53,7 @@ export function useRestartAllPods() {
       }
     },
     onSettled: (_data, _error, variables) => {
-      void queryClient.invalidateQueries({
-        queryKey: ["resourceTree", variables.appName],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: ["application", variables.appName],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: ["applications"],
-      });
+      invalidateAppQueries(queryClient, variables.appName);
     },
   });
 }

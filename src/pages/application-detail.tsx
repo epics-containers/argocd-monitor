@@ -306,7 +306,7 @@ export function ApplicationDetailPage() {
         open={restartAllConfirmOpen}
         onOpenChange={setRestartAllConfirmOpen}
         title="Restart All Pods"
-        description={`Restart all ${restartablePods.length} pods of "${app.metadata.name}"? This will delete every pod and Kubernetes will recreate them.`}
+        description={`Restart all ${restartablePods.length} pods of "${app.metadata.name}"? This deletes every pod owned by a ReplicaSet, StatefulSet or DaemonSet, all at once, and Kubernetes recreates them. Job-owned and bare pods are skipped.`}
         confirmLabel="Restart all"
         variant="destructive"
         loading={restartAllMutation.isPending}
